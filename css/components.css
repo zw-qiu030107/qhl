@@ -243,12 +243,6 @@
   margin: 4px 0;
 }
 
-/* 入场动画 */
-@keyframes msgIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
 /* ================================
    底部输入栏
    ================================ */
