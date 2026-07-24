@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/animations.css">
   <link rel="stylesheet" href="css/notifications.css">
+  <link rel="stylesheet" href="css/modals.css">
 </head>
 <body>
   <header id="topnav">
@@ -244,8 +245,95 @@
   </footer>
 
   <!-- Overlay containers -->
-  <div id="modal-overlay" class="modal-overlay hidden"></div>
   <div id="toast-container" class="toast-container"></div>
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <!-- 角色卡管理 -->
+    <div class="modal hidden" id="modal-char-manager">
+      <div class="modal-header">
+        <h3>角色卡管理</h3>
+        <button class="modal-close" onclick="ModalManager.close()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="char-card-list" style="display:flex;flex-direction:column;gap:8px">
+          <!-- 动态渲染 -->
+        </div>
+        <div class="drop-zone" id="char-drop-zone">
+          <p>拖拽 JSON 角色卡文件到此处导入</p>
+          <input type="file" accept=".json" id="char-file-input" style="display:none">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="ModalManager.close()">关闭</button>
+      </div>
+    </div>
+
+    <!-- 角色卡编辑器 -->
+    <div class="modal hidden wide" id="modal-char-editor">
+      <div class="modal-header">
+        <h3>角色卡编辑器</h3>
+        <div class="modal-header-right">
+          <button id="editor-toggle-view" class="btn btn-secondary btn-sm">JSON 视图</button>
+          <button class="modal-close" onclick="ModalManager.close()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="modal-body" id="char-editor-body">
+        <!-- 可视化表单 -->
+        <div id="editor-form-view">
+          <div class="char-editor-form">
+            <div class="editor-field">
+              <label>名称</label>
+              <input type="text" id="editor-name" placeholder="角色名称">
+            </div>
+            <div class="editor-field">
+              <label>描述</label>
+              <textarea id="editor-description" rows="2" placeholder="简短的角色描述"></textarea>
+            </div>
+            <div class="editor-field">
+              <label>性格</label>
+              <textarea id="editor-personality" class="tall" rows="3" placeholder="性格描述，可包含行为模式、说话风格等"></textarea>
+            </div>
+            <div class="editor-field">
+              <label>场景</label>
+              <textarea id="editor-scenario" rows="2" placeholder="初始场景设定"></textarea>
+            </div>
+            <div class="editor-field">
+              <label>首次问候</label>
+              <textarea id="editor-first-mes" class="tall" rows="3" placeholder="角色说的第一句话"></textarea>
+            </div>
+            <div class="editor-field">
+              <label>对话示例</label>
+              <textarea id="editor-mes-example" class="x-tall" rows="4" placeholder="&#60;START&#62;\n{{user}}: 你好\n{{char}}: 你好呀，今天过得怎么样？"></textarea>
+            </div>
+            <div class="editor-field">
+              <label>健谈程度</label>
+              <div class="range-row">
+                <input type="range" id="editor-talkativeness" min="0" max="100" value="50">
+                <span class="range-value" id="editor-talkativeness-val">50</span>
+              </div>
+            </div>
+            <div class="editor-field">
+              <label>标签</label>
+              <div class="tags-container" id="editor-tags-container">
+                <input type="text" class="tag-input-inline" id="editor-tags-input" placeholder="输入标签后按 Enter 添加">
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- JSON 视图（默认隐藏） -->
+        <div id="editor-json-view" style="display:none">
+          <textarea class="json-editor-textarea" id="editor-json-textarea" spellcheck="false"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="ModalManager.close()">取消</button>
+        <button class="btn btn-primary" id="editor-save">保存</button>
+      </div>
+    </div>
+  </div>
 
   <script src="js/utils.js"></script>
   <script src="js/storage.js"></script>
