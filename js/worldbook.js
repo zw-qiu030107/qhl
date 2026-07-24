@@ -26,43 +26,12 @@ const WorldBook = {
   init() {
     this.container = document.getElementById('wb-list');
     const stored = window.storage?.get('worldbook_entries');
-    if (stored && stored.length > 0) {
-      this.entries = stored;
-    } else {
-      this.loadDefaults();
-    }
+    this.entries = (stored && stored.length > 0) ? stored : [];
     this.render();
     this.bindToolbar();
   },
 
-  loadDefaults() {
-    this.entries = [
-      {
-        id: utils.uid(), name: '自建房五层',
-        keywords: ['五楼', '四楼', '自建房', '楼梯', '走廊'],
-        content: '一栋五层自建房，邱惠玲住在五楼，堂哥住在四楼。楼梯间有声控灯，四楼房門常不关紧。',
-        weight: 100, insertPosition: 'before_char', depth: 0, outletName: '',
-        triggerCondition: 'keyword', enabled: true, order: 0
-      },
-      {
-        id: utils.uid(), name: '母亲小娟',
-        keywords: ['母亲', '小娟', '妈妈', '继父'],
-        content: '母亲小娟与抠门继父对邱惠玲刻薄冷淡，经常外出将她独自留在家中。',
-        weight: 80, insertPosition: 'after_char', depth: 0, outletName: '',
-        triggerCondition: 'keyword', enabled: true, order: 1
-      },
-      {
-        id: utils.uid(), name: '堂哥关系',
-        keywords: ['堂哥', '哥', '依赖', '零花钱'],
-        content: '堂哥是邱惠玲唯一的心理依赖和情感寄托，常通过撒娇获取关爱与零花钱。关系极度信任。',
-        weight: 90, insertPosition: 'before_char', depth: 0, outletName: '',
-        triggerCondition: 'keyword', enabled: true, order: 2
-      },
-    ];
-    this.save();
-  },
-
-  // ---- CRUD (simplified) ----
+  // ---- CRUD ----
 
   getAll() {
     return this.entries;
@@ -115,6 +84,10 @@ const WorldBook = {
     if (el) el.textContent = `${count} 条条目`;
 
     this.container.innerHTML = '';
+    if (count === 0) {
+      this.container.innerHTML = '<div style="text-align:center;padding:48px 16px;color:var(--text-muted);font-size:13px">暂无世界书条目<br><span style="font-size:11px;color:var(--text-dim)">点击"+ 新建"或"导入"添加</span></div>';
+      return;
+    }
     this.entries.forEach(entry => {
       this.container.appendChild(this.renderEntry(entry));
     });
