@@ -401,7 +401,9 @@ const CharacterEditor = {
     if (typeof window.notifications !== 'undefined') {
       window.notifications.show('success', '已保存', `角色卡「${card.name}」已更新`);
     }
-    ModalManager.close();
+    if (typeof ModalManager !== 'undefined') {
+      ModalManager.close();
+    }
   },
 
   showFormView() {
