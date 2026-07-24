@@ -449,3 +449,183 @@
 .toggle-btn.active .toggle-thumb {
   transform: translateX(20px);
 }
+
+/* ================================
+   世界书 (World Book)
+   ================================ */
+.wb-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.wb-toolbar .wb-count { font-size: 11px; color: var(--text-tertiary); }
+
+.wb-toolbar .wb-actions { display: flex; gap: var(--space-sm); }
+
+.wb-toolbar .wb-actions button {
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast);
+}
+
+.wb-toolbar .wb-actions button:hover { color: var(--text-secondary); }
+
+.wb-toolbar .btn-add {
+  font-size: 11px;
+  padding: 4px 10px;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+/* 条目卡片 */
+.wb-entry {
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  margin-bottom: var(--space-sm);
+  transition: border-color var(--transition-fast);
+}
+
+.wb-entry.editing { border-color: var(--border-active); }
+
+.wb-entry-header {
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-hover);
+  cursor: pointer;
+  user-select: none;
+}
+
+.wb-entry-header .entry-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wb-entry-header .entry-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.wb-entry-header .entry-status {
+  width: 6px; height: 6px;
+  border-radius: var(--radius-full);
+}
+
+.wb-entry-header .entry-status.enabled { background: var(--success); }
+.wb-entry-header .entry-status.disabled { background: var(--text-dim); }
+
+.wb-entry-body {
+  display: none;
+  padding: 10px 12px;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wb-entry.editing .wb-entry-body { display: flex; }
+
+.wb-entry-body .wb-field label {
+  display: block;
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-bottom: 3px;
+}
+
+.wb-entry-body .wb-field input,
+.wb-entry-body .wb-field textarea,
+.wb-entry-body .wb-field select {
+  width: 100%;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.wb-entry-body .wb-field textarea {
+  min-height: 48px;
+  resize: vertical;
+}
+
+/* 关键词标签 */
+.wb-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.wb-keyword-tag {
+  padding: 2px 8px;
+  background: var(--bg-hover);
+  border-radius: 10px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.wb-keyword-tag .kw-remove {
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.wb-keyword-input {
+  background: var(--bg-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  width: 80px !important;
+  border-radius: 10px !important;
+  padding: 2px 8px !important;
+  font-size: 11px !important;
+}
+
+/* 深度和出口名称（条件显示） */
+.wb-conditional { display: none; }
+.wb-conditional.show { display: flex; gap: var(--space-sm); }
+
+.wb-entry-actions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: flex-end;
+  border-top: 1px solid var(--border-color);
+  padding-top: 8px;
+}
+
+.wb-entry-actions button {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.wb-btn-save { background: var(--accent); color: var(--bg-primary); }
+.wb-btn-cancel { color: var(--text-muted); }
+.wb-btn-delete { color: var(--danger); }
+
+/* 删除确认 */
+.wb-delete-confirm {
+  background: var(--danger-bg);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  font-size: 11px;
+  margin-bottom: var(--space-sm);
+}
