@@ -129,7 +129,58 @@
       <div id="chat-messages"></div>
     </main>
     <aside id="right-panel">
-      <!-- Task 4 fills this -->
+      <!-- Tab Bar -->
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="tab-character">角色设定</button>
+        <button class="tab-btn" data-tab="tab-worldbook">世界书</button>
+        <button class="tab-btn" data-tab="tab-settings">对话设置</button>
+      </div>
+
+      <!-- Tab: 角色设定 -->
+      <div class="tab-content active" id="tab-character">
+        <div class="char-field">
+          <label for="cs-name">名称</label>
+          <input type="text" id="cs-name" placeholder="角色名称">
+        </div>
+        <div class="char-field">
+          <label for="cs-nickname">昵称</label>
+          <input type="text" id="cs-nickname" placeholder="昵称 / 称呼">
+        </div>
+        <div class="char-field">
+          <label for="cs-age">年龄</label>
+          <input type="text" id="cs-age" placeholder="年龄 / 年级">
+        </div>
+        <div class="char-field">
+          <label for="cs-zodiac">星座</label>
+          <input type="text" id="cs-zodiac" placeholder="星座">
+        </div>
+        <div class="char-field">
+          <label for="cs-personality">性格</label>
+          <textarea id="cs-personality" rows="2" placeholder="性格描述"></textarea>
+        </div>
+        <div class="char-field">
+          <label for="cs-likes">喜好</label>
+          <input type="text" id="cs-likes" placeholder="爱好 / 喜欢的事物">
+        </div>
+        <div class="char-field">
+          <label for="cs-background">背景</label>
+          <textarea id="cs-background" rows="3" placeholder="角色背景故事"></textarea>
+        </div>
+        <div class="char-field">
+          <label for="cs-relationship">关系</label>
+          <input type="text" id="cs-relationship" placeholder="与用户的关系">
+        </div>
+      </div>
+
+      <!-- Tab: 世界书 -->
+      <div class="tab-content" id="tab-worldbook">
+        <!-- 世界书内容待填充 -->
+      </div>
+
+      <!-- Tab: 对话设置 -->
+      <div class="tab-content" id="tab-settings">
+        <!-- 对话设置内容待填充 -->
+      </div>
     </aside>
   </div>
 
