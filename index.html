@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
 </head>
 <body>
   <header id="topnav">
@@ -29,7 +30,100 @@
 
   <div id="app-main">
     <aside id="left-panel">
-      <!-- Task 2 fills this -->
+      <!-- 头像区 -->
+      <div class="avatar-section">
+        <div class="avatar-img">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>
+        </div>
+        <div class="char-name" id="char-name-display">邱惠玲</div>
+        <div class="char-subtitle" id="char-subtitle-display">玲玲 · 14岁 · 巨蟹座</div>
+        <div class="affection-mini">
+          <div class="aff-row">
+            <span class="aff-label">好感度</span>
+            <span class="aff-value" id="aff-value-display">↑ 87</span>
+          </div>
+          <div class="aff-bar"><div class="aff-bar-fill" id="aff-bar-display" style="width:87%"></div></div>
+        </div>
+      </div>
+
+      <!-- 折叠模块 -->
+      <div class="status-modules">
+        <!-- 基本信息（默认展开） -->
+        <details id="mod-basic" open>
+          <summary>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+            基本信息
+          </summary>
+          <div class="module-body">
+            <div class="field-row"><span class="field-label">名称</span><span class="field-value" id="s-name">邱惠玲</span></div>
+            <div class="field-row"><span class="field-label">位置</span><span class="field-value" id="s-location">自建房·四楼房间</span></div>
+            <div class="field-row"><span class="field-label">好感度</span><span class="field-value" id="s-affection" style="color:var(--success)">↑ 87</span></div>
+            <div class="field-row"><span class="field-label">原因</span><span class="field-value muted" id="s-aff-reason">堂哥给了零花钱</span></div>
+            <div class="field-row"><span class="field-label">周围</span><span class="field-value muted" id="s-surrounding">母亲小娟 — 已出门</span></div>
+          </div>
+        </details>
+
+        <!-- 外观（默认折叠） -->
+        <details id="mod-appearance">
+          <summary>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+            外观
+            <span class="summary-hint" id="appearance-hint">灰色吊带 + 黑色短裤</span>
+          </summary>
+          <div class="module-body">
+            <div class="field-row"><span class="field-label">表情</span><span class="field-value" id="s-expression">嘴唇轻抿，带点紧张</span></div>
+            <div class="field-row"><span class="field-label">身体</span><span class="field-value muted" id="s-body">娇小纤瘦，腰细臀翘</span></div>
+            <div class="divider-thin"></div>
+            <div class="section-label">当前穿着</div>
+            <div class="field-row"><span class="field-label">外套</span><span class="field-value muted" id="s-outerwear">—</span></div>
+            <div class="field-row"><span class="field-label">上衣</span><span class="field-value" id="s-top">灰色吊带</span></div>
+            <div class="field-row"><span class="field-label">内衣</span><span class="field-value muted" id="s-inner-top">浅粉色少女款</span></div>
+            <div class="field-row"><span class="field-label">下装</span><span class="field-value" id="s-bottom">黑色短裤</span></div>
+            <div class="field-row"><span class="field-label">内裤</span><span class="field-value muted" id="s-underwear">白色纯棉</span></div>
+            <div class="field-row"><span class="field-label">袜子</span><span class="field-value muted" id="s-socks">—</span></div>
+            <div class="field-row"><span class="field-label">鞋子</span><span class="field-value muted" id="s-shoes">—（光脚）</span></div>
+            <div class="field-row"><span class="field-label">配饰</span><span class="field-value muted" id="s-accessories">—</span></div>
+          </div>
+        </details>
+
+        <!-- 心理（默认折叠） -->
+        <details id="mod-psychology">
+          <summary>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+            心理
+            <span class="summary-hint" id="psychology-hint">想让堂哥答应她留下…</span>
+          </summary>
+          <div class="module-body">
+            <div>
+              <div style="font-size:9px;color:var(--text-dim);margin-bottom:3px">内心想法</div>
+              <div class="inner-thought" id="s-inner-thought">"堂哥会让我留下吗…今晚不想一个人"</div>
+            </div>
+            <div class="action-item">
+              <span class="diamond">◆</span>
+              <span id="s-action">推开门探进半个身子，手还搭在门把上</span>
+            </div>
+            <div class="action-item">
+              <span class="diamond" style="color:var(--text-tertiary)">◆</span>
+              <span id="s-plan" style="color:var(--text-tertiary)">撒娇让堂哥答应她留下来，再要点零花钱</span>
+            </div>
+          </div>
+        </details>
+
+        <!-- 角色档案（默认折叠） -->
+        <details id="mod-profile">
+          <summary>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+            角色档案
+          </summary>
+          <div class="module-body">
+            <div class="field-row"><span class="field-label">年龄</span><span class="field-value muted" id="s-age">14岁 / 初一</span></div>
+            <div class="field-row"><span class="field-label">星座</span><span class="field-value muted" id="s-zodiac">巨蟹座</span></div>
+            <div class="field-row"><span class="field-label">体征</span><span class="field-value muted" id="s-physical">148cm / 38kg</span></div>
+            <div class="field-row"><span class="field-label">性格</span><span class="field-value muted" id="s-personality">敏感早熟 · 拜金虚荣</span></div>
+            <div class="field-row"><span class="field-label">喜好</span><span class="field-value muted" id="s-likes">热舞 · 妆造 · 薅羊毛</span></div>
+          </div>
+        </details>
+      </div>
     </aside>
     <main id="chat-area">
       <div id="chat-messages">

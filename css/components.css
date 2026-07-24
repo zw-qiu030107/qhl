@@ -1,0 +1,162 @@
+/* css/components.css — 左侧面板 */
+#left-panel .avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-lg) var(--space-md) var(--space-md);
+  border-bottom: 1px solid var(--border-color);
+}
+
+#left-panel .avatar-img {
+  width: 64px; height: 64px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--border-color), var(--border-active));
+  border: 2px solid var(--text-dim);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: var(--space-sm);
+}
+
+#left-panel .char-name {
+  font-size: 16px; font-weight: 600; color: var(--text-primary);
+}
+
+#left-panel .char-subtitle {
+  font-size: 10px; color: var(--text-muted); margin-top: 2px;
+}
+
+#left-panel .affection-mini {
+  width: 100%; margin-top: 10px;
+}
+
+#left-panel .affection-mini .aff-row {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 3px;
+}
+
+#left-panel .affection-mini .aff-label {
+  font-size: 9px; color: var(--text-dim);
+}
+
+#left-panel .affection-mini .aff-value {
+  font-size: 11px; color: var(--success);
+}
+
+#left-panel .affection-mini .aff-bar {
+  height: 2px; background: var(--border-color); border-radius: 1px;
+}
+
+#left-panel .affection-mini .aff-bar-fill {
+  height: 100%; background: var(--accent); border-radius: 1px;
+  transition: width var(--transition-normal);
+}
+
+/* 折叠模块 */
+#left-panel .status-modules {
+  overflow-y: auto; flex: 1;
+}
+
+#left-panel details {
+  border-bottom: 1px solid var(--border-color);
+}
+
+#left-panel details summary {
+  padding: 10px 14px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.5px;
+  user-select: none;
+  transition: color var(--transition-fast);
+}
+
+#left-panel details summary:hover {
+  color: var(--text-secondary);
+}
+
+#left-panel details summary .chevron {
+  width: 10px; height: 10px;
+  transition: transform var(--transition-normal);
+}
+
+#left-panel details[open] summary .chevron {
+  transform: rotate(90deg);
+}
+
+#left-panel details summary .summary-hint {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100px;
+}
+
+#left-panel details .module-body {
+  padding: 0 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 10px;
+}
+
+#left-panel .field-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#left-panel .field-label {
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+#left-panel .field-value {
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+#left-panel .field-value.muted {
+  color: var(--text-muted);
+}
+
+#left-panel .inner-thought {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+  font-style: italic;
+  background: var(--bg-surface);
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  border-left: 2px solid var(--text-tertiary);
+}
+
+#left-panel .action-item {
+  font-size: 10px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  display: flex;
+  gap: 4px;
+}
+
+#left-panel .action-item .diamond {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+#left-panel .divider-thin {
+  border-top: 1px solid var(--border-color);
+  margin: 2px 0;
+}
+
+#left-panel .section-label {
+  font-size: 9px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: -2px;
+}
