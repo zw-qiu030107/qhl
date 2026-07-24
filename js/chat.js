@@ -11,6 +11,7 @@ const ChatRenderer = {
   renderMessage(msg) {
     const wrapper = document.createElement('div');
     wrapper.className = `chat-msg ${msg.role}`;
+    if (msg.id) wrapper.dataset.msgId = msg.id;
 
     if (msg.type === 'narration') {
       wrapper.className = 'chat-narration';
@@ -27,6 +28,20 @@ const ChatRenderer = {
     bubble.className = 'msg-bubble';
     bubble.innerHTML = utils.parseMessage(msg.text);
 
+    // 收藏按钮
+    const bmBtn = document.createElement('button');
+    bmBtn.className = 'msg-bookmark-btn';
+    bmBtn.title = '收藏此消息';
+    bmBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>';
+    bmBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const sender = msg.role === 'char' ? (msg.senderName || '角色') : '你';
+      if (typeof Bookmarks !== 'undefined') {
+        Bookmarks.add(msg.text, msg.id || '', sender);
+      }
+    });
+    bubble.appendChild(bmBtn);
+
     wrapper.appendChild(label);
     wrapper.appendChild(bubble);
     this.container.appendChild(wrapper);
@@ -38,6 +53,7 @@ const ChatRenderer = {
     messages.forEach(msg => {
       const wrapper = document.createElement('div');
       wrapper.className = `chat-msg ${msg.role}`;
+      if (msg.id) wrapper.dataset.msgId = msg.id;
       if (msg.type === 'narration') {
         wrapper.className = 'chat-narration';
         wrapper.textContent = msg.text;
@@ -82,6 +98,9 @@ const ChatRenderer = {
     const msg = { role, text, senderName, id: utils.uid(), time: Date.now() };
     this.renderMessage(msg);
     this.scrollToBottom();
+    if (typeof ChatHistory !== 'undefined' && ChatHistory._sessions) {
+      ChatHistory.addMessage(msg);
+    }
     return msg;
   }
 };
@@ -201,4 +220,230 @@ const ChatInput = {
 document.addEventListener('DOMContentLoaded', () => {
   ChatRenderer.init();
   ChatInput.init();
+});
+
+// ====== 对话历史管理 ======
+const ChatHistory = {
+  _sessions: [],
+
+  init() {
+    this.load();
+  },
+
+  load() {
+    const data = storage.get('chat_sessions');
+    this._sessions = Array.isArray(data) ? data : [];
+  },
+
+  save() {
+    storage.set('chat_sessions', this._sessions);
+  },
+
+  _ensureSession() {
+    if (!this._sessions.length || this._sessions[0].closed) {
+      this._sessions.unshift({
+        id: utils.uid(),
+        startTime: Date.now(),
+        endTime: null,
+        closed: false,
+        messageCount: 0,
+        title: '新会话',
+        messages: []
+      });
+      this.save();
+    }
+  },
+
+  getCurrentSession() {
+    this._ensureSession();
+    return this._sessions[0];
+  },
+
+  addMessage(msg) {
+    const session = this.getCurrentSession();
+    session.messages.push(msg);
+    session.messageCount = session.messages.length;
+    if (session.title === '新会话' && msg.text) {
+      const preview = msg.text.replace(/[*"「」]/g, '').trim();
+      session.title = preview.length > 24 ? preview.slice(0, 24) + '...' : preview;
+    }
+    session.endTime = Date.now();
+    this.save();
+  },
+
+  closeSession() {
+    if (this._sessions.length && !this._sessions[0].closed) {
+      this._sessions[0].closed = true;
+      this._sessions[0].endTime = Date.now();
+      this.save();
+    }
+  },
+
+  getAll() {
+    return this._sessions;
+  },
+
+  clearAll() {
+    this._sessions = [];
+    this.save();
+  },
+
+  renderList() {
+    const container = document.getElementById('history-list');
+    if (!container) return;
+    const sessions = this.getAll().filter(s => s.messages && s.messages.length > 0);
+    if (!sessions.length) {
+      container.innerHTML = '<div class="history-empty" style="text-align:center;padding:40px;color:var(--text-muted)"><p>暂无对话记录</p></div>';
+      return;
+    }
+    container.innerHTML = '';
+    sessions.forEach(session => {
+      const item = document.createElement('div');
+      item.className = 'history-session';
+      const time = new Date(session.startTime).toLocaleString('zh-CN', {
+        month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+      const lastMsg = session.messages[session.messages.length - 1];
+      const preview = lastMsg ? lastMsg.text.replace(/[*"「」]/g, '').trim() : '';
+      item.innerHTML =
+        '<div class="history-session-header">' +
+          '<span class="history-session-time">' + utils.escapeHTML(time) + '</span>' +
+          '<span class="history-session-count">' + session.messageCount + ' 条消息</span>' +
+        '</div>' +
+        '<div class="history-session-preview">' + utils.escapeHTML(preview.slice(0, 60)) + '</div>';
+      item.addEventListener('click', () => {
+        if (window.state) {
+          window.state.set('messages', session.messages);
+          ChatRenderer.container.innerHTML = '';
+          ChatRenderer.renderMessages(session.messages);
+          ModalManager.close();
+        }
+      });
+      container.appendChild(item);
+    });
+  }
+};
+
+// ====== 书签管理 ======
+const Bookmarks = {
+  _items: [],
+
+  init() {
+    this.load();
+  },
+
+  load() {
+    const data = storage.get('bookmarks');
+    this._items = Array.isArray(data) ? data : [];
+  },
+
+  save() {
+    storage.set('bookmarks', this._items);
+  },
+
+  add(text, msgId, sender) {
+    const existing = this._items.find(b => b.msgId === msgId);
+    if (existing) {
+      if (typeof notifications !== 'undefined') {
+        notifications.show('info', '已收藏', '此消息已在书签中');
+      }
+      return;
+    }
+    this._items.unshift({
+      id: utils.uid(),
+      msgId: msgId || '',
+      text: text.slice(0, 120),
+      sender: sender || '',
+      time: Date.now()
+    });
+    this.save();
+    if (typeof notifications !== 'undefined') {
+      notifications.show('success', '已添加书签', '消息已收藏到书签');
+    }
+    this.renderList();
+  },
+
+  remove(id) {
+    this._items = this._items.filter(b => b.id !== id);
+    this.save();
+    this.renderList();
+  },
+
+  getAll() {
+    return this._items;
+  },
+
+  clearAll() {
+    this._items = [];
+    this.save();
+  },
+
+  renderList() {
+    const container = document.getElementById('bookmark-list');
+    if (!container) return;
+    if (!this._items.length) {
+      container.innerHTML = '<div class="history-empty" style="text-align:center;padding:40px;color:var(--text-muted)"><p>暂无书签</p></div>';
+      return;
+    }
+    container.innerHTML = '';
+    this._items.forEach(bm => {
+      const item = document.createElement('div');
+      item.className = 'bookmark-item';
+      const time = new Date(bm.time).toLocaleString('zh-CN', {
+        month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+      item.innerHTML =
+        '<div class="bookmark-header">' +
+          '<span class="bookmark-sender">' + utils.escapeHTML(bm.sender) + '</span>' +
+          '<span class="bookmark-time">' + utils.escapeHTML(time) + '</span>' +
+        '</div>' +
+        '<div class="bookmark-quote">' + utils.escapeHTML(bm.text) + '</div>' +
+        '<div class="bookmark-actions">' +
+          '<button class="bookmark-jump btn btn-sm btn-secondary">跳转</button>' +
+          '<button class="bookmark-remove btn btn-sm btn-danger">删除</button>' +
+        '</div>';
+      item.querySelector('.bookmark-jump')?.addEventListener('click', () => {
+        ModalManager.close();
+        if (bm.msgId) {
+          const el = document.querySelector('[data-msg-id="' + bm.msgId + '"]');
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+      item.querySelector('.bookmark-remove')?.addEventListener('click', () => {
+        this.remove(bm.id);
+      });
+      container.appendChild(item);
+    });
+  }
+};
+
+// 初始化历史记录和书签按钮
+document.addEventListener('DOMContentLoaded', () => {
+  ChatHistory.init();
+  Bookmarks.init();
+
+  const historyBtn = document.getElementById('btn-history');
+  const bookmarkBtn = document.getElementById('btn-bookmarks');
+
+  if (historyBtn) {
+    historyBtn.addEventListener('click', () => {
+      ChatHistory.renderList();
+      ModalManager.open('modal-chat-history');
+    });
+  }
+
+  if (bookmarkBtn) {
+    bookmarkBtn.addEventListener('click', () => {
+      Bookmarks.renderList();
+      ModalManager.open('modal-bookmarks');
+    });
+  }
+
+  // 清空对话时关闭当前会话
+  const clearBtn = document.getElementById('act-clear');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      ChatHistory.closeSession();
+    });
+  }
 });
