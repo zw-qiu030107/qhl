@@ -1,0 +1,51 @@
+<h2>设计汇总 · 清醒风格角色扮演对话前端</h2>
+<p class="subtitle">以下为全部已确认的设计决策</p>
+
+<div class="section">
+  <h3>技术栈 & 美学</h3>
+  <table style="width:100%;font-size:13px;border-collapse:collapse">
+    <tr style="border-bottom:1px solid #252830"><td style="padding:8px 14px;color:#8b95a5;width:140px">技术栈</td><td style="padding:8px 14px;color:#c8ccd4">纯 HTML/CSS/JS · 零依赖</td></tr>
+    <tr style="border-bottom:1px solid #252830"><td style="padding:8px 14px;color:#8b95a5">色彩</td><td style="padding:8px 14px;color:#c8ccd4">冷峻深色系 · 深灰/炭黑基底 + 冰蓝/雾绿点缀</td></tr>
+    <tr><td style="padding:8px 14px;color:#8b95a5">字体</td><td style="padding:8px 14px;color:#c8ccd4">现代无衬线 · 非浏览器默认字体系列</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <h3>主页面布局（三栏 + 底部）</h3>
+  <table style="width:100%;font-size:13px;border-collapse:collapse">
+    <tr style="border-bottom:1px solid #252830"><td style="padding:8px 14px;color:#8b95a5;width:140px">左侧栏</td><td style="padding:8px 14px;color:#c8ccd4">角色常驻状态 · 头像/名称/心情/好感度/属性面板/场景标签/角色记忆（单人模式）</td></tr>
+    <tr style="border-bottom:1px solid #252830"><td style="padding:8px 14px;color:#8b95a5">中央区</td><td style="padding:8px 14px;color:#c8ccd4">剧本流 + 微信气泡融合 · *动作* 斜体灰 · "对话" 亮白 · 叙述居中装饰线</td></tr>
+    <tr style="border-bottom:1px solid #252830"><td style="padding:8px 14px;color:#8b95a5">右侧面板</td><td style="padding:8px 14px;color:#c8ccd4">标签页切换 · 角色设定 / 世界书（11种插入位置，完整可编辑）/ 对话设置</td></tr>
+    <tr><td style="padding:8px 14px;color:#8b95a5">底部栏</td><td style="padding:8px 14px;color:#c8ccd4">输入框 + 发送 + Token计数 + 操作菜单（重生成/继续写/撤回）</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <h3>世界书条目结构</h3>
+  <table style="width:100%;font-size:13px;border-collapse:collapse">
+    <tr style="border-bottom:1px solid #2d3140"><td style="padding:6px 14px;color:#8b95a5">字段</td><td style="padding:6px 14px;color:#c8ccd4">条目名称 · 关键词 · 内容 · 权重 · 插入位置（11种） · 触发条件 · 启用/禁用</td></tr>
+    <tr><td style="padding:6px 14px;color:#8b95a5">操作</td><td style="padding:6px 14px;color:#c8ccd4">新建 · 编辑 · 删除（含确认框） · 导入 · 导出 · 排序</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <h3>模态框 & 页面</h3>
+  <div style="display:flex;gap:12px;flex-wrap:wrap">
+    <div style="background:#20242a;padding:10px 16px;border-radius:8px;font-size:12px;color:#c8ccd4">角色卡导入/管理</div>
+    <div style="background:#20242a;padding:10px 16px;border-radius:8px;font-size:12px;color:#c8ccd4">对话历史记录</div>
+    <div style="background:#20242a;padding:10px 16px;border-radius:8px;font-size:12px;color:#c8ccd4">全局设置</div>
+    <div style="background:#20242a;padding:10px 16px;border-radius:8px;font-size:12px;color:#c8ccd4">角色卡编辑器</div>
+    <div style="background:#20242a;padding:10px 16px;border-radius:8px;font-size:12px;color:#c8ccd4">对话书签收藏</div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>设计原则</h3>
+  <ul style="color:#9aa4b2;font-size:13px;line-height:1.8">
+    <li>全中文化 · 禁止 emoji · 使用 SVG 高级图标</li>
+    <li>微交互动画增强高级感 · 悬停效果 · 动态过渡</li>
+    <li>语义化 HTML5 · 唯一 ID · 性能优化</li>
+    <li>内部通知框（非浏览器 alert）</li>
+    <li>非占位符内容 · 基于 qhl.json 真实数据</li>
+  </ul>
+</div>

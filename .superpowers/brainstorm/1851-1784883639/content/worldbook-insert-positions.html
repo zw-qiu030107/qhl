@@ -1,0 +1,171 @@
+<h2>世界书 · 完整插入位置</h2>
+<p class="subtitle">基于酒馆开发文档 · 11 种插入位置 + 角色消息类型</p>
+
+<div style="display:flex;gap:20px;flex-wrap:wrap">
+  <!-- 插入位置下拉完整版 -->
+  <div class="mockup" style="flex:1;min-width:360px">
+    <div class="mockup-header">插入位置 · 完整下拉</div>
+    <div class="mockup-body" style="background:#1a1d23;color:#c8ccd4;font-family:system-ui;min-height:440px;padding:16px">
+      <div style="font-size:10px;color:#6b7583;margin-bottom:6px">插入位置</div>
+      <div style="background:#1a1d23;border:1px solid #3a4050;border-radius:6px;overflow:hidden">
+        <!-- 分组1：角色相关 -->
+        <div style="padding:8px 12px;font-size:10px;color:#4a5060;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #252830">提示词位置</div>
+        <div style="padding:8px 12px;font-size:12px;color:#c8ccd4;cursor:pointer;display:flex;align-items:center;gap:8px;background:#20242a;border-left:2px solid #7eb8da">
+          <span style="color:#7eb8da">◆</span> 角色定义之前
+          <span style="font-size:10px;color:#6b7583;margin-left:auto">对对话有适度影响</span>
+        </div>
+        <div style="padding:8px 12px;font-size:12px;color:#8b95a5;cursor:pointer;display:flex;align-items:center;gap:8px">
+          <span style="color:#4a5060">◆</span> 角色定义之后
+          <span style="font-size:10px;color:#6b7583;margin-left:auto">对对话影响更大</span>
+        </div>
+        <div style="padding:8px 12px;font-size:12px;color:#8b95a5;cursor:pointer;display:flex;align-items:center;gap:8px">
+          <span style="color:#4a5060">◆</span> 示例消息之前
+          <span style="font-size:10px;color:#6b7583;margin-left:auto">解析为示例对话块</span>
+        </div>
+        <div style="padding:8px 12px;font-size:12px;color:#8b95a5;cursor:pointer;display:flex;align-items:center;gap:8px">
+          <span style="color:#4a5060">◆</span> 示例消息之后
+          <span style="font-size:10px;color:#6b7583;margin-left:auto">解析为示例对话块</span>
+        </div>
+        <!-- 分组2：作者注记 -->
+        <div style="padding:8px 12px;font-size:10px;color:#4a5060;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #252830;border-top:1px solid #252830">作者注记</div>
+        <div style="padding:8px 12px;font-size:12px;color:#8b95a5;cursor:pointer;display:flex;align-items:center;gap:8px">
+          <span style="color:#4a5060">◆</span> 作者注记顶部
+          <span style="font-size:10px;color:#6b7583;margin-left:auto">由注记位置决定影响</span>
+        </div>
+        <div style="padding:8px 12px;font-size:12px;color:#8b95a5;cursor:pointer;display:flex;align-items:center;gap:8px">
+          <span style="color:#4a5060">◆</span> 作者注记底部
+          <span style="font-size:10px;color:#6b7583;margin-left:auto">由注记位置决定影响</span>
+        </div>
+        <!-- 分组3：深度插入 -->
+        <div style="padding:8px 12px;font-size:10px;color:#4a5060;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #252830;border-top:1px solid #252830">聊天深度</div>
+        <div style="padding:8px 12px;font-size:12px;color:#8b95a5;cursor:pointer;display:flex;align-items:center;gap:8px">
+          <span style="color:#4a5060">◆</span> @ 深度 D
+          <span style="font-size:10px;color:#6b7583;margin-left:auto">深度 0 = 提示词底部</span>
+        </div>
+        <!-- 分组4：角色消息 -->
+        <div style="padding:8px 12px;font-size:10px;color:#4a5060;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #252830;border-top:1px solid #252830">角色消息类型</div>
+        <div style="padding:8px 12px;font-size:12px;color:#8b95a5;cursor:pointer;display:flex;align-items:center;gap:8px">
+          <span>⚙️</span> 作为系统角色消息
+        </div>
+        <div style="padding:8px 12px;font-size:12px;color:#8b95a5;cursor:pointer;display:flex;align-items:center;gap:8px">
+          <span>👤</span> 作为用户角色消息
+        </div>
+        <div style="padding:8px 12px;font-size:12px;color:#8b95a5;cursor:pointer;display:flex;align-items:center;gap:8px">
+          <span>🤖</span> 作为助手角色消息
+        </div>
+        <!-- 分组5：输出口 -->
+        <div style="padding:8px 12px;font-size:10px;color:#4a5060;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #252830;border-top:1px solid #252830">宏控制</div>
+        <div style="padding:8px 12px;font-size:12px;color:#8b95a5;cursor:pointer;display:flex;align-items:center;gap:8px">
+          <span style="color:#4a5060">◆</span> 输出口
+          <span style="font-size:10px;color:#6b7583;margin-left:auto">{{outlet::名称}} 宏调用</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 编辑态条目 + 深度输入 -->
+  <div class="mockup" style="flex:1;min-width:360px">
+    <div class="mockup-header">编辑条目 · 选中「@深度D」+ 「输出口」时的变化</div>
+    <div class="mockup-body" style="background:#1a1d23;color:#c8ccd4;font-family:system-ui;min-height:440px;padding:16px;display:flex;flex-direction:column;gap:12px">
+
+      <!-- 当选中 @深度D -->
+      <div>
+        <div style="font-size:10px;color:#6b7583;margin-bottom:4px">场景 A：选中「@ 深度 D」时</div>
+        <div style="background:#20242a;border-radius:6px;padding:10px 14px;border:1px solid #2d3140">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:12px;color:#c8ccd4">插入位置</span>
+            <span style="font-size:12px;color:#7eb8da">@ 深度 D</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:11px;color:#8b95a5">深度值</span>
+            <input value="0" type="number" min="0" style="background:#1a1d23;border:1px solid #3a4050;color:#c8ccd4;font-size:12px;width:60px;text-align:center;border-radius:3px;padding:4px 6px;outline:none">
+            <span style="font-size:10px;color:#4a5060">（0 = 提示词底部，数字越大越靠上）</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 当选中 输出口 -->
+      <div>
+        <div style="font-size:10px;color:#6b7583;margin-bottom:4px">场景 B：选中「输出口」时</div>
+        <div style="background:#20242a;border-radius:6px;padding:10px 14px;border:1px solid #2d3140">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:12px;color:#c8ccd4">插入位置</span>
+            <span style="font-size:12px;color:#7eb8da">输出口</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:11px;color:#8b95a5">出口名称</span>
+            <input value="house_desc" style="background:#1a1d23;border:1px solid #3a4050;color:#c8ccd4;font-size:12px;width:160px;border-radius:3px;padding:4px 8px;outline:none">
+            <span style="font-size:10px;color:#4a5060">{{outlet::house_desc}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 示例消息行为提示 -->
+      <div>
+        <div style="font-size:10px;color:#6b7583;margin-bottom:4px">提示：示例消息位置规则</div>
+        <div style="background:#1e2428;border-radius:6px;padding:10px 14px;border-left:2px solid #8b95a5">
+          <div style="font-size:11px;color:#9aa4b2;line-height:1.6">
+            选择「示例消息之前/之后」时：<br>
+            · 条目内容将按提示词构建设置格式化（指令模式 或 聊天补全）<br>
+            · 遵循示例消息行为规则：<span style="color:#c8ccd4">上下文满时逐渐推出</span> / <span style="color:#c8ccd4">始终保留</span> / <span style="color:#c8ccd4">完全禁用</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 作者注记禁用提示 -->
+      <div>
+        <div style="font-size:10px;color:#c46b6b;margin-bottom:4px">注意</div>
+        <div style="background:#2a1e1e;border-radius:6px;padding:10px 14px;border-left:2px solid #c46b6b">
+          <div style="font-size:11px;color:#d4a0a0;line-height:1.5">
+            若作者注记已禁用（插入频率 = 0），位于「作者注记顶部/底部」的世界书条目将被忽略。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:20px">
+  <h3>完整插入位置对照表</h3>
+  <table style="width:100%;font-size:12px;border-collapse:collapse">
+    <tr style="border-bottom:1px solid #2d3140">
+      <td style="padding:8px 12px;color:#8b95a5;width:30px">#</td>
+      <td style="padding:8px 12px;color:#c8ccd4;width:160px">插入位置</td>
+      <td style="padding:8px 12px;color:#8b95a5">分组</td>
+      <td style="padding:8px 12px;color:#6b7583">说明</td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:6px 12px;color:#6b7583">1</td><td style="padding:6px 12px;color:#c8ccd4">角色定义之前</td><td style="padding:6px 12px;color:#8b95a5">提示词</td><td style="padding:6px 12px">插入在角色描述和场景之前，适度影响</td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:6px 12px;color:#6b7583">2</td><td style="padding:6px 12px;color:#c8ccd4">角色定义之后</td><td style="padding:6px 12px;color:#8b95a5">提示词</td><td style="padding:6px 12px">插入在角色描述和场景之后，影响更大</td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:6px 12px;color:#6b7583">3</td><td style="padding:6px 12px;color:#c8ccd4">示例消息之前</td><td style="padding:6px 12px;color:#8b95a5">提示词</td><td style="padding:6px 12px">解析为示例对话块，插入示例之前</td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:6px 12px;color:#6b7583">4</td><td style="padding:6px 12px;color:#c8ccd4">示例消息之后</td><td style="padding:6px 12px;color:#8b95a5">提示词</td><td style="padding:6px 12px">解析为示例对话块，插入示例之后</td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:6px 12px;color:#6b7583">5</td><td style="padding:6px 12px;color:#c8ccd4">作者注记顶部</td><td style="padding:6px 12px;color:#8b95a5">注记</td><td style="padding:6px 12px">插入作者注记内容顶部（注记频率=0时忽略）</td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:6px 12px;color:#6b7583">6</td><td style="padding:6px 12px;color:#c8ccd4">作者注记底部</td><td style="padding:6px 12px;color:#8b95a5">注记</td><td style="padding:6px 12px">插入作者注记内容底部（注记频率=0时忽略）</td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:6px 12px;color:#6b7583">7</td><td style="padding:6px 12px;color:#c8ccd4">@ 深度 D</td><td style="padding:6px 12px;color:#8b95a5">深度</td><td style="padding:6px 12px">指定聊天深度位置，需额外输入深度值D</td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:6px 12px;color:#6b7583">8</td><td style="padding:6px 12px;color:#c8ccd4">⚙️ 系统角色消息</td><td style="padding:6px 12px;color:#8b95a5">角色</td><td style="padding:6px 12px">以 system 角色插入</td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:6px 12px;color:#6b7583">9</td><td style="padding:6px 12px;color:#c8ccd4">👤 用户角色消息</td><td style="padding:6px 12px;color:#8b95a5">角色</td><td style="padding:6px 12px">以 user 角色插入</td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:6px 12px;color:#6b7583">10</td><td style="padding:6px 12px;color:#c8ccd4">🤖 助手角色消息</td><td style="padding:6px 12px;color:#8b95a5">角色</td><td style="padding:6px 12px">以 assistant 角色插入</td>
+    </tr>
+    <tr>
+      <td style="padding:6px 12px;color:#6b7583">11</td><td style="padding:6px 12px;color:#c8ccd4">输出口</td><td style="padding:6px 12px;color:#8b95a5">宏</td><td style="padding:6px 12px">不自动注入，通过 {{outlet::名称}} 宏手动调用</td>
+    </tr>
+  </table>
+</div>

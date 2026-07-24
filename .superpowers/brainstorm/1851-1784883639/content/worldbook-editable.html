@@ -1,0 +1,209 @@
+<h2>世界书 · 可编辑交互原型</h2>
+<p class="subtitle">所有字段可编辑 · 支持新建 / 编辑 / 删除 / 排序</p>
+
+<div class="split">
+  <!-- 编辑态 -->
+  <div class="mockup">
+    <div class="mockup-header">编辑模式 · 条目展开 + 字段可编辑</div>
+    <div class="mockup-body" style="background:#1a1d23;color:#c8ccd4;font-family:system-ui;min-height:500px;padding:0">
+      <div style="display:flex;border-bottom:1px solid #2d3140">
+        <div style="padding:10px 16px;font-size:13px;color:#6b7583">角色设定</div>
+        <div style="padding:10px 16px;font-size:13px;color:#e8eaed;border-bottom:2px solid #7eb8da;font-weight:600">世界书</div>
+        <div style="padding:10px 16px;font-size:13px;color:#6b7583">对话设置</div>
+      </div>
+      <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+        <!-- 操作栏 -->
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:11px;color:#8b95a5">3 条条目</span>
+          <div style="display:flex;gap:8px">
+            <span style="font-size:11px;color:#6b7583;cursor:pointer">导入</span>
+            <span style="font-size:11px;color:#6b7583;cursor:pointer">导出</span>
+            <span style="font-size:11px;padding:4px 10px;background:#7eb8da;color:#1a1d23;border-radius:4px;font-weight:600;cursor:pointer">+ 新建</span>
+          </div>
+        </div>
+
+        <!-- 条目：编辑态 -->
+        <div style="background:#20242a;border-radius:8px;overflow:hidden;border:1px solid #3a4050">
+          <div style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;background:#252830">
+            <div style="display:flex;align-items:center;gap:8px;flex:1">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7eb8da" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+              <input value="自建房五层" style="background:transparent;border:none;border-bottom:1px dashed #4a5060;color:#e8eaed;font-size:13px;font-weight:600;width:140px;outline:none;padding:2px 0">
+              <span style="font-size:10px;color:#6b7583">权重</span>
+              <input value="100" style="background:#1a1d23;border:1px solid #3a4050;color:#c8ccd4;font-size:11px;width:44px;text-align:center;border-radius:3px;padding:2px 4px;outline:none">
+            </div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <div style="width:6px;height:6px;border-radius:50%;background:#6fc98f" title="已启用"></div>
+              <span style="font-size:10px;color:#c46b6b;cursor:pointer" title="删除">删除</span>
+            </div>
+          </div>
+          <div style="padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+            <!-- 关键词 -->
+            <div>
+              <div style="font-size:10px;color:#6b7583;margin-bottom:4px;display:flex;justify-content:space-between">
+                <span>关键词</span>
+                <span style="color:#7eb8da;cursor:pointer">+ 添加</span>
+              </div>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
+                <span style="padding:2px 8px;background:#252830;border-radius:10px;font-size:11px;color:#c8ccd4;display:flex;align-items:center;gap:4px">五楼 <span style="color:#6b7583;cursor:pointer;font-size:13px;line-height:1">×</span></span>
+                <span style="padding:2px 8px;background:#252830;border-radius:10px;font-size:11px;color:#c8ccd4;display:flex;align-items:center;gap:4px">四楼 <span style="color:#6b7583;cursor:pointer;font-size:13px;line-height:1">×</span></span>
+                <span style="padding:2px 8px;background:#252830;border-radius:10px;font-size:11px;color:#c8ccd4;display:flex;align-items:center;gap:4px">自建房 <span style="color:#6b7583;cursor:pointer;font-size:13px;line-height:1">×</span></span>
+                <input placeholder="新关键词" style="background:#1a1d23;border:1px solid #3a4050;color:#9aa4b2;font-size:11px;width:80px;border-radius:10px;padding:2px 8px;outline:none">
+              </div>
+            </div>
+            <!-- 内容 -->
+            <div>
+              <div style="font-size:10px;color:#6b7583;margin-bottom:4px">内容</div>
+              <textarea style="width:100%;background:#1a1d23;border:1px solid #3a4050;color:#c8ccd4;font-size:11px;line-height:1.5;border-radius:4px;padding:8px;outline:none;resize:vertical;min-height:56px;font-family:inherit">一栋五层自建房，邱惠玲住在五楼，堂哥住在四楼。楼梯间有声控灯，四楼房門常不关紧。</textarea>
+            </div>
+            <!-- 插入位置 + 触发条件 -->
+            <div style="display:flex;gap:16px">
+              <div style="flex:1">
+                <div style="font-size:10px;color:#6b7583;margin-bottom:3px">插入位置</div>
+                <select style="width:100%;background:#1a1d23;border:1px solid #3a4050;color:#c8ccd4;font-size:11px;padding:4px 6px;border-radius:3px;outline:none">
+                  <option>角色定义前</option>
+                  <option>角色定义后</option>
+                  <option>对话历史前</option>
+                  <option>对话历史后</option>
+                </select>
+              </div>
+              <div style="flex:1">
+                <div style="font-size:10px;color:#6b7583;margin-bottom:3px">触发条件</div>
+                <select style="width:100%;background:#1a1d23;border:1px solid #3a4050;color:#c8ccd4;font-size:11px;padding:4px 6px;border-radius:3px;outline:none">
+                  <option selected>关键词匹配</option>
+                  <option>始终触发</option>
+                  <option>概率触发</option>
+                </select>
+              </div>
+            </div>
+            <!-- 操作按钮 -->
+            <div style="display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #252830;padding-top:10px">
+              <span style="font-size:11px;color:#6b7583;padding:4px 10px;cursor:pointer">取消</span>
+              <span style="font-size:11px;color:#1a1d23;background:#7eb8da;padding:4px 12px;border-radius:4px;font-weight:600;cursor:pointer">保存</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 条目：折叠态 -->
+        <div style="background:#20242a;border-radius:8px;overflow:hidden;border:1px solid #252830">
+          <div style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+            <div style="display:flex;align-items:center;gap:8px">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6b7583" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+              <span style="font-size:13px;color:#8b95a5">母亲小娟</span>
+              <span style="font-size:10px;color:#6b7583">权重 80</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span style="font-size:10px;color:#4a5060;cursor:pointer">编辑</span>
+              <div style="width:6px;height:6px;border-radius:50%;background:#4a5060"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 条目：折叠态 -->
+        <div style="background:#20242a;border-radius:8px;overflow:hidden;border:1px solid #252830">
+          <div style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+            <div style="display:flex;align-items:center;gap:8px">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6b7583" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+              <span style="font-size:13px;color:#8b95a5">堂哥关系</span>
+              <span style="font-size:10px;color:#6b7583">权重 90</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span style="font-size:10px;color:#4a5060;cursor:pointer">编辑</span>
+              <div style="width:6px;height:6px;border-radius:50%;background:#7eb8da"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新建条目表单 -->
+  <div class="mockup">
+    <div class="mockup-header">新建条目 · 空白表单</div>
+    <div class="mockup-body" style="background:#1a1d23;color:#c8ccd4;font-family:system-ui;min-height:500px;padding:0">
+      <div style="display:flex;border-bottom:1px solid #2d3140">
+        <div style="padding:10px 16px;font-size:13px;color:#6b7583">角色设定</div>
+        <div style="padding:10px 16px;font-size:13px;color:#e8eaed;border-bottom:2px solid #7eb8da;font-weight:600">世界书</div>
+        <div style="padding:10px 16px;font-size:13px;color:#6b7583">对话设置</div>
+      </div>
+      <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+        <!-- 新条目表单 -->
+        <div style="background:#1e2a32;border-radius:8px;overflow:hidden;border:1px solid #3a5060">
+          <div style="padding:10px 14px;background:#222e38;border-bottom:1px solid #3a5060">
+            <span style="font-size:11px;color:#7eb8da;font-weight:600">新条目</span>
+          </div>
+          <div style="padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+            <!-- 名称 -->
+            <div>
+              <div style="font-size:10px;color:#6b7583;margin-bottom:3px">条目名称 <span style="color:#c46b6b">*</span></div>
+              <input placeholder="例如：家族背景" style="width:100%;background:#1a1d23;border:1px solid #3a4050;color:#c8ccd4;font-size:12px;border-radius:4px;padding:6px 10px;outline:none;box-sizing:border-box">
+            </div>
+            <!-- 关键词 -->
+            <div>
+              <div style="font-size:10px;color:#6b7583;margin-bottom:3px">关键词 <span style="color:#c46b6b">*</span></div>
+              <input placeholder="用逗号分隔，例如：家族, 父亲, 继父" style="width:100%;background:#1a1d23;border:1px solid #3a4050;color:#c8ccd4;font-size:12px;border-radius:4px;padding:6px 10px;outline:none;box-sizing:border-box">
+            </div>
+            <!-- 内容 -->
+            <div>
+              <div style="font-size:10px;color:#6b7583;margin-bottom:3px">世界设定内容 <span style="color:#c46b6b">*</span></div>
+              <textarea placeholder="描述这个世界设定，当关键词被触发时，这段内容将注入到上下文中…" style="width:100%;background:#1a1d23;border:1px solid #3a4050;color:#c8ccd4;font-size:12px;line-height:1.5;border-radius:4px;padding:8px 10px;outline:none;resize:vertical;min-height:80px;box-sizing:border-box;font-family:inherit"></textarea>
+            </div>
+            <!-- 权重 -->
+            <div style="display:flex;gap:16px">
+              <div style="flex:1">
+                <div style="font-size:10px;color:#6b7583;margin-bottom:3px">权重</div>
+                <input value="100" type="number" style="width:100%;background:#1a1d23;border:1px solid #3a4050;color:#c8ccd4;font-size:12px;border-radius:4px;padding:6px 10px;outline:none;box-sizing:border-box">
+              </div>
+              <div style="flex:1">
+                <div style="font-size:10px;color:#6b7583;margin-bottom:3px">状态</div>
+                <select style="width:100%;background:#1a1d23;border:1px solid #3a4050;color:#c8ccd4;font-size:12px;padding:6px 10px;border-radius:4px;outline:none;box-sizing:border-box">
+                  <option>启用</option>
+                  <option>禁用</option>
+                </select>
+              </div>
+            </div>
+            <!-- 插入位置 + 触发条件 -->
+            <div style="display:flex;gap:16px">
+              <div style="flex:1">
+                <div style="font-size:10px;color:#6b7583;margin-bottom:3px">插入位置</div>
+                <select style="width:100%;background:#1a1d23;border:1px solid #3a4050;color:#c8ccd4;font-size:12px;padding:6px 10px;border-radius:4px;outline:none;box-sizing:border-box">
+                  <option>角色定义前</option>
+                  <option>角色定义后</option>
+                  <option>对话历史前</option>
+                  <option>对话历史后</option>
+                </select>
+              </div>
+              <div style="flex:1">
+                <div style="font-size:10px;color:#6b7583;margin-bottom:3px">触发条件</div>
+                <select style="width:100%;background:#1a1d23;border:1px solid #3a4050;color:#c8ccd4;font-size:12px;padding:6px 10px;border-radius:4px;outline:none;box-sizing:border-box">
+                  <option>关键词匹配</option>
+                  <option>始终触发</option>
+                  <option>概率触发</option>
+                </select>
+              </div>
+            </div>
+            <!-- 按钮 -->
+            <div style="display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #252830;padding-top:10px">
+              <span style="font-size:11px;color:#6b7583;padding:4px 10px;cursor:pointer">取消</span>
+              <span style="font-size:11px;color:#1a1d23;background:#7eb8da;padding:4px 16px;border-radius:4px;font-weight:600;cursor:pointer">创建条目</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 删除确认提示 -->
+        <div style="background:#2a1e1e;border:1px solid #5a3a3a;border-radius:8px;padding:12px 14px">
+          <div style="display:flex;align-items:flex-start;gap:8px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c46b6b" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            <div>
+              <div style="font-size:12px;color:#d4a0a0;font-weight:600;margin-bottom:2px">确认删除</div>
+              <div style="font-size:11px;color:#a08080;line-height:1.4">确定要删除条目「母亲小娟」吗？此操作不可撤销。</div>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <span style="font-size:11px;color:#6b7583;padding:3px 10px;cursor:pointer">取消</span>
+                <span style="font-size:11px;color:#f0c0c0;background:#5a3030;padding:3px 12px;border-radius:3px;font-weight:600;cursor:pointer">删除</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

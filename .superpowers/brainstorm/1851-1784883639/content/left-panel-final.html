@@ -1,0 +1,167 @@
+<h2>左侧角色状态栏 · 最终版</h2>
+<p class="subtitle">默认紧凑 · 四模块可折叠 · 全部字段无缺失</p>
+
+<div class="split">
+  <!-- 默认态 -->
+  <div class="mockup">
+    <div class="mockup-header">默认态 · 仅基本信息展开</div>
+    <div class="mockup-body" style="background:#1a1d23;color:#c8ccd4;font-family:system-ui;min-height:580px;padding:0;width:240px;margin:0 auto">
+      <div style="display:flex;flex-direction:column;align-items:center;padding:16px 12px 12px;border-bottom:1px solid #252830">
+        <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#2d3140,#3a3f50);border:2px solid #4a5060;display:flex;align-items:center;justify-content:center;margin-bottom:8px">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8b95a5" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>
+        </div>
+        <div style="font-size:16px;font-weight:600;color:#e8eaed">邱惠玲</div>
+        <div style="font-size:10px;color:#6b7583;margin-top:2px">玲玲 · 14岁 · 巨蟹座</div>
+        <div style="width:100%;margin-top:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+            <span style="font-size:9px;color:#4a5060">好感度</span>
+            <span style="font-size:11px;color:#6fc98f">↑ 87 <span style="font-size:9px;color:#6b7583">+3</span></span>
+          </div>
+          <div style="height:3px;background:#2d3140;border-radius:2px"><div style="height:100%;width:87%;background:linear-gradient(90deg,#7eb8da,#6fc98f);border-radius:2px"></div></div>
+        </div>
+      </div>
+      <div style="overflow-y:auto;max-height:460px">
+        <!-- 基本信息：展开 -->
+        <details open style="border-bottom:1px solid #252830">
+          <summary style="padding:10px 14px;font-size:11px;color:#8b95a5;cursor:pointer;display:flex;align-items:center;gap:6px;letter-spacing:0.5px">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7eb8da" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>基本信息
+          </summary>
+          <div style="padding:0 14px 12px;display:flex;flex-direction:column;gap:7px">
+            <div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:#4a5060">位置</span><span style="font-size:11px;color:#c8ccd4">四楼·堂哥房间</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:#4a5060">好感</span><span style="font-size:11px;color:#6fc98f">↑ 87</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:#4a5060">原因</span><span style="font-size:10px;color:#6b7583">堂哥给了零花钱</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:#4a5060">周围</span><span style="font-size:10px;color:#6b7583">母亲小娟 — 已出门</span></div>
+          </div>
+        </details>
+        <!-- 外观：折叠 -->
+        <details style="border-bottom:1px solid #252830">
+          <summary style="padding:10px 14px;font-size:11px;color:#8b95a5;cursor:pointer;display:flex;align-items:center;gap:6px;letter-spacing:0.5px">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6b7583" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>外观 <span style="font-size:10px;color:#6b7583;font-weight:400">· 灰色吊带 + 黑色短裤</span>
+          </summary>
+        </details>
+        <!-- 心理：折叠 -->
+        <details style="border-bottom:1px solid #252830">
+          <summary style="padding:10px 14px;font-size:11px;color:#8b95a5;cursor:pointer;display:flex;align-items:center;gap:6px;letter-spacing:0.5px">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6b7583" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>心理 <span style="font-size:10px;color:#6b7583;font-weight:400">· 想让堂哥答应她留下…</span>
+          </summary>
+        </details>
+        <!-- 角色档案：折叠 -->
+        <details style="border-bottom:1px solid #252830">
+          <summary style="padding:10px 14px;font-size:11px;color:#8b95a5;cursor:pointer;display:flex;align-items:center;gap:6px;letter-spacing:0.5px">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#6b7583" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>角色档案 <span style="font-size:10px;color:#6b7583;font-weight:400">· 14岁 · 148cm</span>
+          </summary>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <!-- 全部展开 -->
+  <div class="mockup">
+    <div class="mockup-header">全部展开 · 零字段缺失</div>
+    <div class="mockup-body" style="background:#1a1d23;color:#c8ccd4;font-family:system-ui;min-height:580px;padding:0;width:240px;margin:0 auto">
+      <div style="display:flex;flex-direction:column;align-items:center;padding:16px 12px 12px;border-bottom:1px solid #252830">
+        <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#2d3140,#3a3f50);border:2px solid #4a5060;display:flex;align-items:center;justify-content:center;margin-bottom:8px">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8b95a5" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>
+        </div>
+        <div style="font-size:15px;font-weight:600;color:#e8eaed">邱惠玲</div>
+        <div style="font-size:10px;color:#6b7583">玲玲 · 14岁 · 巨蟹座</div>
+        <div style="width:100%;margin-top:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+            <span style="font-size:9px;color:#4a5060">好感度</span>
+            <span style="font-size:10px;color:#6fc98f">↑ 87 <span style="font-size:9px;color:#6b7583">+3</span></span>
+          </div>
+          <div style="height:2px;background:#2d3140;border-radius:1px"><div style="height:100%;width:87%;background:#7eb8da;border-radius:1px"></div></div>
+        </div>
+      </div>
+      <div style="overflow-y:auto;max-height:460px">
+        <!-- 基本信息 -->
+        <details open style="border-bottom:1px solid #252830">
+          <summary style="padding:8px 14px;font-size:10px;color:#8b95a5;cursor:pointer;display:flex;align-items:center;gap:6px;letter-spacing:0.5px">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7eb8da" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>基本信息
+          </summary>
+          <div style="padding:0 14px 10px;display:flex;flex-direction:column;gap:5px;font-size:10px">
+            <div style="display:flex;justify-content:space-between"><span style="color:#4a5060">名称</span><span style="color:#c8ccd4">邱惠玲</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#4a5060">位置</span><span style="color:#c8ccd4">自建房·四楼房间</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#4a5060">好感度</span><span style="color:#6fc98f">↑ 87</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#4a5060">变化原因</span><span style="color:#6b7583">堂哥给了零花钱</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start"><span style="color:#4a5060;flex-shrink:0">周围角色</span><span style="color:#6b7583;text-align:right;line-height:1.4">母亲小娟 — 已出门去叔叔那住一晚</span></div>
+          </div>
+        </details>
+        <!-- 外观 -->
+        <details open style="border-bottom:1px solid #252830">
+          <summary style="padding:8px 14px;font-size:10px;color:#8b95a5;cursor:pointer;display:flex;align-items:center;gap:6px;letter-spacing:0.5px">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7eb8da" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>外观
+          </summary>
+          <div style="padding:0 14px 10px;display:flex;flex-direction:column;gap:4px;font-size:10px">
+            <div style="display:flex;justify-content:space-between"><span style="color:#4a5060">表情</span><span style="color:#c8ccd4">嘴唇轻抿，带点紧张</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#4a5060">身体</span><span style="color:#9aa4b2">娇小纤瘦，腰细臀翘</span></div>
+            <div style="border-top:1px solid #252830;margin:2px 0"></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#4a5060">外套</span><span style="color:#6b7583">—</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#4a5060">上衣</span><span style="color:#c8ccd4">灰色吊带</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#4a5060">内衣</span><span style="color:#9aa4b2">浅粉色少女款</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#4a5060">下装</span><span style="color:#c8ccd4">黑色短裤</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#4a5060">内裤</span><span style="color:#9aa4b2">白色纯棉</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#4a5060">袜子</span><span style="color:#6b7583">—</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#4a5060">鞋子</span><span style="color:#9aa4b2">—（光脚）</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#4a5060">配饰</span><span style="color:#6b7583">—</span></div>
+          </div>
+        </details>
+        <!-- 心理 -->
+        <details open style="border-bottom:1px solid #252830">
+          <summary style="padding:8px 14px;font-size:10px;color:#8b95a5;cursor:pointer;display:flex;align-items:center;gap:6px;letter-spacing:0.5px">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7eb8da" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>心理
+          </summary>
+          <div style="padding:0 14px 10px;display:flex;flex-direction:column;gap:6px">
+            <div>
+              <div style="font-size:9px;color:#4a5060;margin-bottom:2px">内心想法</div>
+              <div style="font-size:10px;color:#9aa4b2;line-height:1.4;font-style:italic;background:#20242a;padding:5px 8px;border-radius:3px;border-left:2px solid #8b95a5">"堂哥会让我留下吗…今晚不想一个人"</div>
+            </div>
+            <div style="display:flex;gap:4px">
+              <span style="font-size:9px;color:#4a5060;flex-shrink:0;width:36px">当前动作</span>
+              <span style="font-size:10px;color:#c8ccd4;line-height:1.4">推开门探进半个身子，手还搭在门把上</span>
+            </div>
+            <div style="display:flex;gap:4px">
+              <span style="font-size:9px;color:#4a5060;flex-shrink:0;width:36px">下一步</span>
+              <span style="font-size:10px;color:#9aa4b2;line-height:1.4">撒娇让堂哥答应她留下来，再要点零花钱</span>
+            </div>
+          </div>
+        </details>
+        <!-- 角色档案 -->
+        <details open style="border-bottom:1px solid #252830">
+          <summary style="padding:8px 14px;font-size:10px;color:#8b95a5;cursor:pointer;display:flex;align-items:center;gap:6px;letter-spacing:0.5px">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7eb8da" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>角色档案
+          </summary>
+          <div style="padding:0 14px 10px;display:flex;flex-direction:column;gap:4px;font-size:10px">
+            <div style="display:flex;justify-content:space-between"><span style="color:#4a5060">年龄</span><span style="color:#9aa4b2">14岁 / 初一</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#4a5060">星座</span><span style="color:#9aa4b2">巨蟹座</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#4a5060">体征</span><span style="color:#9aa4b2">148cm / 38kg</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#4a5060">性格</span><span style="color:#9aa4b2">敏感早熟 · 拜金虚荣</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:#4a5060">喜好</span><span style="color:#9aa4b2">热舞 · 妆造 · 薅羊毛</span></div>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="background:#1e2428;border-radius:8px;padding:14px 18px;margin-top:20px;border-left:3px solid #6fc98f">
+  <h3 style="margin-top:0">字段清单核对 ✓</h3>
+  <div style="display:flex;gap:32px;flex-wrap:wrap;font-size:12px">
+    <div>
+      <div style="color:#7eb8da;font-weight:600;margin-bottom:6px">基本信息（4字段）</div>
+      <div style="color:#9aa4b2;line-height:1.8">✓ 名称 · ✓ 位置 · ✓ 好感度+原因 · ✓ 周围角色</div>
+    </div>
+    <div>
+      <div style="color:#7eb8da;font-weight:600;margin-bottom:6px">外观（10字段）</div>
+      <div style="color:#9aa4b2;line-height:1.8">✓ 表情 · ✓ 身体 · ✓ 外套 · ✓ 上衣 · ✓ 内衣 · ✓ 下装 · ✓ 内裤 · ✓ 袜子 · ✓ 鞋子 · ✓ 配饰</div>
+    </div>
+    <div>
+      <div style="color:#7eb8da;font-weight:600;margin-bottom:6px">心理（3字段）</div>
+      <div style="color:#9aa4b2;line-height:1.8">✓ 内心想法 · ✓ 当前动作 · ✓ 下一步计划</div>
+    </div>
+    <div>
+      <div style="color:#7eb8da;font-weight:600;margin-bottom:6px">档案（5字段）</div>
+      <div style="color:#9aa4b2;line-height:1.8">✓ 年龄 · ✓ 星座 · ✓ 体征 · ✓ 性格 · ✓ 喜好</div>
+    </div>
+  </div>
+</div>

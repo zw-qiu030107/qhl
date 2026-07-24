@@ -1,0 +1,164 @@
+<h2>左侧角色栏 — 三种方案对比</h2>
+<p class="subtitle">基于 qhl.json（邱惠玲）角色数据，展示不同深度的状态栏设计</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">方案 A · 简洁版</div>
+    <div class="mockup-body" style="background:#1a1d23;color:#c8ccd4;padding:16px;font-family:system-ui;min-height:420px">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px;width:200px;margin:0 auto">
+        <!-- 头像 -->
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#2d3140,#3a3f50);border:2px solid #4a5060;display:flex;align-items:center;justify-content:center">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8b95a5" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>
+        </div>
+        <!-- 名称 -->
+        <div style="font-size:16px;font-weight:600;color:#e8eaed">邱惠玲</div>
+        <div style="font-size:11px;color:#6b7583">玲玲 · 14岁 · 初一</div>
+        <!-- 心情指示器 -->
+        <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:#252830;border-radius:20px;font-size:12px">
+          <div style="width:8px;height:8px;border-radius:50%;background:#7eb8da"></div>
+          <span style="color:#9aa4b2">在线</span>
+        </div>
+        <!-- 好感度 -->
+        <div style="width:100%;text-align:center">
+          <div style="font-size:10px;color:#6b7583;margin-bottom:4px">好感度</div>
+          <div style="height:4px;background:#2d3140;border-radius:2px;overflow:hidden">
+            <div style="height:100%;width:78%;background:linear-gradient(90deg,#7eb8da,#8bbfda);border-radius:2px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mockup-header">方案 B · 标准版</div>
+    <div class="mockup-body" style="background:#1a1d23;color:#c8ccd4;padding:16px;font-family:system-ui;min-height:420px">
+      <div style="display:flex;flex-direction:column;gap:14px;width:200px;margin:0 auto">
+        <!-- 头像+名称 -->
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#2d3140,#3a3f50);border:2px solid #4a5060;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8b95a5" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>
+          </div>
+          <div>
+            <div style="font-size:15px;font-weight:600;color:#e8eaed">邱惠玲</div>
+            <div style="font-size:10px;color:#6b7583">在线 · 心情愉悦</div>
+          </div>
+        </div>
+        <!-- 属性面板（可折叠） -->
+        <details open style="font-size:12px">
+          <summary style="color:#8b95a5;cursor:pointer;margin-bottom:6px">角色属性</summary>
+          <div style="display:flex;flex-direction:column;gap:4px;color:#9aa4b2">
+            <div style="display:flex;justify-content:space-between"><span>年龄</span><span style="color:#c8ccd4">14岁</span></div>
+            <div style="display:flex;justify-content:space-between"><span>星座</span><span style="color:#c8ccd4">巨蟹座</span></div>
+            <div style="display:flex;justify-content:space-between"><span>身高</span><span style="color:#c8ccd4">148cm</span></div>
+            <div style="display:flex;justify-content:space-between"><span>性格</span><span style="color:#c8ccd4">敏感早熟</span></div>
+          </div>
+        </details>
+        <!-- 关系进度 -->
+        <div style="font-size:12px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:#8b95a5">信任度</span><span style="color:#c8ccd4">极高</span></div>
+          <div style="height:3px;background:#2d3140;border-radius:2px"><div style="height:100%;width:92%;background:#7eb8da;border-radius:2px"></div></div>
+        </div>
+        <!-- 最近互动 -->
+        <div style="font-size:10px;color:#6b7583;border-top:1px solid #2d3140;padding-top:8px">
+          <div style="color:#8b95a5;margin-bottom:3px">最近互动</div>
+          <div>2小时前 · 转账记录</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mockup-header">方案 C · 完整版</div>
+    <div class="mockup-body" style="background:#1a1d23;color:#c8ccd4;padding:16px;font-family:system-ui;min-height:420px">
+      <div style="display:flex;flex-direction:column;gap:12px;width:200px;margin:0 auto">
+        <!-- 角色切换标签 -->
+        <div style="display:flex;gap:4px">
+          <div style="padding:4px 10px;background:#7eb8da;color:#1a1d23;border-radius:12px;font-size:11px;font-weight:600">玲玲</div>
+          <div style="padding:4px 10px;background:#252830;color:#6b7583;border-radius:12px;font-size:11px">+</div>
+        </div>
+        <!-- 头像+名称 -->
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#2d3140,#3a3f50);border:2px solid #4a5060;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b95a5" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>
+          </div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:#e8eaed">邱惠玲</div>
+            <div style="font-size:10px;color:#7eb8da">堂妹 · 极度信任</div>
+          </div>
+        </div>
+        <!-- 状态+心情 -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span style="padding:2px 8px;background:#1a3a2a;color:#6fc98f;border-radius:10px;font-size:10px">在线</span>
+          <span style="padding:2px 8px;background:#2a2530;color:#b895c8;border-radius:10px;font-size:10px">撒娇中</span>
+        </div>
+        <!-- 属性面板 -->
+        <details open style="font-size:11px">
+          <summary style="color:#8b95a5;cursor:pointer;margin-bottom:4px">角色属性</summary>
+          <div style="display:flex;flex-direction:column;gap:3px;color:#9aa4b2">
+            <div style="display:flex;justify-content:space-between"><span>年龄/星座</span><span style="color:#c8ccd4">14/巨蟹</span></div>
+            <div style="display:flex;justify-content:space-between"><span>体征</span><span style="color:#c8ccd4">148cm/38kg</span></div>
+            <div style="display:flex;justify-content:space-between"><span>喜好</span><span style="color:#c8ccd4">热舞/妆造</span></div>
+          </div>
+        </details>
+        <!-- 场景标签 -->
+        <div style="font-size:11px">
+          <div style="color:#8b95a5;margin-bottom:3px">当前场景</div>
+          <div style="padding:6px 8px;background:#252830;border-radius:6px;color:#c8ccd4;font-size:10px;line-height:1.4">
+            五层自建房 · 夜晚 · 母亲刚出门
+          </div>
+        </div>
+        <!-- 记忆标签 -->
+        <div style="font-size:11px">
+          <div style="color:#8b95a5;margin-bottom:3px">角色记忆</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px">
+            <span style="padding:2px 6px;background:#252830;border-radius:4px;font-size:10px;color:#9aa4b2">前天转账</span>
+            <span style="padding:2px 6px;background:#252830;border-radius:4px;font-size:10px;color:#9aa4b2">抖音评论</span>
+            <span style="padding:2px 6px;background:#252830;border-radius:4px;font-size:10px;color:#9aa4b2">母亲冷淡</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:24px">
+  <h3>与 qhl.json 角色卡字段的对应关系</h3>
+  <table style="width:100%;font-size:13px;border-collapse:collapse">
+    <tr style="border-bottom:1px solid #2d3140">
+      <td style="padding:6px 12px;color:#8b95a5">角色卡字段</td>
+      <td style="padding:6px 12px;color:#c8ccd4">方案 A</td>
+      <td style="padding:6px 12px;color:#c8ccd4">方案 B</td>
+      <td style="padding:6px 12px;color:#c8ccd4">方案 C</td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:6px 12px;color:#9aa4b2">name / description</td>
+      <td style="padding:6px 12px">✓</td>
+      <td style="padding:6px 12px">✓</td>
+      <td style="padding:6px 12px">✓</td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:6px 12px;color:#9aa4b2">personality (性格特质)</td>
+      <td style="padding:6px 12px">—</td>
+      <td style="padding:6px 12px">✓ 摘要</td>
+      <td style="padding:6px 12px">✓ 完整</td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:6px 12px;color:#9aa4b2">scenario (场景)</td>
+      <td style="padding:6px 12px">—</td>
+      <td style="padding:6px 12px">—</td>
+      <td style="padding:6px 12px">✓</td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:6px 12px;color:#9aa4b2">mes_example (对话示例)</td>
+      <td style="padding:6px 12px">—</td>
+      <td style="padding:6px 12px">—</td>
+      <td style="padding:6px 12px">✓ 记忆提取</td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:6px 12px;color:#9aa4b2">first_mes (开场白)</td>
+      <td style="padding:6px 12px;color:#6b7583">—</td>
+      <td style="padding:6px 12px;color:#6b7583">—</td>
+      <td style="padding:6px 12px;color:#6b7583">—</td>
+    </tr>
+  </table>
+</div>

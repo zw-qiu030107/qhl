@@ -1,0 +1,125 @@
+<h2>对话框样式原型</h2>
+<p class="subtitle">剧本流 + 微信气泡融合 · 基于 qhl.json 实际对话内容</p>
+
+<style>
+  .bubble-demo {
+    background:#1a1d23;
+    border-radius:12px;
+    padding:24px;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    max-width:640px;
+    margin:0 auto;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  .msg-row { display:flex; flex-direction:column; max-width:85% }
+  .msg-row.user { align-self:flex-end; align-items:flex-end }
+  .msg-row.char { align-self:flex-start; align-items:flex-start }
+  .msg-label { font-size:10px; color:#6b7583; margin-bottom:2px; letter-spacing:0.5px }
+  .msg-bubble { padding:10px 14px; border-radius:16px; font-size:14px; line-height:1.7; word-break:break-word }
+  .msg-bubble.user { background:#1e3a4a; color:#c8dae6; border-bottom-right-radius:4px }
+  .msg-bubble.char { background:#252830; color:#c8ccd4; border-bottom-left-radius:4px }
+  .msg-bubble .action { color:#8b95a5; font-style:italic }
+  .msg-bubble .speech { color:#d4d8df }
+  .msg-bubble.user .action { color:#7ea8c4 }
+  .msg-bubble.user .speech { color:#d0dce6 }
+  .msg-bubble.char .speech { color:#d4d8df }
+  .msg-narration { font-size:13px; color:#6b7583; font-style:italic; padding:4px 14px; line-height:1.6; align-self:stretch; text-align:center; border-left:2px solid #2d3140; margin:4px 0 }
+</style>
+
+<div class="section">
+  <h3>对话流示例（基于 first_mes + 场景）</h3>
+</div>
+
+<div class="bubble-demo">
+  <!-- 叙述 -->
+  <div class="msg-narration">五楼走廊那头传来翻箱倒柜的声响…母亲小娟正往脸上抹粉，口红涂歪了一道。</div>
+
+  <!-- 角色动作 -->
+  <div class="msg-row char">
+    <div class="msg-label">玲玲</div>
+    <div class="msg-bubble char">
+      <span class="action">*玲玲退回自己房间，把门掩上，没关严。她坐在床边拿起手机，屏幕上是抖音里一个跳舞的视频，音量调到最低。*</span>
+    </div>
+  </div>
+
+  <!-- 叙述 -->
+  <div class="msg-narration">走廊里高跟鞋踩瓷砖的声音由远及近。</div>
+
+  <!-- 角色动作+叙述 -->
+  <div class="msg-row char">
+    <div class="msg-label">玲玲</div>
+    <div class="msg-bubble char">
+      <span class="action">*光着脚走到门口，手搭在门把上停了停，嘴唇抿了一下。然后踩着楼梯往下走。四楼堂哥的房门没关紧，她直接推开半扇，探进脑袋。*</span>
+    </div>
+  </div>
+
+  <!-- 角色对话 -->
+  <div class="msg-row char">
+    <div class="msg-label">玲玲</div>
+    <div class="msg-bubble char">
+      <span class="speech">"哥，我妈又出去了，你要不要上来。"</span>
+      <span style="color:#6b7583;font-size:12px;margin-left:4px">声音压得低，尾音往上飘</span>
+    </div>
+  </div>
+
+  <!-- 用户回复 -->
+  <div class="msg-row user">
+    <div class="msg-label">你</div>
+    <div class="msg-bubble user">
+      <span class="speech">"这么晚了还不睡？上来吧，我在打游戏。"</span>
+    </div>
+  </div>
+
+  <!-- 角色混合 -->
+  <div class="msg-row char">
+    <div class="msg-label">玲玲</div>
+    <div class="msg-bubble char">
+      <span class="action">*她推门进来，光着脚踩在地板上，径直走到你床沿坐下。栗色卷发散在肩上，灰色吊带的肩带滑了一边。*</span>
+      <br><br>
+      <span class="speech">"哥——"</span>
+      <span class="action">*拖长了尾音，把手机翻过来给你看屏幕，上面是和母亲的聊天记录。*</span>
+      <br><br>
+      <span class="speech">"我妈又去找那个叔叔了。我不想一个人在五楼。"</span>
+      <span class="action">*她低头抠着手机壳边缘，声音越来越小。*</span>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:24px">
+  <h3>样式规则说明</h3>
+  <table style="width:100%;font-size:13px;border-collapse:collapse">
+    <tr style="border-bottom:1px solid #2d3140">
+      <td style="padding:8px 12px;color:#8b95a5;width:120px">元素</td>
+      <td style="padding:8px 12px;color:#c8ccd4">样式</td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:8px 12px;color:#9aa4b2"><code>*...*</code> 动作/心理</td>
+      <td style="padding:8px 12px">
+        <span style="color:#8b95a5;font-style:italic">斜体 · 灰色</span>（角色侧）或
+        <span style="color:#7ea8c4;font-style:italic">斜体 · 浅蓝灰</span>（用户侧）
+      </td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:8px 12px;color:#9aa4b2"><code>"..."</code> 对话</td>
+      <td style="padding:8px 12px">
+        <span style="color:#d4d8df">正常 · 亮白</span> — 主要阅读内容
+      </td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:8px 12px;color:#9aa4b2">叙述性文字</td>
+      <td style="padding:8px 12px">
+        <span style="color:#6b7583;font-style:italic">居中 · 细灰斜体 · 左侧装饰线</span>
+      </td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:8px 12px;color:#9aa4b2">角色气泡</td>
+      <td style="padding:8px 12px">左对齐 · 深灰底 <span style="display:inline-block;width:12px;height:12px;background:#252830;border-radius:3px;vertical-align:middle"></span> · 左下直角</td>
+    </tr>
+    <tr>
+      <td style="padding:8px 12px;color:#9aa4b2">用户气泡</td>
+      <td style="padding:8px 12px">右对齐 · 深蓝底 <span style="display:inline-block;width:12px;height:12px;background:#1e3a4a;border-radius:3px;vertical-align:middle"></span> · 右下直角</td>
+    </tr>
+  </table>
+</div>
