@@ -156,29 +156,131 @@ const ChatInput = {
     const text = this.input.value.trim();
     if (!text) return;
     const msg = ChatRenderer.addMessage('user', text, '你');
-    // 保存到状态
-    if (window.state) {
-      const msgs = window.state.get('messages') || [];
-      msgs.push(msg);
-      window.state.set('messages', msgs);
-    }
+    const msgs = window.state?.get('messages') || [];
+    msgs.push(msg);
+    window.state?.set('messages', msgs);
     this.input.value = '';
     this.updateTokenCount();
     this.actionMenu.classList.remove('show');
-    // TODO: 未来连接 LLM 后端时在此处发送请求
+
+    // 调用 LLM API
+    this.callLLM(msgs);
+  },
+
+  async callLLM(messages) {
+    const config = Settings?.getApiConfig?.() || {};
+    if (!config.url || !config.key) {
+      window.notifications?.show('warning', '未配置 API', '请在全局设置中填写 API 接口地址和 Key');
+      return;
+    }
+
+    // 构建发送给 API 的消息列表
+    const apiMessages = this.buildApiMessages(messages);
+
+    // 显示"思考中"状态
+    const thinkingMsg = ChatRenderer.addMessage('char', '*正在思考…*', '玲玲');
+    window.notifications?.show('info', '请求中', '正在等待模型回复…');
+
+    try {
+      const resp = await fetch(config.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${config.key}`,
+        },
+        body: JSON.stringify({
+          model: config.model || 'gpt-4o',
+          messages: apiMessages,
+          max_tokens: parseInt(document.getElementById('cs-max-tokens')?.value || '512'),
+          temperature: parseFloat(document.getElementById('cs-temperature')?.value || '1.0'),
+          top_p: parseFloat(document.getElementById('cs-topp')?.value || '0.9'),
+          stream: false,
+        }),
+      });
+
+      // 移除"思考中"
+      thinkingMsg.remove();
+
+      if (!resp.ok) {
+        const errText = await resp.text();
+        window.notifications?.show('error', 'API 错误', `${resp.status}: ${errText.slice(0, 100)}`);
+        ChatRenderer.addMessage('char', `*[API 错误: ${resp.status}]*`, '系统');
+        return;
+      }
+
+      const data = await resp.json();
+      const reply = data.choices?.[0]?.message?.content || '(空回复)';
+
+      // 添加角色回复
+      const msg = ChatRenderer.addMessage('char', reply, '玲玲');
+      const updatedMsgs = window.state?.get('messages') || [];
+      updatedMsgs.push(msg);
+      window.state?.set('messages', updatedMsgs);
+
+    } catch (e) {
+      thinkingMsg.remove();
+      window.notifications?.show('error', '网络错误', e.message);
+      ChatRenderer.addMessage('char', `*[网络错误: ${e.message}]*`, '系统');
+    }
+  },
+
+  buildApiMessages(messages) {
+    const charName = document.getElementById('cs-name')?.value || '邱惠玲';
+    const personality = document.getElementById('cs-personality')?.value || '';
+    const scenario = document.getElementById('cs-background')?.value || '';
+
+    // 构建系统提示
+    let systemPrompt = `你是${charName}，正在进行角色扮演。\n`;
+    if (personality) systemPrompt += `性格: ${personality}\n`;
+    if (scenario) systemPrompt += `场景: ${scenario}\n`;
+    systemPrompt += `回复中使用 *动作描述* 表示动作/心理，"对话内容" 表示说话。`;
+
+    const apiMessages = [{ role: 'system', content: systemPrompt }];
+
+    messages.forEach(m => {
+      if (m.type === 'narration') return; // 跳过叙述
+      const role = m.role === 'user' ? 'user' : 'assistant';
+      // 清理文本中的 HTML 标签
+      const cleanText = m.text.replace(/<[^>]+>/g, '');
+      apiMessages.push({ role, content: cleanText });
+    });
+
+    return apiMessages;
   },
 
   regenerate() {
-    if (typeof notifications !== 'undefined') {
-      notifications.show('info', '重新生成', '此功能将在连接后端后可用');
+    const msgs = window.state?.get('messages') || [];
+    if (msgs.length === 0) {
+      window.notifications?.show('info', '重新生成', '没有可重新生成的消息');
+      this.actionMenu.classList.remove('show');
+      return;
     }
+    // 移除最后一条角色消息（如果存在）
+    const last = msgs[msgs.length - 1];
+    if (last.role === 'char') {
+      msgs.pop();
+      window.state?.set('messages', msgs);
+      // 重建聊天区
+      ChatRenderer.container.innerHTML = '';
+      ChatRenderer.renderMessages(msgs);
+    }
+    // 重新调用 LLM
+    this.callLLM(msgs);
     this.actionMenu.classList.remove('show');
   },
 
   continueWrite() {
-    if (typeof notifications !== 'undefined') {
-      notifications.show('info', '继续写', '此功能将在连接后端后可用');
+    const msgs = window.state?.get('messages') || [];
+    if (msgs.length === 0) {
+      window.notifications?.show('info', '继续写', '没有可继续的消息');
+      this.actionMenu.classList.remove('show');
+      return;
     }
+    // 在最后一条消息后添加继续提示
+    const continueMsg = { role: 'user', text: '(继续写下去，不要重复之前的内容)', senderName: '系统', id: utils.uid(), time: Date.now() };
+    msgs.push(continueMsg);
+    window.state?.set('messages', msgs);
+    this.callLLM(msgs);
     this.actionMenu.classList.remove('show');
   },
 
@@ -417,27 +519,10 @@ const Bookmarks = {
   }
 };
 
-// 初始化历史记录和书签按钮
+// 初始化历史记录和书签
 document.addEventListener('DOMContentLoaded', () => {
   ChatHistory.init();
   Bookmarks.init();
-
-  const historyBtn = document.getElementById('btn-history');
-  const bookmarkBtn = document.getElementById('btn-bookmarks');
-
-  if (historyBtn) {
-    historyBtn.addEventListener('click', () => {
-      ChatHistory.renderList();
-      ModalManager.open('modal-chat-history');
-    });
-  }
-
-  if (bookmarkBtn) {
-    bookmarkBtn.addEventListener('click', () => {
-      Bookmarks.renderList();
-      ModalManager.open('modal-bookmarks');
-    });
-  }
 
   // 清空对话时关闭当前会话
   const clearBtn = document.getElementById('act-clear');

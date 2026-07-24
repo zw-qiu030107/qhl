@@ -40,6 +40,9 @@ const Settings = {
     theme: 'default',
     fontSize: 'medium',
     bubbleStyle: 'default',
+    apiUrl: '',
+    apiKey: '',
+    apiModel: '',
   },
 
   init() {
@@ -51,6 +54,12 @@ const Settings = {
     document.getElementById('setting-font-size').addEventListener('change', (e) => this.set('fontSize', e.target.value));
     document.getElementById('setting-bubble-style').addEventListener('change', (e) => this.set('bubbleStyle', e.target.value));
     document.getElementById('btn-clear-all').addEventListener('click', () => this.clearAll());
+
+    // API 配置
+    document.getElementById('setting-api-url').addEventListener('change', (e) => this.set('apiUrl', e.target.value));
+    document.getElementById('setting-api-key').addEventListener('change', (e) => this.set('apiKey', e.target.value));
+    document.getElementById('setting-api-model').addEventListener('change', (e) => this.set('apiModel', e.target.value));
+    document.getElementById('btn-test-api').addEventListener('click', () => this.testApiConnection());
   },
 
   load() {
@@ -74,11 +83,54 @@ const Settings = {
     return { ...this.defaults, ...(window.storage?.get('settings') || {}) };
   },
 
+  getApiConfig() {
+    const s = this.getAll();
+    return { url: s.apiUrl, key: s.apiKey, model: s.apiModel };
+  },
+
   apply(s) {
     document.documentElement.dataset.theme = s.theme;
     document.documentElement.style.setProperty('--font-size-multiplier',
       s.fontSize === 'small' ? '0.9' : s.fontSize === 'large' ? '1.15' : '1');
     document.body.dataset.bubbleStyle = s.bubbleStyle;
+  },
+
+  async testApiConnection() {
+    const { url, key, model } = this.getApiConfig();
+    const resultEl = document.getElementById('api-test-result');
+    if (!url || !key) {
+      resultEl.textContent = '请先填写接口地址和 API Key';
+      resultEl.style.color = 'var(--danger)';
+      return;
+    }
+    resultEl.textContent = '测试中…';
+    resultEl.style.color = 'var(--text-muted)';
+    try {
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+        body: JSON.stringify({
+          model: model || 'gpt-4o',
+          messages: [{ role: 'user', content: 'Hi' }],
+          max_tokens: 5,
+        }),
+      });
+      if (resp.ok) {
+        resultEl.textContent = '连接成功';
+        resultEl.style.color = 'var(--success)';
+        this.set('apiUrl', url);
+        this.set('apiKey', key);
+        this.set('apiModel', model);
+      } else {
+        const err = await resp.text();
+        resultEl.textContent = `连接失败: ${resp.status}`;
+        resultEl.style.color = 'var(--danger)';
+        console.warn('[API Test]', err);
+      }
+    } catch (e) {
+      resultEl.textContent = `网络错误: ${e.message}`;
+      resultEl.style.color = 'var(--danger)';
+    }
   },
 
   clearAll() {
@@ -109,4 +161,15 @@ document.getElementById('btn-history')?.addEventListener('click', () => {
 });
 document.getElementById('btn-bookmarks')?.addEventListener('click', () => {
   ModalManager.open('modal-bookmarks');
+});
+
+// 通知按钮 — 显示最近通知
+document.getElementById('btn-notifications')?.addEventListener('click', () => {
+  const recent = window.storage?.get('notification_history') || [];
+  if (recent.length === 0) {
+    window.notifications?.show('info', '通知中心', '暂无通知记录');
+  } else {
+    window.notifications?.show('info', '通知中心', `最近 ${recent.length} 条通知，详情见控制台`);
+    console.table(recent.slice(-10));
+  }
 });

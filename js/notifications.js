@@ -31,6 +31,12 @@ const notifications = {
     `;
     this.container.appendChild(toast);
 
+    // 记录通知历史
+    const history = window.storage?.get('notification_history') || [];
+    history.push({ type, title, message, time: Date.now() });
+    if (history.length > 50) history.shift();
+    window.storage?.set('notification_history', history);
+
     // Limit to max 3 visible toasts -- remove oldest when exceeded
     const toasts = this.container.querySelectorAll('.toast');
     if (toasts.length > 3) toasts[0].remove();
