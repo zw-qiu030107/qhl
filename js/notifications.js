@@ -42,3 +42,4 @@ const notifications = {
     }, 3000);
   }
 };
+window.notifications = notifications;

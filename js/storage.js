@@ -31,3 +31,4 @@ const storage = {
       .map(k => k.slice(this.PREFIX.length));
   }
 };
+window.storage = storage;

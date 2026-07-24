@@ -369,6 +369,53 @@
         </div>
       </div>
     </div>
+
+    <!-- 全局设置 -->
+    <div class="modal hidden" id="modal-settings">
+      <div class="modal-header">
+        <h3>全局设置</h3>
+        <button class="modal-close" onclick="ModalManager.close()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="char-field">
+          <label>主题</label>
+          <select id="setting-theme">
+            <option value="default">深色（默认）</option>
+            <option value="darker">更暗</option>
+          </select>
+        </div>
+        <div class="char-field">
+          <label>字体大小</label>
+          <select id="setting-font-size">
+            <option value="small">小</option>
+            <option value="medium" selected>中</option>
+            <option value="large">大</option>
+          </select>
+        </div>
+        <div class="char-field">
+          <label>气泡样式</label>
+          <select id="setting-bubble-style">
+            <option value="default" selected>当前风格</option>
+            <option value="compact">紧凑风格</option>
+          </select>
+        </div>
+        <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border-color)">
+          <h4 style="font-size:13px;color:var(--text-primary);margin-bottom:8px">键盘快捷键</h4>
+          <table style="width:100%;font-size:11px;color:var(--text-muted)">
+            <tr><td style="padding:4px 0">发送消息</td><td style="color:var(--text-secondary)">Enter</td></tr>
+            <tr><td style="padding:4px 0">换行</td><td style="color:var(--text-secondary)">Shift + Enter</td></tr>
+            <tr><td style="padding:4px 0">关闭弹窗</td><td style="color:var(--text-secondary)">Esc</td></tr>
+          </table>
+        </div>
+        <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border-color)">
+          <h4 style="font-size:13px;color:var(--danger);margin-bottom:8px">数据管理</h4>
+          <button class="btn btn-danger" id="btn-clear-all">清空所有本地数据</button>
+          <p style="font-size:10px;color:var(--text-muted);margin-top:4px">此操作将删除所有角色卡、世界书条目、对话历史和设置</p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="js/utils.js"></script>

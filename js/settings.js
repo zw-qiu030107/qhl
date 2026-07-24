@@ -32,3 +32,81 @@ if (anFreqInput && anWarning) {
   // 初始检查
   toggleWarning();
 }
+
+// ===== 全局设置对象 =====
+
+const Settings = {
+  defaults: {
+    theme: 'default',
+    fontSize: 'medium',
+    bubbleStyle: 'default',
+  },
+
+  init() {
+    this.load();
+    document.getElementById('btn-settings').addEventListener('click', () => {
+      ModalManager.open('modal-settings');
+    });
+    document.getElementById('setting-theme').addEventListener('change', (e) => this.set('theme', e.target.value));
+    document.getElementById('setting-font-size').addEventListener('change', (e) => this.set('fontSize', e.target.value));
+    document.getElementById('setting-bubble-style').addEventListener('change', (e) => this.set('bubbleStyle', e.target.value));
+    document.getElementById('btn-clear-all').addEventListener('click', () => this.clearAll());
+  },
+
+  load() {
+    const saved = window.storage?.get('settings') || {};
+    const s = { ...this.defaults, ...saved };
+    Object.entries(s).forEach(([k, v]) => {
+      const el = document.getElementById(`setting-${k.replace(/([A-Z])/g, '-$1').toLowerCase()}`);
+      if (el) el.value = v;
+    });
+    this.apply(s);
+  },
+
+  set(key, val) {
+    const s = this.getAll();
+    s[key] = val;
+    window.storage?.set('settings', s);
+    this.apply(s);
+  },
+
+  getAll() {
+    return { ...this.defaults, ...(window.storage?.get('settings') || {}) };
+  },
+
+  apply(s) {
+    document.documentElement.dataset.theme = s.theme;
+    document.documentElement.style.setProperty('--font-size-multiplier',
+      s.fontSize === 'small' ? '0.9' : s.fontSize === 'large' ? '1.15' : '1');
+    document.body.dataset.bubbleStyle = s.bubbleStyle;
+  },
+
+  clearAll() {
+    if (confirm('确定要清空所有本地数据吗？此操作不可撤销。')) {
+      window.storage?.clearAll();
+      window.notifications?.show('success', '已清空', '所有本地数据已清除，刷新页面生效');
+    }
+  }
+};
+
+// ===== 键盘快捷键与导航按钮绑定 =====
+
+// Ctrl+H 打开对话历史, Ctrl+B 打开书签
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.key === 'h') {
+    e.preventDefault();
+    ModalManager.open('modal-chat-history');
+  }
+  if (e.ctrlKey && e.key === 'b') {
+    e.preventDefault();
+    ModalManager.open('modal-bookmarks');
+  }
+});
+
+// 导航按钮点击打开对应模态框
+document.getElementById('btn-history')?.addEventListener('click', () => {
+  ModalManager.open('modal-chat-history');
+});
+document.getElementById('btn-bookmarks')?.addEventListener('click', () => {
+  ModalManager.open('modal-bookmarks');
+});
