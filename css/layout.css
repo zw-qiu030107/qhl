@@ -1,0 +1,65 @@
+/* css/layout.css */
+body { display: flex; flex-direction: column; height: 100vh; }
+
+#topnav {
+  height: var(--topnav-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-lg);
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+#app-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+#left-panel {
+  width: var(--left-panel-width);
+  flex-shrink: 0;
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+#right-panel {
+  width: var(--right-panel-width);
+  flex-shrink: 0;
+  background: var(--bg-panel);
+  border-left: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#input-bar {
+  height: var(--input-bar-height);
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-lg);
+  gap: var(--space-md);
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+/* 响应式：小屏幕隐藏侧边栏 */
+@media (max-width: 900px) {
+  #left-panel, #right-panel { display: none; }
+}

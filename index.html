@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>清醒酒馆 · 角色扮演</title>
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+</head>
+<body>
+  <header id="topnav">
+    <div id="nav-left">
+      <span id="app-logo">清醒酒馆</span>
+    </div>
+    <div id="nav-right">
+      <button id="btn-character-manager" class="nav-btn" title="角色管理">
+        <!-- SVG 用户图标 -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
+      <button id="btn-settings" class="nav-btn" title="设置">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </button>
+      <button id="btn-notifications" class="nav-btn" title="通知">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div id="app-main">
+    <aside id="left-panel">
+      <!-- Task 2 fills this -->
+    </aside>
+    <main id="chat-area">
+      <div id="chat-messages">
+        <!-- Task 3 fills this -->
+      </div>
+    </main>
+    <aside id="right-panel">
+      <!-- Task 4 fills this -->
+    </aside>
+  </div>
+
+  <footer id="input-bar">
+    <!-- Task 3 fills this -->
+  </footer>
+
+  <!-- Overlay containers -->
+  <div id="modal-overlay" class="modal-overlay hidden"></div>
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/modals.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/character.js"></script>
+  <script src="js/worldbook.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

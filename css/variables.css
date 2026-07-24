@@ -1,0 +1,67 @@
+/* css/variables.css */
+:root {
+  /* 色彩 */
+  --bg-primary: #141619;
+  --bg-panel: #1a1d23;
+  --bg-surface: #20242a;
+  --bg-hover: #252830;
+  --border-color: #2d3140;
+  --border-active: #3a4050;
+  --text-primary: #e8eaed;
+  --text-secondary: #c8ccd4;
+  --text-tertiary: #8b95a5;
+  --text-muted: #6b7583;
+  --text-dim: #4a5060;
+  --accent: #7eb8da;
+  --accent-dim: #5a8aaa;
+  --accent-glow: rgba(126, 184, 218, 0.25);
+  --success: #6fc98f;
+  --warning: #d4a860;
+  --danger: #c46b6b;
+  --danger-bg: rgba(196, 107, 107, 0.12);
+  --bubble-char: #252830;
+  --bubble-user: #1e3a4a;
+
+  /* 字体 */
+  --font-sans: "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", "Consolas", monospace;
+
+  /* 间距 */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+
+  /* 圆角 */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 50%;
+
+  /* 阴影 */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+  --glow-accent: 0 0 12px var(--accent-glow);
+
+  /* 过渡 */
+  --transition-fast: 150ms ease-out;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease-out;
+
+  /* 尺寸 */
+  --left-panel-width: 220px;
+  --right-panel-width: 280px;
+  --topnav-height: 40px;
+  --input-bar-height: 64px;
+}
+
+/* 深色主题变体 */
+[data-theme="darker"] {
+  --bg-primary: #0c0e12;
+  --bg-panel: #111318;
+  --bg-surface: #161920;
+  --bg-hover: #1c1f27;
+}
