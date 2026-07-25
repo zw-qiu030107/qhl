@@ -11,12 +11,17 @@
   <link rel="stylesheet" href="css/animations.css">
   <link rel="stylesheet" href="css/notifications.css">
   <link rel="stylesheet" href="css/modals.css">
+  <link rel="stylesheet" href="css/game-mode.css">
 </head>
 <body>
   <header id="topnav">
     <div id="nav-left">
       <span id="app-logo">清醒酒馆</span>
     </div>
+    <button id="btn-game-mode" title="切换到游戏模式" aria-pressed="false">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+      <span>游戏</span>
+    </button>
     <div id="nav-right">
       <!-- 角色（多选项组，pill 无 data-view，需悬停选择子项） -->
       <div class="nav-pill-group">
@@ -168,6 +173,20 @@
     </aside>
     <main id="chat-area">
       <div id="chat-messages"></div>
+    </main>
+
+    <!-- Game Mode UI (hidden by default) -->
+    <main id="game-area" style="display:none">
+      <div id="game-maintext"></div>
+      <div id="game-options"></div>
+      <details id="game-thinking">
+        <summary>
+          <svg class="chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+          <span class="thinking-label">思考过程</span>
+        </summary>
+        <div class="game-thinking-body"></div>
+      </details>
+      <div id="game-vars"></div>
     </main>
     <aside id="right-panel">
       <!-- Tab Bar -->
@@ -472,6 +491,11 @@
   <script src="js/state.js"></script>
   <script src="js/notifications.js"></script>
   <script src="js/modals.js"></script>
+  <script src="js/sillytavern/vars-merger.js"></script>
+  <script src="js/sillytavern/stream-parser.js"></script>
+  <script src="js/sillytavern/variables.js"></script>
+  <script src="js/sillytavern/importer.js"></script>
+  <script src="js/game-mode.js"></script>
   <script src="js/chat.js"></script>
   <script src="js/character.js"></script>
   <script src="js/worldbook.js"></script>

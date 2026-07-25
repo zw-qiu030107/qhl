@@ -1,0 +1,242 @@
+/* css/game-mode.css */
+/* ================================
+   Game Mode — Interactive Fiction UI
+   ================================ */
+
+/* Game mode toggle button in topnav */
+#btn-game-mode {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  height: 28px;
+  border-radius: 14px;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  margin: 0 auto;
+}
+
+#btn-game-mode:hover {
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border-color: var(--border-color);
+}
+
+#btn-game-mode.active {
+  color: var(--accent);
+  background: var(--bg-surface);
+  border-color: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+#btn-game-mode svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* ================================
+   Game Area Container
+   ================================ */
+#game-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+  background: var(--bg-primary);
+}
+
+/* ================================
+   Game Main Text
+   ================================ */
+#game-maintext {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-xl) var(--space-lg);
+  line-height: 1.9;
+  font-size: 15px;
+  color: var(--text-primary);
+  scroll-behavior: smooth;
+}
+
+#game-maintext p {
+  margin-bottom: 0.8em;
+}
+
+#game-maintext p:last-child {
+  margin-bottom: 0;
+}
+
+#game-maintext strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+#game-maintext em {
+  color: var(--text-tertiary);
+}
+
+/* ================================
+   Game Options
+   ================================ */
+#game-options {
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-panel);
+  flex-shrink: 0;
+  max-height: 180px;
+  overflow-y: auto;
+  align-items: flex-start;
+}
+
+.game-options-empty {
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: var(--space-sm) 0;
+  font-style: italic;
+}
+
+/* Option button cards */
+.game-option-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-family: inherit;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+  white-space: normal;
+  word-break: break-word;
+  flex: 1 1 auto;
+  min-width: 120px;
+  max-width: 280px;
+}
+
+.game-option-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+  border-color: var(--border-active);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.game-option-btn:active {
+  transform: translateY(0);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+/* ================================
+   Game Thinking (foldable)
+   ================================ */
+#game-thinking {
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-panel);
+  flex-shrink: 0;
+}
+
+#game-thinking summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px var(--space-lg);
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+  transition: color var(--transition-fast);
+  list-style: none;
+}
+
+#game-thinking summary::-webkit-details-marker {
+  display: none;
+}
+
+#game-thinking summary .chevron {
+  width: 10px;
+  height: 10px;
+  transition: transform var(--transition-normal);
+  flex-shrink: 0;
+}
+
+#game-thinking[open] summary .chevron {
+  transform: rotate(90deg);
+}
+
+#game-thinking summary:hover {
+  color: var(--text-secondary);
+}
+
+#game-thinking summary .thinking-label {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#game-thinking .game-thinking-body {
+  padding: 0 var(--space-lg) var(--space-md);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-tertiary);
+  font-style: italic;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* ================================
+   Game Vars
+   ================================ */
+#game-vars {
+  display: none;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  padding: 8px var(--space-lg);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 120px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+/* ================================
+   Responsive
+   ================================ */
+@media (max-width: 900px) {
+  #game-maintext {
+    padding: var(--space-md);
+    font-size: 14px;
+  }
+
+  #game-options {
+    padding: var(--space-sm) var(--space-md);
+    gap: 6px;
+    max-height: 150px;
+  }
+
+  .game-option-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+    min-width: 100px;
+  }
+}

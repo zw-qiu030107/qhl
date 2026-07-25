@@ -211,11 +211,41 @@ const ChatInput = {
       const data = await resp.json();
       const reply = data.choices?.[0]?.message?.content || '(空回复)';
 
-      // 添加角色回复
-      const msg = ChatRenderer.addMessage('char', reply, '玲玲');
-      const updatedMsgs = window.state?.get('messages') || [];
-      updatedMsgs.push(msg);
-      window.state?.set('messages', updatedMsgs);
+      // 解析结构化标签（SillyTavern stream parser）
+      var parsed = null;
+      if (window.ST && ST.StreamParser) {
+        parsed = ST.StreamParser.parse(reply);
+        // 提取变量更新
+        if (ST.Variables && parsed.varsRaw) {
+          var varResult = ST.Variables.extractVariables(reply);
+          if (Object.keys(varResult.updates).length > 0) {
+            parsed.varsExtracted = varResult.updates;
+          }
+        }
+      }
+
+      // 如果游戏模式激活，使用游戏界面渲染
+      var msg, updatedMsgs;
+      if (window.ST && ST.GameMode && ST.GameMode.isActive() && parsed && (parsed.maintext || parsed.options.length > 0)) {
+        ST.GameMode.displayParsedReply(parsed);
+        // 仍然添加消息到历史（用于上下文），但不在聊天区显示气泡
+        msg = { role: 'char', text: reply, senderName: '玲玲', id: utils.uid(), time: Date.now(), parsed: parsed };
+        updatedMsgs = window.state?.get('messages') || [];
+        updatedMsgs.push(msg);
+        window.state?.set('messages', updatedMsgs);
+        // 如果有变量更新，应用它们
+        if (parsed.varsExtracted && ST.VarsMerger) {
+          var currentVars = window.state?.get('gameVariables') || {};
+          var nextVars = ST.VarsMerger.mergeVariables(currentVars, parsed.varsExtracted);
+          window.state?.set('gameVariables', nextVars);
+        }
+      } else {
+        // 正常聊天模式：显示气泡
+        msg = ChatRenderer.addMessage('char', reply, '玲玲');
+        updatedMsgs = window.state?.get('messages') || [];
+        updatedMsgs.push(msg);
+        window.state?.set('messages', updatedMsgs);
+      }
 
     } catch (e) {
       thinkingMsg.remove();
@@ -322,6 +352,10 @@ const ChatInput = {
 document.addEventListener('DOMContentLoaded', () => {
   ChatRenderer.init();
   ChatInput.init();
+  // 初始化游戏模式
+  if (window.ST && ST.GameMode) {
+    ST.GameMode.init();
+  }
 });
 
 // ====== 对话历史管理 ======
