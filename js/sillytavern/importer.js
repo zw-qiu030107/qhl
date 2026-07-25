@@ -334,10 +334,182 @@ ST.Importer = (function () {
   }
 
   // ==================================================================
+  // Character Card Import/Export (SillyTavern v2/v3 spec)
+  // ==================================================================
+
+  /**
+   * Import a SillyTavern character card JSON (v2/v3 spec).
+   * Reads spec version, normalizes to internal format.
+   * @param {Object} json - Raw character card JSON
+   * @returns {Object} Normalized character card object
+   */
+  function importCharacterCard(json) {
+    var spec = json.spec || 'chara_card_v2';
+    var data = json.data || json; // v3 wraps in .data, v2 is flat
+
+    return {
+      spec: spec,
+      specVersion: json.spec_version || '2.0',
+      name: data.name || json.name || '',
+      description: data.description || json.description || '',
+      personality: data.personality || json.personality || '',
+      scenario: data.scenario || json.scenario || '',
+      firstMes: data.first_mes || json.first_mes || '',
+      mesExample: data.mes_example || json.mes_example || '',
+      creatorNotes: data.creator_notes || json.creatorcomment || '',
+      systemPrompt: data.system_prompt || '',
+      postHistoryInstructions: data.post_history_instructions || '',
+      alternateGreetings: data.alternate_greetings || [],
+      tags: data.tags || json.tags || [],
+      creator: data.creator || json.creator || '',
+      characterVersion: data.character_version || '',
+      extensions: data.extensions || json.extensions || {},
+      // Raw v3 data block
+      raw: data,
+    };
+  }
+
+  /**
+   * Export an internal character card to ST v3 JSON.
+   * @param {Object} card - Internal card object
+   * @returns {Object} ST v3 spec JSON
+   */
+  function exportCharacterCard(card) {
+    return {
+      spec: 'chara_card_v3',
+      spec_version: '3.0',
+      data: {
+        name: card.name || '',
+        description: card.description || '',
+        personality: card.personality || '',
+        scenario: card.scenario || '',
+        first_mes: card.firstMes || '',
+        mes_example: card.mesExample || '',
+        creator_notes: card.creatorNotes || '',
+        system_prompt: card.systemPrompt || '',
+        post_history_instructions: card.postHistoryInstructions || '',
+        alternate_greetings: card.alternateGreetings || [],
+        tags: card.tags || [],
+        creator: card.creator || '',
+        character_version: card.characterVersion || '',
+        extensions: card.extensions || {},
+      },
+    };
+  }
+
+  /**
+   * Extract character card JSON from a PNG file (SillyTavern PNG embedding).
+   * ST embeds base64-encoded JSON in the tEXt chunk with keyword "chara".
+   * @param {File} file - PNG file
+   * @returns {Promise<Object>} Parsed character card
+   */
+  function extractCardFromPng(file) {
+    return new Promise(function (resolve, reject) {
+      if (!file || !file.type.includes('png')) {
+        reject(new Error('仅支持 PNG 格式的角色卡图片'));
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function () {
+        try {
+          var bytes = new Uint8Array(reader.result);
+          var json = null;
+
+          // Scan for tEXt "chara" chunk in PNG binary
+          var offset = 8; // skip PNG signature
+          while (offset < bytes.length) {
+            var length = (bytes[offset] << 24) | (bytes[offset + 1] << 16) | (bytes[offset + 2] << 8) | bytes[offset + 3];
+            var type = String.fromCharCode(bytes[offset + 4], bytes[offset + 5], bytes[offset + 6], bytes[offset + 7]);
+            if (type === 'tEXt') {
+              var dataStart = offset + 8;
+              var nullIdx = -1;
+              for (var i = dataStart; i < dataStart + length; i++) {
+                if (bytes[i] === 0) { nullIdx = i; break; }
+              }
+              if (nullIdx > dataStart) {
+                var keyword = '';
+                for (var k = dataStart; k < nullIdx; k++) {
+                  keyword += String.fromCharCode(bytes[k]);
+                }
+                if (keyword === 'chara') {
+                  var contentStart = nullIdx + 1;
+                  var content = '';
+                  for (var c = contentStart; c < dataStart + length; c++) {
+                    content += String.fromCharCode(bytes[c]);
+                  }
+                  // Try base64 decode
+                  try {
+                    var decoded = atob(content);
+                    json = JSON.parse(decoded);
+                    break;
+                  } catch (e) {
+                    // maybe raw JSON
+                    try { json = JSON.parse(content); break; } catch (e2) {}
+                  }
+                }
+              }
+            }
+            offset += 12 + length;
+          }
+
+          if (json) {
+            resolve(importCharacterCard(json));
+          } else {
+            reject(new Error('PNG 中未找到角色卡数据（chara 块）'));
+          }
+        } catch (e) {
+          reject(new Error('解析 PNG 失败: ' + e.message));
+        }
+      };
+      reader.onerror = function () { reject(new Error('读取文件失败')); };
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  /**
+   * Apply a character card to the UI: left panel, right panel character settings, and storage.
+   * @param {Object} card - Parsed character card (from importCharacterCard)
+   */
+  function applyCharacterCard(card) {
+    // 左侧状态栏
+    var el = function (id) { return document.getElementById(id); };
+    if (el('char-name-display')) el('char-name-display').textContent = card.name;
+    if (el('s-name')) el('s-name').textContent = card.name;
+
+    // 右侧角色设定表单
+    if (el('cs-name')) el('cs-name').value = card.name;
+    if (el('cs-nickname')) el('cs-nickname').value = card.description;
+    if (el('cs-personality')) el('cs-personality').value = card.personality;
+    if (el('cs-background')) el('cs-background').value = card.scenario;
+
+    // 保存到 localStorage
+    if (window.storage) {
+      window.storage.set('character_card', card);
+    }
+    // 同步到 ST 数据库
+    if (ST.getSettings && ST.saveSettings) {
+      ST.getSettings().then(function (s) {
+        if (s) {
+          s.characterName = card.name;
+          ST.saveSettings(s);
+        }
+      }).catch(function () {});
+    }
+
+    window.notifications?.show('success', '角色卡已加载', '已应用: ' + card.name);
+  }
+
+  // ==================================================================
   // Exported namespace
   // ==================================================================
 
   return {
+    // Character cards
+    importCharacterCard: importCharacterCard,
+    exportCharacterCard: exportCharacterCard,
+    extractCardFromPng: extractCardFromPng,
+    applyCharacterCard: applyCharacterCard,
+    // Lorebooks
     importLorebook: importLorebook,
     exportLorebook: exportLorebook,
     importPreset: importPreset,

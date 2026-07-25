@@ -141,7 +141,7 @@ const CharacterManager = {
       e.preventDefault();
       zone.classList.remove('drag-over');
       const file = e.dataTransfer.files[0];
-      if (file && file.name.endsWith('.json')) {
+      if (file && (file.name.endsWith('.json') || file.name.endsWith('.png'))) {
         this.readFile(file);
       }
     });
@@ -154,27 +154,41 @@ const CharacterManager = {
   },
 
   readFile(file) {
+    // PNG 角色卡（SillyTavern PNG 嵌入）
+    if (file.type.includes('png') && window.ST && ST.Importer && ST.Importer.extractCardFromPng) {
+      ST.Importer.extractCardFromPng(file).then(card => {
+        this.importCard(card);
+      }).catch(err => {
+        window.notifications?.show('error', '导入失败', err.message);
+      });
+      return;
+    }
+    // JSON 角色卡
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const data = JSON.parse(e.target.result);
-        this.importCard(data);
+        const raw = JSON.parse(e.target.result);
+        const card = (window.ST && ST.Importer && ST.Importer.importCharacterCard)
+          ? ST.Importer.importCharacterCard(raw)
+          : raw;
+        this.importCard(card);
       } catch (err) {
-        if (typeof window.notifications !== 'undefined') {
-          window.notifications.show('error', '导入失败', 'JSON 解析错误：' + err.message);
-        }
+        window.notifications?.show('error', '导入失败', 'JSON 解析错误：' + err.message);
       }
     };
     reader.readAsText(file);
   },
 
-  importCard(jsonData) {
-    this.cards.push(jsonData);
+  importCard(card) {
+    this.cards.push(card);
     this.saveToStorage();
     this.renderList();
-    if (typeof window.notifications !== 'undefined') {
-      const name = jsonData.data?.name || jsonData.name || '角色卡';
-      window.notifications.show('success', '导入成功', `已导入「${name}」`);
+    const name = card.name || card.data?.name || '角色卡';
+    window.notifications?.show('success', '导入成功', `已导入「${name}」`);
+
+    // 自动应用为当前角色
+    if (window.ST && ST.Importer && ST.Importer.applyCharacterCard) {
+      ST.Importer.applyCharacterCard(card);
     }
   },
 
