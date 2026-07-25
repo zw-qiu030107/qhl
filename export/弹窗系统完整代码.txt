@@ -1,0 +1,711 @@
+================================================================================
+清醒酒馆 — 弹窗系统 完整代码导出
+================================================================================
+包含：导航药丸按钮 / 悬停下拉 / 弹窗 HTML / 弹窗 CSS / ViewManager JS
+================================================================================
+
+========================================
+一、HTML — 导航药丸按钮（index.html #nav-right 内）
+========================================
+
+    <div id="nav-right">
+      <!-- 角色 -->
+      <div class="nav-pill-group">
+        <button id="btn-character-manager" class="nav-pill" data-view="modal-char-manager">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>角色</span>
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pill-chevron"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="pill-dropdown">
+          <button data-view="modal-char-manager">角色卡管理</button>
+          <button data-view="modal-char-editor">角色卡编辑器</button>
+        </div>
+      </div>
+
+      <!-- 历史 -->
+      <div class="nav-pill-group">
+        <button id="btn-history" class="nav-pill" data-view="modal-chat-history">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>历史</span>
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pill-chevron"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="pill-dropdown">
+          <button data-view="modal-chat-history">对话历史</button>
+        </div>
+      </div>
+
+      <!-- 书签 -->
+      <div class="nav-pill-group">
+        <button id="btn-bookmarks" class="nav-pill" data-view="modal-bookmarks">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+          <span>书签</span>
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pill-chevron"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="pill-dropdown">
+          <button data-view="modal-bookmarks">书签收藏</button>
+        </div>
+      </div>
+
+      <!-- 设置 -->
+      <div class="nav-pill-group">
+        <button id="btn-settings" class="nav-pill" data-view="modal-settings">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          <span>设置</span>
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pill-chevron"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="pill-dropdown">
+          <button data-view="modal-settings">全局设置</button>
+        </div>
+      </div>
+    </div>
+
+【设计要点】
+- 每个 .nav-pill-group 是一个独立的药丸+下拉组合
+- .nav-pill 是药丸按钮本体（图标+文字+箭头）
+- .pill-dropdown 是下拉菜单（悬停时自动滑出）
+- data-view 属性指向对应的弹窗 ID，由 modals.js 统一绑定
+- 新增功能入口：在 #nav-right 内添加新的 .nav-pill-group 即可
+
+
+========================================
+二、HTML — 弹窗容器（index.html #modal-overlay 内）
+========================================
+
+【遮罩层】
+<div id="modal-overlay" class="modal-overlay hidden">
+
+【弹窗 1：角色卡管理】
+<div class="modal hidden" id="modal-char-manager">
+  <div class="modal-header">
+    <h3>角色卡管理</h3>
+    <button class="modal-close" onclick="ViewManager.close()">
+      <svg><!-- X 图标 --></svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div id="char-card-list"><!-- JS 动态渲染角色卡列表 --></div>
+    <div class="drop-zone" id="char-drop-zone">
+      <p>拖拽 JSON 角色卡文件到此处导入</p>
+      <input type="file" accept=".json" id="char-file-input" style="display:none">
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" onclick="ModalManager.close()">关闭</button>
+  </div>
+</div>
+
+【弹窗 2：角色卡编辑器】
+<div class="modal hidden wide" id="modal-char-editor">
+  <div class="modal-header">
+    <h3>角色卡编辑器</h3>
+    <div class="modal-header-right">
+      <button id="editor-toggle-view" class="btn btn-secondary btn-sm">JSON 视图</button>
+      <button class="modal-close" onclick="ModalManager.close()"><!-- X --></button>
+    </div>
+  </div>
+  <div class="modal-body" id="char-editor-body">
+    <!-- 可视化表单 -->
+    <div id="editor-form-view">
+      <div class="char-editor-form">
+        <div class="editor-field"><label>名称</label><input type="text" id="editor-name"></div>
+        <div class="editor-field"><label>描述</label><textarea id="editor-description" rows="2"></textarea></div>
+        <div class="editor-field"><label>性格</label><textarea id="editor-personality" class="tall" rows="3"></textarea></div>
+        <div class="editor-field"><label>场景</label><textarea id="editor-scenario" rows="2"></textarea></div>
+        <div class="editor-field"><label>首次问候</label><textarea id="editor-first-mes" class="tall" rows="3"></textarea></div>
+        <div class="editor-field"><label>对话示例</label><textarea id="editor-mes-example" class="x-tall" rows="4"></textarea></div>
+        <div class="editor-field"><label>健谈程度</label><div class="range-row"><input type="range" id="editor-talkativeness" min="0" max="100" value="50"><span class="range-value" id="editor-talkativeness-val">50</span></div></div>
+        <div class="editor-field"><label>标签</label><div class="tags-container" id="editor-tags-container"><input type="text" class="tag-input-inline" id="editor-tags-input" placeholder="输入标签后按 Enter 添加"></div></div>
+      </div>
+    </div>
+    <!-- JSON 视图（默认隐藏） -->
+    <div id="editor-json-view" style="display:none">
+      <textarea class="json-editor-textarea" id="editor-json-textarea" spellcheck="false"></textarea>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" onclick="ModalManager.close()">取消</button>
+    <button class="btn btn-primary" id="editor-save">保存</button>
+  </div>
+</div>
+
+【弹窗 3：对话历史】
+<div class="modal hidden" id="modal-chat-history">
+  <div class="modal-header">
+    <h3>对话历史</h3>
+    <button class="modal-close" onclick="ViewManager.close()"><!-- X --></button>
+  </div>
+  <div class="modal-body" id="history-list">
+    <!-- JS 动态渲染 -->
+  </div>
+</div>
+
+【弹窗 4：书签收藏】
+<div class="modal hidden" id="modal-bookmarks">
+  <div class="modal-header">
+    <h3>书签收藏</h3>
+    <button class="modal-close" onclick="ViewManager.close()"><!-- X --></button>
+  </div>
+  <div class="modal-body" id="bookmark-list">
+    <!-- JS 动态渲染 -->
+  </div>
+</div>
+
+【弹窗 5：全局设置】
+<div class="modal hidden" id="modal-settings">
+  <div class="modal-header">
+    <h3>全局设置</h3>
+    <button class="modal-close" onclick="ViewManager.close()"><!-- X --></button>
+  </div>
+  <div class="modal-body">
+    <!-- 主题 / 字体大小 / 气泡样式 -->
+    <!-- API 连接配置（接口地址 / Key / 模型 / 测试连接） -->
+    <!-- 键盘快捷键 -->
+    <!-- 数据管理（清空所有本地数据） -->
+  </div>
+</div>
+
+</div><!-- #modal-overlay -->
+
+
+========================================
+三、CSS — 药丸按钮样式（css/components.css 导航部分）
+========================================
+
+#nav-right {
+  display: flex;
+  gap: 2px;
+}
+
+.nav-pill-group {
+  position: relative;   /* 为下拉菜单提供定位锚点 */
+}
+
+.nav-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  height: 28px;
+  border-radius: 14px;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+.nav-pill .pill-chevron {
+  transition: transform var(--transition-normal);
+}
+.nav-pill:hover {
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border-color: var(--border-color);
+}
+.nav-pill:active {
+  transform: scale(0.96);
+}
+.nav-pill.active {
+  color: var(--accent);
+  background: var(--bg-surface);
+  border-color: var(--border-active);
+}
+
+/* ---- 下拉面板（Adobe 风格：悬停滑出） ---- */
+.pill-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  min-width: 140px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition:
+    opacity 180ms ease-out,
+    transform 200ms ease-out,
+    visibility 0ms 200ms;  /* 延迟隐藏，让动画播完 */
+  z-index: 200;
+}
+
+/* 悬停触发：显示 + 上滑 */
+.nav-pill-group:hover .pill-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition:
+    opacity 150ms ease-out,
+    transform 180ms ease-out,
+    visibility 0ms 0ms;  /* 立即显示 */
+}
+
+/* 悬停时药丸高亮 */
+.nav-pill-group:hover .nav-pill {
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border-color: var(--border-active);
+}
+
+/* 悬停时箭头旋转 180° */
+.nav-pill-group:hover .pill-chevron {
+  transform: rotate(180deg);
+}
+
+/* 下拉菜单选项 */
+.pill-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: left;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.pill-dropdown button:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+.pill-dropdown button + button {
+  border-top: 1px solid var(--border-color);
+  margin-top: 2px;
+  padding-top: 9px;
+}
+
+
+========================================
+四、CSS — 弹窗/模态框样式（css/modals.css 完整）
+========================================
+
+/* 遮罩层：半透明 + 轻微模糊 */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 150ms ease-out;
+}
+.modal-overlay.hidden { display: none; }
+
+/* 弹窗卡片 */
+.modal {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+  width: 90vw;
+  max-width: 460px;
+  max-height: 76vh;
+  display: flex;
+  flex-direction: column;
+  animation: modalIn 220ms ease-out;
+}
+.modal.wide { max-width: 640px; }
+
+/* 弹窗头部 */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px var(--space-lg);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+.modal-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* 头部左侧返回链接 */
+.modal-header .view-back {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+.modal-header .view-back:hover { background: var(--bg-hover); }
+
+/* 头部右侧按钮组 */
+.modal-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* 关闭按钮 (X) */
+.modal-close {
+  width: 28px; height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.modal-close:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+/* 弹窗内容区 */
+.modal-body {
+  padding: var(--space-lg);
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* 弹窗底部按钮栏 */
+.modal-footer {
+  padding: var(--space-md) var(--space-lg);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
+
+/* 按钮体系 */
+.btn {
+  padding: 8px 16px;
+  font-size: 12px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+.btn-primary:hover { box-shadow: var(--glow-accent); }
+.btn-secondary {
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+.btn-secondary:hover { border-color: var(--text-dim); }
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+.btn-danger:hover { opacity: 0.9; }
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 10px;
+}
+
+/* 拖拽上传区 */
+.drop-zone {
+  margin-top: 16px;
+  padding: 16px;
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.drop-zone:hover, .drop-zone.drag-over {
+  border-color: var(--accent);
+  background: rgba(126,184,218,0.06);
+}
+.drop-zone p {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 0;
+}
+
+/* 编辑器表单 */
+.char-editor-form { display: flex; flex-direction: column; gap: 14px; }
+.editor-field { display: flex; flex-direction: column; gap: 4px; }
+.editor-field label {
+  font-size: 11px; font-weight: 500; color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.editor-field input[type="text"],
+.editor-field input[type="number"],
+.editor-field textarea,
+.editor-field select {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+.editor-field input:focus,
+.editor-field textarea:focus,
+.editor-field select:focus { border-color: var(--accent); }
+.editor-field textarea { resize: vertical; min-height: 60px; }
+.editor-field textarea.tall { min-height: 100px; }
+.editor-field textarea.x-tall { min-height: 140px; }
+.editor-field input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+/* 范围滑块行 */
+.range-row { display: flex; align-items: center; gap: 10px; }
+.range-row input[type="range"] { flex: 1; }
+.range-value { font-size: 13px; font-weight: 600; color: var(--accent); min-width: 32px; text-align: center; }
+
+/* 标签输入 */
+.tags-container {
+  display: flex; flex-wrap: wrap; gap: 6px; padding: 8px;
+  background: var(--bg-surface); border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm); min-height: 36px; cursor: text;
+}
+.tag-chip {
+  display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px;
+  background: var(--accent-glow); border: 1px solid rgba(126,184,218,0.3);
+  border-radius: var(--radius-sm); font-size: 11px; color: var(--accent);
+}
+.tag-chip .tag-remove {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; border-radius: 50%; cursor: pointer;
+  color: var(--text-muted); transition: color var(--transition-fast);
+}
+.tag-chip .tag-remove:hover { color: var(--danger); }
+.tag-input-inline {
+  border: none; background: transparent; color: var(--text-primary);
+  font-size: 12px; outline: none; flex: 1; min-width: 80px;
+  font-family: var(--font-sans);
+}
+
+/* JSON 编辑器 */
+.json-editor-textarea {
+  width: 100%; min-height: 360px; background: var(--bg-surface);
+  border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+  padding: 12px; font-family: var(--font-mono); font-size: 12px;
+  color: var(--text-primary); resize: vertical; outline: none;
+  line-height: 1.6; tab-size: 2;
+}
+.json-editor-textarea:focus { border-color: var(--accent); }
+
+/* 角色卡列表项 */
+.char-card-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px; background: var(--bg-surface);
+  border-radius: var(--radius-sm); border: 1px solid var(--border-color);
+  transition: border-color var(--transition-fast);
+}
+.char-card-item:hover { border-color: var(--border-active); }
+.char-card-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.char-card-name { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+.char-card-desc { font-size: 11px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.char-card-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.char-card-actions button {
+  width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-sm); background: none; border: none;
+  color: var(--text-muted); cursor: pointer; transition: all var(--transition-fast);
+}
+.char-card-actions button:hover { background: var(--bg-hover); color: var(--text-primary); }
+.char-card-actions .btn-card-delete:hover { color: var(--danger); }
+
+/* 历史会话 */
+.history-session {
+  padding: 12px; margin-bottom: 8px; background: var(--bg-surface);
+  border-radius: var(--radius-md); border: 1px solid var(--border-color);
+  cursor: pointer; transition: border-color var(--transition-fast);
+}
+.history-session:hover { border-color: var(--border-active); }
+.history-session-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.history-session-time { font-size: 11px; color: var(--text-muted); }
+.history-session-count { font-size: 10px; color: var(--text-dim); padding: 2px 6px; background: var(--bg-hover); border-radius: var(--radius-sm); }
+.history-session-preview { font-size: 12px; color: var(--text-tertiary); line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 书签 */
+.bookmark-item { padding: 12px; margin-bottom: 8px; background: var(--bg-surface); border-radius: var(--radius-md); border: 1px solid var(--border-color); }
+.bookmark-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.bookmark-sender { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.bookmark-time { font-size: 10px; color: var(--text-dim); }
+.bookmark-quote { font-size: 12px; color: var(--text-tertiary); line-height: 1.5; margin-bottom: 8px; padding: 8px 10px; background: var(--bg-primary); border-radius: var(--radius-sm); border-left: 2px solid var(--accent-dim); }
+.bookmark-actions { display: flex; gap: 6px; justify-content: flex-end; }
+
+/* 消息气泡上的书签按钮（悬停显示） */
+.msg-bubble { position: relative; }
+.msg-bookmark-btn {
+  position: absolute; top: 4px; right: 4px; width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-sm); background: var(--bg-hover);
+  border: 1px solid var(--border-color); color: var(--text-muted);
+  cursor: pointer; opacity: 0;
+  transition: opacity var(--transition-fast), color var(--transition-fast);
+}
+.msg-bubble:hover .msg-bookmark-btn { opacity: 1; }
+.msg-bookmark-btn:hover { color: var(--accent); border-color: var(--accent-dim); }
+
+/* 空状态 */
+.empty-list-msg {
+  text-align: center; color: var(--text-muted); font-size: 13px; padding: 24px 0;
+}
+
+
+========================================
+五、JS — ViewManager 视图管理器（js/modals.js 完整）
+========================================
+
+const ViewManager = {
+  overlay: null,
+  current: null,
+
+  init() {
+    this.overlay = document.getElementById('modal-overlay');
+    if (!this.overlay) return;
+
+    // Escape 键关闭
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') this.close();
+    });
+
+    // 点击遮罩外部关闭
+    this.overlay.addEventListener('click', (e) => {
+      if (e.target === this.overlay) this.close();
+    });
+
+    // 子视图内关闭按钮委托
+    this.overlay.querySelectorAll('.view-close, .view-back').forEach(btn => {
+      btn.addEventListener('click', () => this.close());
+    });
+  },
+
+  // 打开指定 ID 的弹窗
+  open(viewId) {
+    if (this.current) {
+      this.current.classList.add('hidden');
+    }
+
+    this.current = document.getElementById(viewId);
+    if (!this.current) return;
+
+    this.overlay.classList.remove('hidden');
+    this.current.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    this.highlightNav(viewId);
+  },
+
+  // 关闭当前弹窗
+  close() {
+    if (this.current) {
+      this.current.classList.add('hidden');
+    }
+    if (this.overlay) {
+      this.overlay.classList.add('hidden');
+    }
+    this.current = null;
+    document.body.style.overflow = '';
+    this.clearNavHighlight();
+  },
+
+  // 高亮触发弹窗的导航按钮
+  highlightNav(viewId) {
+    const map = {
+      'modal-char-manager': 'btn-character-manager',
+      'modal-char-editor': 'btn-character-manager',
+      'modal-chat-history': 'btn-history',
+      'modal-bookmarks': 'btn-bookmarks',
+      'modal-settings': 'btn-settings',
+    };
+    const btnId = map[viewId];
+    if (btnId) {
+      document.getElementById(btnId)?.classList.add('active');
+    }
+  },
+
+  clearNavHighlight() {
+    document.querySelectorAll('#topnav .nav-pill.active').forEach(b => b.classList.remove('active'));
+  }
+};
+
+// 兼容旧代码的别名（ModalManager → ViewManager）
+const ModalManager = {
+  init() { ViewManager.init(); },
+  open(id) { ViewManager.open(id); },
+  close() { ViewManager.close(); }
+};
+
+
+========================================
+六、JS — 统一事件绑定（modals.js 底部）
+========================================
+
+// 所有带 data-view 属性的元素自动打开对应弹窗
+// 新增按钮只需加 data-view="modal-xxx" 即可，无需写 JS
+document.addEventListener('DOMContentLoaded', () => {
+  ViewManager.init();
+
+  document.addEventListener('click', (e) => {
+    const trigger = e.target.closest('[data-view]');
+    if (!trigger) return;
+    const viewId = trigger.dataset.view;
+    if (viewId) {
+      e.preventDefault();
+      ViewManager.open(viewId);
+    }
+  });
+});
+
+
+========================================
+七、架构说明
+========================================
+
+【触发流程】
+1. 用户悬停药丸按钮 (.nav-pill-group)
+2. CSS :hover 触发下拉面板 (.pill-dropdown) 滑出
+3. 用户点击选项按钮 (data-view="modal-xxx")
+4. 事件委托捕获点击 → ViewManager.open('modal-xxx')
+5. 遮罩层显示 → 指定弹窗显示
+
+【如何新增一个弹窗】
+1. 在 #nav-right 添加新的 .nav-pill-group（可选，也可从别处触发）
+2. 在 #modal-overlay 内添加 <div class="modal hidden" id="modal-新功能">
+3. 触发按钮添加 data-view="modal-新功能"
+4. 完成。无需写 JS。
+
+【CSS 变量依赖】（定义在 css/variables.css）
+--bg-panel, --bg-surface, --bg-hover, --bg-primary
+--border-color, --border-active
+--text-primary, --text-secondary, --text-tertiary, --text-muted, --text-dim
+--accent, --accent-dim, --accent-glow
+--danger
+--radius-sm, --radius-md, --radius-lg
+--shadow-lg, --glow-accent
+--transition-fast (150ms), --transition-normal (200ms)
+--font-sans, --font-mono
+--space-xs ~ --space-lg
+
+【动画关键帧】（定义在 css/animations.css）
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+================================================================================
+导出完毕。共 6 个弹窗入口、5 个弹窗视图、1 套统一管理机制。
+================================================================================
