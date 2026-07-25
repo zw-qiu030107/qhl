@@ -357,4 +357,22 @@
   };
 
   console.log('[ST.Plugins] 插件系统已初始化 (' + _plugins.length + ' 个插件)');
+
+  // 绑定插件按钮
+  document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.getElementById('btn-plugins');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        var info = '已加载 ' + _plugins.length + ' 个插件:\n';
+        _plugins.forEach(function (p) {
+          info += '\n' + (p.enabled ? '✓' : '✗') + ' ' + p.name + ' — ' + (p.description || '');
+        });
+        if (window.notifications) {
+          window.notifications.show('info', '插件系统', info.replace(/\n/g, '<br>'));
+        } else {
+          console.log(info);
+        }
+      });
+    }
+  });
 })();

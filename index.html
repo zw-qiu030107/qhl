@@ -76,6 +76,14 @@
         </div>
       </div>
 
+      <!-- 插件 Pill -->
+      <div class="nav-pill-group">
+        <button class="nav-pill" id="btn-plugins">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+          <span>插件</span>
+        </button>
+      </div>
+
       <!-- 设置 Pill -->
       <div class="nav-pill-group">
         <button class="nav-pill" id="btn-settings">
@@ -155,7 +163,7 @@
           <summary>
             <svg class="chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
             外观
-            <span class="summary-hint">栗色卷发</span>
+            <span class="summary-hint">—</span>
           </summary>
           <div class="module-body">
             <div class="field-row"><span class="field-label">外貌</span><span class="field-value" id="s-appearance">—</span></div>
@@ -169,14 +177,14 @@
           <summary>
             <svg class="chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
             心理
-            <span class="summary-hint">不安</span>
+            <span class="summary-hint">—</span>
           </summary>
           <div class="module-body">
-            <div class="inner-thought" id="s-inner-thought">妈又去找那个叔叔了…我不想一个人待在五楼。</div>
+            <div class="inner-thought" id="s-inner-thought">—</div>
             <div class="section-label">动作</div>
-            <div class="action-item"><span class="diamond">&#9670;</span><span id="s-action">光着脚踩在楼梯上，手指扣着手机壳边缘</span></div>
+            <div class="action-item"><span class="diamond">&#9670;</span><span id="s-action">—</span></div>
             <div class="section-label">计划</div>
-            <div class="field-value" id="s-plan">去四楼找堂哥</div>
+            <div class="field-value" id="s-plan">—</div>
           </div>
         </details>
 
@@ -185,20 +193,20 @@
           <summary>
             <svg class="chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
             角色档案
-            <span class="summary-hint">服装 / 位置</span>
+            <span class="summary-hint">—</span>
           </summary>
           <div class="module-body">
-            <div class="field-row"><span class="field-label">服装-外套</span><span class="field-value" id="s-outerwear">-</span></div>
-            <div class="field-row"><span class="field-label">上衣</span><span class="field-value" id="s-top">灰色吊带</span></div>
-            <div class="field-row"><span class="field-label">内衣</span><span class="field-value" id="s-inner-top">-</span></div>
-            <div class="field-row"><span class="field-label">下衣</span><span class="field-value" id="s-bottom">短裤</span></div>
-            <div class="field-row"><span class="field-label">内裤</span><span class="field-value" id="s-underwear">-</span></div>
-            <div class="field-row"><span class="field-label">袜子</span><span class="field-value" id="s-socks">-</span></div>
-            <div class="field-row"><span class="field-label">鞋子</span><span class="field-value" id="s-shoes">-</span></div>
-            <div class="field-row"><span class="field-label">配饰</span><span class="field-value" id="s-accessories">手机</span></div>
+            <div class="field-row"><span class="field-label">服装-外套</span><span class="field-value" id="s-outerwear">—</span></div>
+            <div class="field-row"><span class="field-label">上衣</span><span class="field-value" id="s-top">—</span></div>
+            <div class="field-row"><span class="field-label">内衣</span><span class="field-value" id="s-inner-top">—</span></div>
+            <div class="field-row"><span class="field-label">下衣</span><span class="field-value" id="s-bottom">—</span></div>
+            <div class="field-row"><span class="field-label">内裤</span><span class="field-value" id="s-underwear">—</span></div>
+            <div class="field-row"><span class="field-label">袜子</span><span class="field-value" id="s-socks">—</span></div>
+            <div class="field-row"><span class="field-label">鞋子</span><span class="field-value" id="s-shoes">—</span></div>
+            <div class="field-row"><span class="field-label">配饰</span><span class="field-value" id="s-accessories">—</span></div>
             <div class="divider-thin"></div>
-            <div class="field-row"><span class="field-label">周围人物</span><span class="field-value" id="s-surrounding">母亲小娟、堂哥</span></div>
-            <div class="field-row"><span class="field-label">地点</span><span class="field-value" id="s-location">五楼走廊 / 四楼堂哥房间</span></div>
+            <div class="field-row"><span class="field-label">周围人物</span><span class="field-value" id="s-surrounding">—</span></div>
+            <div class="field-row"><span class="field-label">地点</span><span class="field-value" id="s-location">—</span></div>
           </div>
         </details>
       </div>
@@ -269,11 +277,11 @@
       <div class="tab-content active" id="tab-character">
         <div class="char-field">
           <label>姓名</label>
-          <input type="text" id="cs-name" value="邱惠玲">
+          <input type="text" id="cs-name" value="" placeholder="角色名称">
         </div>
         <div class="char-field">
           <label>昵称</label>
-          <input type="text" id="cs-nickname" value="玲玲">
+          <input type="text" id="cs-nickname" value="" placeholder="昵称">
         </div>
         <div class="char-field">
           <label>年龄</label>
@@ -281,7 +289,7 @@
         </div>
         <div class="char-field">
           <label>星座</label>
-          <input type="text" id="cs-zodiac" value="天秤座">
+          <input type="text" id="cs-zodiac" value="" placeholder="星座">
         </div>
         <div class="char-field">
           <label>性格</label>
