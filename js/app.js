@@ -12,7 +12,12 @@ const App = {
       try { Settings.init(); } catch (e) { console.warn('[App] Settings.init 失败:', e.message); }
     }
 
-    // 2. 加载角色卡
+    // 2. 初始化酒馆 IndexedDB
+    if (window.ST && typeof ST.dbInit === 'function') {
+      try { await ST.dbInit(); console.log('[App] ST 数据库已初始化'); } catch (e) { console.warn('[App] ST.dbInit 失败:', e.message); }
+    }
+
+    // 3. 加载角色卡
     await this.loadCharacterCard();
 
     // 3. 初始化各模块（带空保护）

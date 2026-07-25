@@ -174,8 +174,38 @@ const ChatInput = {
       return;
     }
 
-    // 构建发送给 API 的消息列表
-    const apiMessages = this.buildApiMessages(messages);
+    // 使用酒馆 prompt assembler（含世界书匹配 + 格式提示）
+    let apiMessages;
+    if (window.ST && ST.assemblePrompt) {
+      const charName = document.getElementById('cs-name')?.value || '邱惠玲';
+      const userName = '你';
+      const lastMsg = messages[messages.length - 1];
+      const userInput = lastMsg?.text || '';
+      const preset = ST.createDefaultPreset();
+
+      // 获取活跃世界书（从 ST 数据库或 worldbook.js 兼容）
+      let activeBooks = [];
+      if (ST.getLorebooks) {
+        try { activeBooks = await ST.getLorebooks(); } catch(e) {}
+      }
+
+      const result = ST.assemblePrompt({
+        userInput: userInput.replace(/<[^>]+>/g, ''),
+        history: messages.filter(m => m.type !== 'narration').map(m => ({
+          role: m.role === 'user' ? 'user' : 'assistant',
+          content: (m.text || '').replace(/<[^>]+>/g, ''),
+        })),
+        preset,
+        lorebooks: activeBooks,
+        userName,
+        characterName: charName,
+        variables: {},
+      });
+      apiMessages = result.messages;
+    } else {
+      // 回退：使用旧的 buildApiMessages
+      apiMessages = this.buildApiMessages(messages);
+    }
 
     // 显示"思考中"状态
     const thinkingMsg = ChatRenderer.addMessage('char', '*正在思考…*', '玲玲');
