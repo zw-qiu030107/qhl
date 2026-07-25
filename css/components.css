@@ -1,4 +1,28 @@
-/* css/components.css — 左侧面板 */
+/* css/components.css */
+
+/* === 顶部导航按钮 === */
+.nav-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.nav-btn:hover {
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+}
+
+.nav-btn.active {
+  color: var(--accent);
+  background: var(--bg-surface);
+}
+
+/* === 左侧面板 === */
 #left-panel .avatar-section {
   display: flex;
   flex-direction: column;
