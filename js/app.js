@@ -56,7 +56,8 @@ const App = (function () {
     }
 
     // ---- 3. 加载角色卡 ----
-    await loadCharacterCard();
+    // 先加载并应用 UI，character_book 导入延迟到 WorldBook 初始化之后
+    var pendingCharBookCard = await loadCharacterCard();
 
     // ---- 4. 业务模块 ----
     _safeInit('ChatRenderer', function () {
@@ -73,6 +74,18 @@ const App = (function () {
 
     _safeInit('WorldBook', function () {
       if (typeof WorldBook !== 'undefined') WorldBook.init();
+    });
+
+    // WorldBook 初始化后再导入 character_book
+    if (pendingCharBookCard) {
+      _importCharacterBook(pendingCharBookCard);
+    }
+
+    // Regex 引擎 UI 初始化（右面板第4个 tab）
+    _safeInit('RegexEngine UI', function () {
+      if (window.ST && ST.RegexEngine && typeof ST.RegexEngine.initUI === 'function') {
+        ST.RegexEngine.initUI();
+      }
     });
 
     _safeInit('CharacterManager', function () {
@@ -107,6 +120,16 @@ const App = (function () {
       }
     }
 
+    // ---- 7. 插件系统 onInit 钩子 ----
+    if (window.ST && ST.Plugins && typeof ST.Plugins.call === 'function') {
+      try {
+        ST.Plugins.call('onInit');
+        console.log('[App] 插件 onInit 钩子已调用');
+      } catch (e) {
+        console.warn('[App] 插件 onInit 失败:', e.message);
+      }
+    }
+
     console.log('[App] 初始化完成');
   }
 
@@ -116,40 +139,49 @@ const App = (function () {
    * 加载顺序：
    * 1. 优先从 localStorage 读取已保存的角色卡
    * 2. 若不存在，尝试 fetch('data/qhl.json')
-   * 3. 应用角色卡到 UI（左侧面板、右侧设定表单）
-   * 4. 提取 character_book 并导入为世界书
+   * 3. 通过 importCharacterCard 规范化为内部格式
+   * 4. 应用角色卡到 UI（左侧面板、右侧设定表单）
+   * 5. 返回原始 card 对象供后续 character_book 导入
    *
-   * @returns {Promise<void>}
+   * @returns {Promise<Object|null>} 返回原始 card 对象（含 character_book 数据），供延迟导入
    */
   async function loadCharacterCard() {
     try {
-      var card = null;
+      var rawCard = null;
 
       // 尝试从 storage 加载
       if (typeof window.storage !== 'undefined') {
-        card = window.storage.get('character_card');
+        rawCard = window.storage.get('character_card');
       }
 
       // 不存在则从 JSON 文件加载
-      if (!card) {
+      if (!rawCard) {
         try {
           var resp = await fetch('data/qhl.json');
           if (resp.ok) {
-            card = await resp.json();
+            rawCard = await resp.json();
             if (typeof window.storage !== 'undefined') {
-              window.storage.set('character_card', card);
+              window.storage.set('character_card', rawCard);
             }
             console.log('[App] 从 data/qhl.json 加载了默认角色卡');
           }
         } catch (e) {
           console.warn('[App] 无法加载默认角色卡:', e.message);
-          return;
+          return null;
         }
       }
 
-      if (!card) return;
+      if (!rawCard) return null;
 
-      // 应用角色卡到 UI
+      // 通过 importCharacterCard 规范化为内部格式
+      var card;
+      if (window.ST && ST.Importer && typeof ST.Importer.importCharacterCard === 'function') {
+        card = ST.Importer.importCharacterCard(rawCard);
+      } else {
+        card = rawCard;
+      }
+
+      // 应用角色卡到 UI（使用规范化后的 card）
       if (window.ST && ST.Importer && typeof ST.Importer.applyCharacterCard === 'function') {
         try {
           ST.Importer.applyCharacterCard(card);
@@ -158,11 +190,12 @@ const App = (function () {
         }
       }
 
-      // 提取 character_book 并导入为世界书
-      _importCharacterBook(card);
+      // 返回原始数据供后续 character_book 导入
+      return rawCard;
 
     } catch (e) {
       console.warn('[App] loadCharacterCard 失败:', e.message);
+      return null;
     }
   }
 

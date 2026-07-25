@@ -97,6 +97,15 @@ const ChatRenderer = (function () {
     wrapper.appendChild(bubble);
     _container.appendChild(wrapper);
 
+    // === 插件: onRender 钩子 ===
+    if (window.ST && ST.Plugins && typeof ST.Plugins.call === 'function') {
+      try {
+        ST.Plugins.call('onRender', { msg: msg, element: wrapper });
+      } catch (e) {
+        console.warn('[ChatRenderer] 插件 onRender 失败:', e.message);
+      }
+    }
+
     return wrapper;
   }
 
@@ -416,6 +425,31 @@ const ChatInput = (function () {
       notifications.show('info', '请求中', '正在等待模型回复...');
     }
 
+    // === 提取用户输入 ===
+    var lastMsg = messages[messages.length - 1];
+    var userInput = (lastMsg && lastMsg.text) ? lastMsg.text.replace(/<[^>]+>/g, '') : '';
+
+    // === 正则引擎: 处理用户输入 ===
+    if (window.ST && ST.RegexEngine && typeof ST.RegexEngine.applyInput === 'function') {
+      try {
+        userInput = ST.RegexEngine.applyInput(userInput);
+      } catch (e) {
+        console.warn('[ChatInput] RegexEngine.applyInput 失败:', e.message);
+      }
+    }
+
+    // === 插件: onSend 钩子 ===
+    if (window.ST && ST.Plugins && typeof ST.Plugins.call === 'function') {
+      try {
+        var sendCtx = ST.Plugins.call('onSend', { text: userInput });
+        if (sendCtx && sendCtx.text !== undefined) {
+          userInput = sendCtx.text;
+        }
+      } catch (e) {
+        console.warn('[ChatInput] 插件 onSend 失败:', e.message);
+      }
+    }
+
     // 构建 API 消息
     var apiMessages;
     try {
@@ -423,8 +457,6 @@ const ChatInput = (function () {
         // === 使用酒馆 prompt assembler（完整流程） ===
         var charName = _getCharacterName();
         var userName = '你';
-        var lastMsg = messages[messages.length - 1];
-        var userInput = (lastMsg && lastMsg.text) ? lastMsg.text.replace(/<[^>]+>/g, '') : '';
         var preset = (typeof ST.createDefaultPreset === 'function')
           ? ST.createDefaultPreset()
           : {};
@@ -516,6 +548,27 @@ const ChatInput = (function () {
         reply = data.choices[0].text;
       } else {
         reply = '(空回复)';
+      }
+
+      // === 正则引擎: 处理模型回复 ===
+      if (window.ST && ST.RegexEngine && typeof ST.RegexEngine.applyOutput === 'function') {
+        try {
+          reply = ST.RegexEngine.applyOutput(reply);
+        } catch (e) {
+          console.warn('[ChatInput] RegexEngine.applyOutput 失败:', e.message);
+        }
+      }
+
+      // === 插件: onReply 钩子 ===
+      if (window.ST && ST.Plugins && typeof ST.Plugins.call === 'function') {
+        try {
+          var replyCtx = ST.Plugins.call('onReply', { text: reply, parsed: null });
+          if (replyCtx && replyCtx.text !== undefined) {
+            reply = replyCtx.text;
+          }
+        } catch (e) {
+          console.warn('[ChatInput] 插件 onReply 失败:', e.message);
+        }
       }
 
       // 尝试解析结构化标签

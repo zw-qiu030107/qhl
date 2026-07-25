@@ -706,6 +706,11 @@
       return;
     }
 
+    // 如果传入的是原始 JSON（有 .data 包裹），先通过 importCharacterCard 规范化
+    if (card.data && typeof card.data === 'object' && !card.raw) {
+      card = importCharacterCard(card);
+    }
+
     /**
      * Helper to safely get a DOM element by id.
      * @param {string} id
@@ -715,26 +720,63 @@
       return document.getElementById(id);
     }
 
+    // 从性格文本中提取信息
+    var extracted = _extractPersonalityInfo(card.personality || '');
+
     // --- Left sidebar display ---
     if (getEl('char-name-display')) {
-      getEl('char-name-display').textContent = card.name;
+      getEl('char-name-display').textContent = card.name || '';
     }
     if (getEl('s-name')) {
-      getEl('s-name').textContent = card.name;
+      getEl('s-name').textContent = card.name || '';
+    }
+    if (getEl('s-nickname') && extracted.nickname) {
+      getEl('s-nickname').textContent = extracted.nickname;
+    }
+    if (getEl('s-age') && extracted.age) {
+      getEl('s-age').textContent = extracted.age;
+    }
+    if (getEl('s-zodiac') && extracted.zodiac) {
+      getEl('s-zodiac').textContent = extracted.zodiac;
+    }
+    if (getEl('s-gender') && extracted.gender) {
+      getEl('s-gender').textContent = extracted.gender;
+    }
+    if (getEl('s-height') && extracted.height) {
+      getEl('s-height').textContent = extracted.height;
+    }
+    if (getEl('s-weight') && extracted.weight) {
+      getEl('s-weight').textContent = extracted.weight;
+    }
+    if (getEl('s-appearance') && extracted.appearance) {
+      getEl('s-appearance').textContent = extracted.appearance;
     }
 
     // --- Right panel character settings form ---
     if (getEl('cs-name')) {
-      getEl('cs-name').value = card.name;
+      getEl('cs-name').value = card.name || '';
     }
     if (getEl('cs-nickname')) {
-      getEl('cs-nickname').value = card.description;
+      // 优先用 description，为空则用提取的昵称
+      getEl('cs-nickname').value = card.description || extracted.nickname || '';
+    }
+    if (getEl('cs-age') && extracted.age) {
+      getEl('cs-age').value = extracted.age;
+    }
+    if (getEl('cs-zodiac') && extracted.zodiac) {
+      getEl('cs-zodiac').value = extracted.zodiac;
     }
     if (getEl('cs-personality')) {
-      getEl('cs-personality').value = card.personality;
+      getEl('cs-personality').value = card.personality || '';
     }
     if (getEl('cs-background')) {
-      getEl('cs-background').value = card.scenario;
+      getEl('cs-background').value = card.scenario || '';
+    }
+    if (getEl('cs-likes') && extracted.likes) {
+      getEl('cs-likes').value = extracted.likes;
+    }
+    if (getEl('cs-relationship') && extracted.relationship) {
+      getEl('cs-relationship').value = extracted.relationship;
     }
 
     // --- Save to localStorage ---
@@ -758,6 +800,106 @@
     if (window.notifications && typeof window.notifications.show === 'function') {
       window.notifications.show('success', '角色卡已加载', '已应用: ' + card.name);
     }
+  }
+
+  // =========================================================================
+  // Private Helpers
+  // =========================================================================
+
+  /**
+   * 从性格文本中提取结构化信息（昵称、年龄、星座等）
+   *
+   * 解析类似 SillyTavern 角色卡 personality 字段中的结构化文本，
+   * 提取可在左右面板显示的基本信息。
+   *
+   * @param {string} personalityText — 性格描述文本
+   * @returns {Object} 提取的信息对象
+   * @private
+   */
+  function _extractPersonalityInfo(personalityText) {
+    var info = {};
+    if (!personalityText || typeof personalityText !== 'string') return info;
+
+    // 提取昵称: 姓名: XXX (昵称: YYY/ZZZ)
+    var nicknameMatch = personalityText.match(/昵称[：:]\s*([^\n\r),，\)]+)/);
+    if (nicknameMatch) {
+      var nicks = nicknameMatch[1].split('/');
+      info.nickname = nicks[0].trim();
+    }
+
+    // 提取属性行: 属性: 14岁/女/巨蟹座/初一
+    var attrMatch = personalityText.match(/属性[：:]\s*([^\n\r]+)/);
+    if (attrMatch) {
+      var parts = attrMatch[1].split('/');
+      for (var i = 0; i < parts.length; i++) {
+        var p = parts[i].trim();
+        if (/\d+岁/.test(p) && !info.age) {
+          info.age = p;
+        }
+        if (/^(男|女)$/.test(p) && !info.gender) {
+          info.gender = p;
+        }
+        if (/(座)$/.test(p) && !info.zodiac) {
+          info.zodiac = p;
+        }
+      }
+    }
+
+    // 提取体征: 体征: 148cm/38kg/...
+    var bodyMatch = personalityText.match(/体征[：:]\s*([^\n\r]+)/);
+    if (bodyMatch) {
+      var bodyParts = bodyMatch[1].split('/');
+      for (var j = 0; j < bodyParts.length; j++) {
+        var bp = bodyParts[j].trim();
+        if (/\d+cm/.test(bp) && !info.height) {
+          info.height = bp;
+        }
+        if (/\d+kg/.test(bp) && !info.weight) {
+          info.weight = bp;
+        }
+        if (!info.appearance && !/\d+(cm|kg)/.test(bp) && bp.length > 2) {
+          info.appearance = bp;
+        }
+      }
+    }
+
+    // 提取外在: 外在: ...
+    var extMatch = personalityText.match(/外在[：:]\s*([^\n\r]+)/);
+    if (extMatch) {
+      if (info.appearance) {
+        info.appearance += '; ' + extMatch[1].trim();
+      } else {
+        info.appearance = extMatch[1].trim();
+      }
+    }
+
+    // 提取喜好: 喜: ... 厌: ...
+    var likesMatch = personalityText.match(/喜[：:]\s*([^\n\r]+)/);
+    var dislikesMatch = personalityText.match(/厌[：:]\s*([^\n\r]+)/);
+    if (likesMatch || dislikesMatch) {
+      var likesText = '';
+      if (likesMatch) likesText += '喜欢: ' + likesMatch[1].trim();
+      if (dislikesMatch) likesText += (likesText ? '\n' : '') + '讨厌: ' + dislikesMatch[1].trim();
+      info.likes = likesText;
+    }
+
+    // 提取人物关系
+    var relSection = personalityText.match(/人物关系[\s\S]*?(?:\n\n|\n(?=[^\n]*[：:])|$)/);
+    if (!relSection) {
+      // 尝试匹配 "身份:" 和 "动态:"
+      var identityMatch = personalityText.match(/身份[：:]\s*([^\n\r]+)/);
+      var dynamicMatch = personalityText.match(/动态[：:]\s*([^\n\r]+)/);
+      if (identityMatch || dynamicMatch) {
+        var relText = '';
+        if (identityMatch) relText += '身份: ' + identityMatch[1].trim();
+        if (dynamicMatch) relText += (relText ? '\n' : '') + '动态: ' + dynamicMatch[1].trim();
+        info.relationship = relText;
+      }
+    } else {
+      info.relationship = relSection[0].replace(/人物关系[\s\S]*?\n/, '').trim();
+    }
+
+    return info;
   }
 
   // =========================================================================

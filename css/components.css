@@ -985,3 +985,231 @@
   margin-bottom: var(--space-sm);
   line-height: 1.5;
 }
+
+/* ================================
+   Regex Rules Tab
+   ================================ */
+
+.regex-rule {
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  margin-bottom: var(--space-sm);
+  transition: border-color var(--transition-fast), opacity var(--transition-fast);
+}
+
+.regex-rule.disabled {
+  opacity: 0.55;
+}
+
+.regex-rule:hover {
+  border-color: var(--border-active);
+}
+
+.regex-rule-header {
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-hover);
+  cursor: default;
+  user-select: none;
+}
+
+.regex-rule-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 160px;
+}
+
+.regex-rule.disabled .regex-rule-name {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.regex-rule-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Scope Badge */
+.regex-scope-badge {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.regex-scope-input {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.regex-scope-output {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.regex-scope-both {
+  background: rgba(168, 85, 247, 0.15);
+  color: #a78bfa;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+/* Toggle button (checkmark) */
+.regex-btn-toggle {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.regex-btn-toggle.enabled {
+  background: var(--success);
+  border-color: var(--success);
+  color: var(--bg-primary);
+}
+
+.regex-btn-toggle:hover {
+  border-color: var(--text-muted);
+}
+
+/* Rule Body */
+.regex-rule-body {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.regex-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.regex-field label {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.regex-field input,
+.regex-field select {
+  width: 100%;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color var(--transition-fast);
+}
+
+.regex-field input:focus,
+.regex-field select:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+/* Pattern input: monospace font */
+.regex-input-pattern {
+  font-family: var(--font-mono, 'Cascadia Code', 'Fira Code', 'Consolas', 'Monaco', monospace) !important;
+  font-size: 11px !important;
+}
+
+.regex-input-replacement {
+  font-family: var(--font-mono, 'Cascadia Code', 'Fira Code', 'Consolas', 'Monaco', monospace) !important;
+  font-size: 11px !important;
+}
+
+/* Side-by-side fields row */
+.regex-field-row {
+  display: flex;
+  gap: 8px;
+}
+
+.regex-field-row .regex-field {
+  flex: 1;
+}
+
+/* Rule action buttons */
+.regex-rule-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 8px;
+}
+
+.regex-btn-move {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.regex-btn-move:hover:not(:disabled) {
+  color: var(--text-secondary);
+  border-color: var(--text-muted);
+}
+
+.regex-btn-move:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.regex-btn-delete {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--danger);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.regex-btn-delete:hover {
+  background: var(--danger-bg);
+  border-color: var(--danger);
+}
+
+/* Word count badge (plugin) */
+.word-count-badge {
+  display: inline-block;
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-left: 6px;
+  opacity: 0.7;
+}

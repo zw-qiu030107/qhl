@@ -162,6 +162,21 @@
       allMatchedEntries = ST.matchLorebooks(scanText, lorebooks, {
         maxDepth: 3,
       });
+
+      // === 插件: onWorldBookMatch 钩子 ===
+      if (window.ST && ST.Plugins && typeof ST.Plugins.call === 'function') {
+        try {
+          var wbCtx = ST.Plugins.call('onWorldBookMatch', {
+            entries: allMatchedEntries,
+            input: scanText,
+          });
+          if (wbCtx && wbCtx.entries && Array.isArray(wbCtx.entries)) {
+            allMatchedEntries = wbCtx.entries;
+          }
+        } catch (e) {
+          console.warn('[ST.assemblePrompt] 插件 onWorldBookMatch 失败:', e.message);
+        }
+      }
     }
 
     // =====================================================================
