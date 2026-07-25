@@ -1,26 +1,52 @@
 /* css/components.css */
 
-/* === 顶部导航按钮 === */
-.nav-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-sm);
+/* === 顶部导航：独立药丸按钮 === */
+#nav-right {
+  display: flex;
+  gap: 4px;
+}
+
+.nav-pill {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 4px;
+  padding: 4px 10px;
+  height: 28px;
+  border-radius: 14px;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.nav-pill:hover {
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border-color: var(--border-color);
+}
+
+.nav-pill:active {
+  transform: scale(0.96);
+}
+
+.nav-pill.active {
+  color: var(--accent);
+  background: var(--bg-surface);
+  border-color: var(--border-active);
+}
+
+/* 兼容旧代码 */
+.nav-btn {
+  width: 32px; height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
   color: var(--text-muted);
   transition: color var(--transition-fast), background var(--transition-fast);
 }
-
-.nav-btn:hover {
-  color: var(--text-secondary);
-  background: var(--bg-hover);
-}
-
-.nav-btn.active {
-  color: var(--accent);
-  background: var(--bg-surface);
-}
+.nav-btn:hover { color: var(--text-secondary); background: var(--bg-hover); }
 
 /* === 左侧面板 === */
 #left-panel .avatar-section {

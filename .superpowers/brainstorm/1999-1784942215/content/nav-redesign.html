@@ -1,0 +1,196 @@
+<h2>右上角按钮 · 四种独立方案</h2>
+<p class="subtitle">每个方案都是完整独立的交互入口，不是共享弹窗</p>
+
+<style>
+  .nav-demo { background:#1a1d23; border-radius:12px; padding:0; margin-bottom:20px; overflow:hidden }
+  .nav-demo-bar { display:flex; align-items:center; justify-content:space-between; padding:0 16px; height:44px; background:#1a1d23; border-bottom:1px solid #2d3140 }
+  .nav-demo-logo { font-size:13px; font-weight:600; color:#e8eaed }
+  .nav-demo-body { padding:20px; text-align:center; color:#6b7583; font-size:13px; min-height:120px; display:flex; align-items:center; justify-content:center }
+</style>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">方案 A · 独立药丸按钮</div>
+    <div class="mockup-body" style="background:#141619;min-height:300px;padding:0">
+      <div class="nav-demo-bar">
+        <span class="nav-demo-logo">清醒酒馆</span>
+        <div style="display:flex;gap:6px">
+          <button style="display:flex;align-items:center;gap:4px;padding:5px 10px;background:#20242a;border-radius:16px;font-size:11px;color:#c8ccd4;cursor:pointer;border:1px solid #2d3140;transition:all .15s">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            角色
+          </button>
+          <button style="display:flex;align-items:center;gap:4px;padding:5px 10px;background:#20242a;border-radius:16px;font-size:11px;color:#8b95a5;cursor:pointer;border:1px solid transparent;transition:all .15s">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            历史
+          </button>
+          <button style="display:flex;align-items:center;gap:4px;padding:5px 10px;background:#20242a;border-radius:16px;font-size:11px;color:#8b95a5;cursor:pointer;border:1px solid transparent;transition:all .15s">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+            书签
+          </button>
+          <button style="display:flex;align-items:center;gap:4px;padding:5px 10px;background:transparent;border-radius:16px;font-size:11px;color:#8b95a5;cursor:pointer;border:1px solid transparent;transition:all .15s">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2"/></svg>
+            设置
+          </button>
+        </div>
+      </div>
+      <div class="nav-demo-body">
+        <div style="max-width:320px">
+          <div style="font-size:12px;color:#c8ccd4;margin-bottom:8px;text-align:left">每个按钮 = 独立入口</div>
+          <div style="display:flex;flex-direction:column;gap:6px;text-align:left;font-size:11px">
+            <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:2px;background:#7eb8da"></span> 带标签文字，一眼识别功能</div>
+            <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:2px;background:#7eb8da"></span> 药丸形状，视觉独立不粘连</div>
+            <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:2px;background:#7eb8da"></span> 点击后全屏切换，返回主页</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mockup-header">方案 B · 汉堡菜单收纳</div>
+    <div class="mockup-body" style="background:#141619;min-height:300px;padding:0">
+      <div class="nav-demo-bar">
+        <span class="nav-demo-logo">清醒酒馆</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:10px;color:#6b7583">角色管理 · 历史 · 书签 · 设置</span>
+          <button style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:#20242a;border-radius:6px;color:#c8ccd4;cursor:pointer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <!-- 菜单展开态 -->
+      <div style="padding:0 16px">
+        <div style="background:#1a1d23;border:1px solid #2d3140;border-radius:10px;margin-top:4px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.5)">
+          <div style="padding:10px 14px;font-size:12px;color:#c8ccd4;display:flex;align-items:center;gap:8px;cursor:pointer;border-bottom:1px solid #252830;transition:background .15s">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7eb8da" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 角色卡管理
+          </div>
+          <div style="padding:10px 14px;font-size:12px;color:#c8ccd4;display:flex;align-items:center;gap:8px;cursor:pointer;border-bottom:1px solid #252830;transition:background .15s">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7eb8da" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 对话历史
+          </div>
+          <div style="padding:10px 14px;font-size:12px;color:#c8ccd4;display:flex;align-items:center;gap:8px;cursor:pointer;border-bottom:1px solid #252830;transition:background .15s">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7eb8da" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg> 书签收藏
+          </div>
+          <div style="padding:10px 14px;font-size:12px;color:#c8ccd4;display:flex;align-items:center;gap:8px;cursor:pointer;transition:background .15s">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7eb8da" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2"/></svg> 全局设置
+          </div>
+        </div>
+      </div>
+      <div class="nav-demo-body">
+        <div style="max-width:320px">
+          <div style="font-size:11px;color:#9aa4b2;line-height:1.6;text-align:left">
+            一个按钮收纳全部 · 顶栏极简 · 点击弹出菜单 · 选一项进入独立全屏视图
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">方案 C · 右侧抽屉面板</div>
+    <div class="mockup-body" style="background:#141619;min-height:300px;padding:0">
+      <div class="nav-demo-bar">
+        <span class="nav-demo-logo">清醒酒馆</span>
+        <button style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#2d3140,#3a3f50);border:2px solid #4a5060;display:flex;align-items:center;justify-content:center;cursor:pointer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b95a5" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>
+        </button>
+      </div>
+      <!-- 抽屉面板 -->
+      <div style="display:flex;height:220px">
+        <div style="flex:1;background:rgba(0,0,0,0.3)"></div>
+        <div style="width:220px;background:#1a1d23;border-left:1px solid #2d3140;padding:16px;display:flex;flex-direction:column;gap:4px">
+          <div style="font-size:10px;color:#4a5060;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">功能菜单</div>
+          <div style="padding:10px 12px;font-size:12px;color:#c8ccd4;display:flex;align-items:center;gap:8px;border-radius:6px;cursor:pointer;background:#20242a">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7eb8da" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> 角色卡管理
+          </div>
+          <div style="padding:10px 12px;font-size:12px;color:#8b95a5;display:flex;align-items:center;gap:8px;border-radius:6px;cursor:pointer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 对话历史
+          </div>
+          <div style="padding:10px 12px;font-size:12px;color:#8b95a5;display:flex;align-items:center;gap:8px;border-radius:6px;cursor:pointer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg> 书签收藏
+          </div>
+          <div style="padding:10px 12px;font-size:12px;color:#8b95a5;display:flex;align-items:center;gap:8px;border-radius:6px;cursor:pointer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2"/></svg> 全局设置
+          </div>
+        </div>
+      </div>
+      <div class="nav-demo-body" style="min-height:40px;padding:12px">
+        <div style="font-size:11px;color:#9aa4b2">头像按钮 → 右侧滑出抽屉 → 选功能 → 全屏视图</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mockup-header">方案 D · 底部功能标签栏</div>
+    <div class="mockup-body" style="background:#141619;min-height:300px;padding:0">
+      <div class="nav-demo-bar">
+        <span class="nav-demo-logo">清醒酒馆</span>
+        <span style="font-size:10px;color:#6b7583">功能入口在底部</span>
+      </div>
+      <div class="nav-demo-body" style="min-height:140px">
+        <div style="font-size:12px;color:#9aa4b2">主聊天区域</div>
+      </div>
+      <!-- 底部标签栏 -->
+      <div style="display:flex;border-top:1px solid #2d3140;background:#1a1d23;padding:4px 0">
+        <button style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;color:#7eb8da;cursor:pointer;font-size:10px;background:transparent;border:none">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          角色
+        </button>
+        <button style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;color:#6b7583;cursor:pointer;font-size:10px;background:transparent;border:none">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          历史
+        </button>
+        <button style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;color:#6b7583;cursor:pointer;font-size:10px;background:transparent;border:none">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+          书签
+        </button>
+        <button style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;color:#6b7583;cursor:pointer;font-size:10px;background:transparent;border:none">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2"/></svg>
+          设置
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:24px">
+  <h3>四种方案对比</h3>
+  <table style="width:100%;font-size:13px;border-collapse:collapse">
+    <tr style="border-bottom:1px solid #2d3140">
+      <td style="padding:8px 12px;color:#8b95a5;width:120px"></td>
+      <td style="padding:8px 12px;color:#7eb8da;font-weight:600">A · 独立药丸</td>
+      <td style="padding:8px 12px;color:#c8ccd4">B · 汉堡收纳</td>
+      <td style="padding:8px 12px;color:#c8ccd4">C · 抽屉面板</td>
+      <td style="padding:8px 12px;color:#c8ccd4">D · 底部标签</td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:6px 12px;color:#6b7583">按钮独立</td>
+      <td style="padding:6px 12px;color:#6fc98f">完全独立</td>
+      <td style="padding:6px 12px">收纳一处</td>
+      <td style="padding:6px 12px">收纳一处</td>
+      <td style="padding:6px 12px;color:#6fc98f">完全独立</td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:6px 12px;color:#6b7583">顶栏简洁度</td>
+      <td style="padding:6px 12px">中等</td>
+      <td style="padding:6px 12px;color:#6fc98f">极简</td>
+      <td style="padding:6px 12px;color:#6fc98f">极简</td>
+      <td style="padding:6px 12px;color:#6fc98f">极简</td>
+    </tr>
+    <tr style="border-bottom:1px solid #252830">
+      <td style="padding:6px 12px;color:#6b7583">操作步数</td>
+      <td style="padding:6px 12px;color:#6fc98f">1 步直达</td>
+      <td style="padding:6px 12px">2 步（展开→选）</td>
+      <td style="padding:6px 12px">2 步（展开→选）</td>
+      <td style="padding:6px 12px;color:#6fc98f">1 步直达</td>
+    </tr>
+    <tr>
+      <td style="padding:6px 12px;color:#6b7583">适合风格</td>
+      <td style="padding:6px 12px">桌面应用</td>
+      <td style="padding:6px 12px">移动端/简洁</td>
+      <td style="padding:6px 12px">移动端 App</td>
+      <td style="padding:6px 12px">手机 App</td>
+    </tr>
+  </table>
+</div>

@@ -47,9 +47,7 @@ const Settings = {
 
   init() {
     this.load();
-    document.getElementById('btn-settings').addEventListener('click', () => {
-      ModalManager.open('modal-settings');
-    });
+    // 设置按钮由 modals.js 统一绑定（data-view 属性）
     document.getElementById('setting-theme').addEventListener('change', (e) => this.set('theme', e.target.value));
     document.getElementById('setting-font-size').addEventListener('change', (e) => this.set('fontSize', e.target.value));
     document.getElementById('setting-bubble-style').addEventListener('change', (e) => this.set('bubbleStyle', e.target.value));
@@ -155,21 +153,4 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// 导航按钮点击打开对应模态框
-document.getElementById('btn-history')?.addEventListener('click', () => {
-  ModalManager.open('modal-chat-history');
-});
-document.getElementById('btn-bookmarks')?.addEventListener('click', () => {
-  ModalManager.open('modal-bookmarks');
-});
-
-// 通知按钮 — 显示最近通知
-document.getElementById('btn-notifications')?.addEventListener('click', () => {
-  const recent = window.storage?.get('notification_history') || [];
-  if (recent.length === 0) {
-    window.notifications?.show('info', '通知中心', '暂无通知记录');
-  } else {
-    window.notifications?.show('info', '通知中心', `最近 ${recent.length} 条通知，详情见控制台`);
-    console.table(recent.slice(-10));
-  }
-});
+// 导航按钮均由 modals.js 通过 data-view 属性统一绑定

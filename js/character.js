@@ -66,13 +66,7 @@ const CharacterManager = {
   cards: [],
 
   init() {
-    const btn = document.getElementById('btn-character-manager');
-    if (!btn) return;
-    btn.addEventListener('click', () => {
-      if (typeof ModalManager === 'undefined') return;
-      this.renderList();
-      ModalManager.open('modal-char-manager');
-    });
+    // 按钮由 modals.js 统一绑定（data-view）
     this.setupDragDrop();
   },
 

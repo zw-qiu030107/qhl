@@ -70,7 +70,7 @@ const ViewManager = {
   },
 
   clearNavHighlight() {
-    document.querySelectorAll('#topnav .nav-btn.active').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('#topnav .nav-pill.active').forEach(b => b.classList.remove('active'));
   }
 };
 
@@ -81,7 +81,14 @@ const ModalManager = {
   close() { ViewManager.close(); }
 };
 
-// Auto-init
+// 统一点击绑定 — 所有 .nav-pill 按钮自动打开对应视图
 document.addEventListener('DOMContentLoaded', () => {
   ViewManager.init();
+
+  document.querySelectorAll('.nav-pill[data-view]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const viewId = btn.dataset.view;
+      if (viewId) ViewManager.open(viewId);
+    });
+  });
 });
