@@ -1,9 +1,9 @@
 /**
  * SillyTavern Core Types — Vanilla JavaScript
- * All interfaces converted to JSDoc-annotated plain objects.
- * Exports as global ST namespace (window.ST).
+ * Type constants, factory functions, and default configurations
+ * for the SillyTavern runtime system.
  *
- * @module silltyavern/types
+ * @module sillytavern/types
  */
 (function () {
   'use strict';
@@ -11,24 +11,24 @@
   // Ensure namespace
   window.ST = window.ST || {};
 
-  // ========================================================================
-  // Constants
-  // ========================================================================
+  // =========================================================================
+  // XML Tag Constants
+  // =========================================================================
 
   /**
-   * Default XML tags to extract from assistant output.
+   * Default XML tags extracted from assistant output.
    * @type {string[]}
    */
   ST.DEFAULT_TAGS = ['maintext', 'option', 'sum', 'vars', 'thinking', 'think'];
 
   /**
-   * Tags whose content should be treated as opaque / hidden.
+   * Tags whose inner content is treated as opaque (not parsed for nested tags).
    * @type {string[]}
    */
   ST.DEFAULT_OPAQUE_TAGS = ['thinking', 'think'];
 
   /**
-   * Default format prompt instructing the model how to structure output.
+   * Default format prompt — instructs the model how to structure its XML output.
    * @type {string}
    */
   ST.DEFAULT_FORMAT_PROMPT =
@@ -39,19 +39,32 @@
     '<sum>……</sum>               ← 必填；本回合一句话总结\n' +
     '<vars>{ "金钱": +10, "HP": 38 }</vars>   ← 选填；JSON 深合并';
 
+  // =========================================================================
+  // Default Settings Factory
+  // =========================================================================
+
   /**
-   * Build default application settings, pulling API config from the
-   * global Settings object when available (vanilla integration).
-   * @returns {Object} default settings object
+   * Build the default application settings object.
+   * Optionally inherits API configuration from a global Settings singleton
+   * when available (for vanilla integration scenarios).
+   *
+   * @returns {Object} Default settings object
    */
   ST.getDefaultSettings = function () {
-    var api = { baseUrl: 'https://api.openai.com/v1', apiKey: '', model: 'gpt-3.5-turbo', timeout: 60000 };
+    var api = {
+      baseUrl: 'https://api.openai.com/v1',
+      apiKey: '',
+      model: 'gpt-3.5-turbo',
+      timeout: 60000,
+    };
+
     if (typeof Settings !== 'undefined' && Settings.getApiConfig) {
       var cfg = Settings.getApiConfig();
-      if (cfg.url) api.baseUrl = cfg.url;
-      if (cfg.key) api.apiKey = cfg.key;
-      if (cfg.model) api.model = cfg.model;
+      if (cfg.url)   { api.baseUrl = cfg.url; }
+      if (cfg.key)   { api.apiKey = cfg.key; }
+      if (cfg.model) { api.model = cfg.model; }
     }
+
     return {
       api: api,
       apiMode: 'single',
@@ -70,42 +83,57 @@
     };
   };
 
-  /** @type {Object} */
+  /**
+   * Frozen snapshot of the default settings (cached at module load).
+   * @type {Object}
+   */
   ST.DEFAULT_SETTINGS = ST.getDefaultSettings();
 
-  // ========================================================================
+  // =========================================================================
   // Prompt Order
-  // ========================================================================
+  // =========================================================================
 
   /**
-   * Common SillyTavern prompt_order identifiers used in OpenAI presets.
-   * @type {Array<{identifier:string, name:string, role:string}>}
+   * Standard prompt_order identifiers for OpenAI-compatible presets.
+   * Each item defines where and how a piece of context is injected into
+   * the assembled messages array.
+   *
+   * @type {Array<{identifier: string, name: string, role: string}>}
    */
   ST.DEFAULT_PROMPT_ORDER = [
-    { identifier: 'main',              name: 'Main Prompt',             role: 'system' },
-    { identifier: 'worldInfoBefore',   name: 'World Info (Before)',     role: 'system' },
-    { identifier: 'charDescription',   name: 'Character Description',   role: 'system' },
-    { identifier: 'charPersonality',   name: 'Character Personality',   role: 'system' },
-    { identifier: 'scenario',          name: 'Scenario',                role: 'system' },
-    { identifier: 'personaDescription',name: 'Persona Description',     role: 'system' },
-    { identifier: 'dialogueExamples',  name: 'Dialogue Examples',       role: 'system' },
-    { identifier: 'chatHistory',       name: 'Chat History',            role: 'system' },
-    { identifier: 'worldInfoAfter',    name: 'World Info (After)',      role: 'system' },
-    { identifier: 'groupNudge',        name: 'Group Nudge',             role: 'system' },
+    { identifier: 'main',               name: 'Main Prompt',             role: 'system' },
+    { identifier: 'worldInfoBefore',     name: 'World Info (Before)',     role: 'system' },
+    { identifier: 'charDescription',     name: 'Character Description',   role: 'system' },
+    { identifier: 'charPersonality',     name: 'Character Personality',   role: 'system' },
+    { identifier: 'scenario',            name: 'Scenario',                role: 'system' },
+    { identifier: 'personaDescription',  name: 'Persona Description',     role: 'system' },
+    { identifier: 'dialogueExamples',    name: 'Dialogue Examples',       role: 'system' },
+    { identifier: 'chatHistory',         name: 'Chat History',            role: 'system' },
+    { identifier: 'worldInfoAfter',      name: 'World Info (After)',      role: 'system' },
+    { identifier: 'groupNudge',          name: 'Group Nudge',             role: 'system' },
   ];
 
-  // ========================================================================
-  // Factory Functions
-  // ========================================================================
+  // =========================================================================
+  // Preset Factory
+  // =========================================================================
 
   /**
-   * Create a default chat completion preset (without id / timestamps).
-   * @returns {Object} default preset
+   * Create a default OpenAI-compatible chat completion preset.
+   * The returned object does NOT include id or timestamps — those are
+   * assigned by the database layer on first save.
+   *
+   * @returns {Object} Default preset object
    */
   ST.createDefaultPreset = function () {
-    var promptOrder = ST.DEFAULT_PROMPT_ORDER.map(function (p, i) {
-      return { identifier: p.identifier, name: p.name, role: p.role, enabled: true };
+    var promptOrder = ST.DEFAULT_PROMPT_ORDER.map(function (p) {
+      return {
+        identifier: p.identifier,
+        name: p.name,
+        role: p.role,
+        enabled: true,
+      };
     });
+
     return {
       name: '默认预设',
       description: 'SillyTavern 兼容的默认 OpenAI 预设',
@@ -143,16 +171,17 @@
     };
   };
 
-  // ========================================================================
-  // Type Constants (plain objects serving as documentation / factories)
-  // ========================================================================
+  // =========================================================================
+  // Lorebook Constants
+  // =========================================================================
 
   /**
-   * Lorebook position enum values.
-   * 0=before_char, 1=after_char, 2=before_example(AN top),
-   * 3=after_example(AN bottom), 4=at_depth, 5=example_msg_top,
-   * 6=example_msg_bottom, 7=outlet
-   * @enum {string}
+   * Lorebook entry insertion positions (string form).
+   * Numeric equivalents: 0=before_char, 1=after_char, 2=before_example,
+   * 3=after_example, 4=at_depth, 5=example_msg_top, 6=example_msg_bottom,
+   * 7=outlet.
+   *
+   * @type {string[]}
    */
   ST.LOREBOOK_POSITIONS = [
     'before_char',
@@ -165,21 +194,34 @@
     'outlet',
   ];
 
-  /** Selective logic modes. @enum {string} */
+  /**
+   * Selective logic modes for multi-keyword matching.
+   * @type {string[]}
+   */
   ST.SELECTIVE_LOGICS = ['and_any', 'not_all', 'not_any', 'and_all'];
 
-  /** Supported macro placeholders for prompt templates. */
+  /**
+   * Supported macro placeholders for prompt templates.
+   * Each entry describes a token that gets replaced at assembly time.
+   *
+   * @type {Array<{name: string, description: string}>}
+   */
   ST.SUPPORTED_MACROS = [
-    { name: '{{user}}',      description: '用户名' },
-    { name: '{{char}}',      description: 'AI角色名' },
-    { name: '{{original}}',  description: '用户原始输入' },
-    { name: '{{变量名}}',    description: '自定义变量（例如 {{hp}}）' },
+    { name: '{{user}}',     description: '用户名' },
+    { name: '{{char}}',     description: 'AI角色名' },
+    { name: '{{original}}', description: '用户原始输入' },
+    { name: '{{变量名}}',   description: '自定义变量（例如 {{hp}}）' },
   ];
 
+  // =========================================================================
+  // Factory Functions — Data Objects
+  // =========================================================================
+
   /**
-   * Create a new lorebook entry with all defaults.
-   * @param {Object} [overrides={}]
-   * @returns {Object}
+   * Create a new lorebook entry with all defaults populated.
+   *
+   * @param {Object} [overrides={}] — properties to override defaults
+   * @returns {Object} New lorebook entry object
    */
   ST.createLorebookEntry = function (overrides) {
     var base = {
@@ -222,9 +264,10 @@
   };
 
   /**
-   * Create a new lorebook with all defaults.
-   * @param {Object} [overrides={}]
-   * @returns {Object}
+   * Create a new lorebook object with all defaults populated.
+   *
+   * @param {Object} [overrides={}] — properties to override defaults
+   * @returns {Object} New lorebook object
    */
   ST.createLorebook = function (overrides) {
     var base = {
@@ -242,9 +285,10 @@
   };
 
   /**
-   * Create a new chat message object.
-   * @param {Object} [overrides={}]
-   * @returns {Object}
+   * Create a new chat message object with all defaults populated.
+   *
+   * @param {Object} [overrides={}] — properties to override defaults
+   * @returns {Object} New chat message object
    */
   ST.createChatMessage = function (overrides) {
     var base = {
@@ -262,9 +306,10 @@
   };
 
   /**
-   * Create a new chat session object.
-   * @param {Object} [overrides={}]
-   * @returns {Object}
+   * Create a new chat session object with all defaults populated.
+   *
+   * @param {Object} [overrides={}] — properties to override defaults
+   * @returns {Object} New chat session object
    */
   ST.createChatSession = function (overrides) {
     var base = {
@@ -283,8 +328,10 @@
   };
 
   /**
-   * Default ParsedTags object used after stream-parsing assistant output.
-   * @returns {Object}
+   * Create a default ParsedTags result object used after stream-parsing
+   * assistant output. Represents the structured content extracted from XML tags.
+   *
+   * @returns {Object} Empty ParsedTags object
    */
   ST.createParsedTags = function () {
     return {
@@ -298,35 +345,47 @@
     };
   };
 
-  /** @enum {string} Available API modes */
+  // =========================================================================
+  // Enum Constants
+  // =========================================================================
+
+  /** Available API modes. @type {string[]} */
   ST.API_MODES = ['single', 'dual'];
 
-  /** @enum {string} Available themes */
+  /** Available UI themes. @type {string[]} */
   ST.THEMES = ['dark', 'light'];
 
-  /** @enum {string} Available languages */
+  /** Available interface languages. @type {string[]} */
   ST.LANGUAGES = ['zh', 'en'];
 
-  /** @enum {string} Available UI modes */
+  /** Available UI modes (game layout vs. chat layout). @type {string[]} */
   ST.UI_MODES = ['game', 'chat'];
 
-  /** @enum {string} Available thinking display modes */
+  /** Available thinking content display modes. @type {string[]} */
   ST.THINKING_DISPLAY_MODES = ['fold', 'hide', 'inline'];
 
-  /** @enum {string} Chat message roles */
+  /** Valid chat message roles. @type {string[]} */
   ST.MESSAGE_ROLES = ['system', 'user', 'assistant'];
 
-  /** @enum {string} Task names for dual-API split */
+  /** Task names used for dual-API split routing. @type {string[]} */
   ST.TASKS = ['story', 'summary', 'vars'];
 
-  /** @enum {string} API targets */
+  /** API target designations for dual-API mode. @type {string[]} */
   ST.API_TARGETS = ['primary', 'secondary'];
 
-  /** @type {number} Database version */
+  // =========================================================================
+  // Database Constants
+  // =========================================================================
+
+  /** Current database schema version. @type {number} */
   ST.DB_VERSION = 3;
 
-  /** @type {string} Database name */
+  /** IndexedDB database name. @type {string} */
   ST.DB_NAME = 'SillyTavernWebDB';
+
+  // =========================================================================
+  // Init
+  // =========================================================================
 
   console.log('[ST.types] SillyTavern core types initialized');
 })();

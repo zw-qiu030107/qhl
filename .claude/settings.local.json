@@ -6,7 +6,12 @@
       "Bash(git check-ignore *)",
       "Bash(gh auth *)",
       "Bash(git push *)",
-      "Bash(git clone *)"
+      "Bash(git clone *)",
+      "Bash(grep -oP 'id=\"[^\"]*\"' \"E:\\\\\\\\ai\\\\\\\\ai liaotian\\\\\\\\index.html\")",
+      "Bash(grep -o 'id=\"[^\"]*\"' \"E:\\\\\\\\ai\\\\\\\\ai liaotian\\\\\\\\index.html\")",
+      "Bash(grep -c 'data-view' \"E:\\\\\\\\ai\\\\\\\\ai liaotian\\\\\\\\index.html\")",
+      "Bash(grep -c 'view-close\\\\|view-back' \"E:\\\\\\\\ai\\\\\\\\ai liaotian\\\\\\\\index.html\")",
+      "Bash(grep -c 'hidden' \"E:\\\\\\\\ai\\\\\\\\ai liaotian\\\\\\\\index.html\")"
     ]
   }
 }

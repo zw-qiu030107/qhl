@@ -1,6 +1,9 @@
 /* css/variables.css */
+
 :root {
-  /* 色彩 */
+  /* ================================
+     Colors — Dark Theme Base #141619
+     ================================ */
   --bg-primary: #141619;
   --bg-panel: #1a1d23;
   --bg-surface: #20242a;
@@ -19,49 +22,92 @@
   --warning: #d4a860;
   --danger: #c46b6b;
   --danger-bg: rgba(196, 107, 107, 0.12);
+
+  /* Chat bubble backgrounds */
   --bubble-char: #252830;
   --bubble-user: #1e3a4a;
 
-  /* 字体 */
+  /* ================================
+     Typography
+     ================================ */
   --font-sans: "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", "Consolas", monospace;
 
-  /* 间距 */
+  --font-size-xs: 9px;
+  --font-size-sm: 11px;
+  --font-size-base: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+
+  /* ================================
+     Spacing
+     ================================ */
+  --space-3xs: 2px;
+  --space-2xs: 4px;
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 12px;
   --space-lg: 16px;
   --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 48px;
 
-  /* 圆角 */
+  /* ================================
+     Border Radius
+     ================================ */
+  --radius-xs: 2px;
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
   --radius-full: 50%;
 
-  /* 阴影 */
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+  /* ================================
+     Shadows
+     ================================ */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
   --glow-accent: 0 0 12px var(--accent-glow);
 
-  /* 过渡 */
+  /* ================================
+     Transitions
+     ================================ */
   --transition-fast: 150ms ease-out;
   --transition-normal: 200ms ease;
   --transition-slow: 300ms ease-out;
+  --transition-fade: 200ms ease-out;
 
-  /* 尺寸 */
+  /* ================================
+     Layout Dimensions
+     ================================ */
   --left-panel-width: 220px;
   --right-panel-width: 280px;
   --topnav-height: 40px;
   --input-bar-height: 64px;
+
+  /* ================================
+     Z-Index Scale
+     ================================ */
+  --z-dropdown: 200;
+  --z-sticky: 300;
+  --z-modal-backdrop: 5000;
+  --z-modal: 5010;
+  --z-toast: 9999;
+  --z-tooltip: 10000;
 }
 
-/* 深色主题变体 */
+/* ================================
+   Theme Variant: Darker
+   ================================ */
 [data-theme="darker"] {
   --bg-primary: #0c0e12;
   --bg-panel: #111318;
   --bg-surface: #161920;
   --bg-hover: #1c1f27;
+  --border-color: #252830;
+  --border-active: #2d3140;
+  --bubble-char: #1c1f27;
+  --bubble-user: #152535;
 }

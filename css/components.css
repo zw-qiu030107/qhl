@@ -1,17 +1,45 @@
 /* css/components.css */
 
-/* === 顶部导航：Adobe 风格药丸 + 悬停下拉 === */
+/* ================================
+   Logo Area (topnav left)
+   ================================ */
+#logo-area {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
+
+#logo-area .logo-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--accent-dim), var(--accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+#logo-area .logo-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* ================================
+   Top Nav — Pill Buttons
+   ================================ */
 #nav-right {
   display: flex;
   gap: 2px;
 }
 
-/* 药丸容器 */
 .nav-pill-group {
   position: relative;
 }
 
-/* 药丸按钮 */
 .nav-pill {
   display: flex;
   align-items: center;
@@ -48,7 +76,7 @@
   border-color: var(--border-active);
 }
 
-/* 下拉面板 */
+/* Pill dropdown */
 .pill-dropdown {
   position: absolute;
   top: calc(100% + 6px);
@@ -58,15 +86,14 @@
   border-radius: var(--radius-md);
   padding: 4px;
   min-width: 140px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   opacity: 0;
   visibility: hidden;
   transform: translateY(-8px);
   transition: opacity 180ms ease-out, transform 200ms ease-out, visibility 0ms 200ms;
-  z-index: 200;
+  z-index: var(--z-dropdown);
 }
 
-/* 悬停触发 */
 .nav-pill-group:hover .pill-dropdown {
   opacity: 1;
   visibility: visible;
@@ -74,7 +101,6 @@
   transition: opacity 150ms ease-out, transform 180ms ease-out, visibility 0ms 0ms;
 }
 
-/* 悬停时药丸高亮 + 箭头旋转 */
 .nav-pill-group:hover .nav-pill {
   color: var(--text-primary);
   background: var(--bg-surface);
@@ -85,7 +111,6 @@
   transform: rotate(180deg);
 }
 
-/* 下拉选项 */
 .pill-dropdown button {
   display: flex;
   align-items: center;
@@ -105,24 +130,32 @@
   color: var(--text-primary);
 }
 
-/* 下拉选项之间的分隔 */
 .pill-dropdown button + button {
   border-top: 1px solid var(--border-color);
   margin-top: 2px;
   padding-top: 9px;
 }
 
-/* 兼容旧代码 */
+/* Legacy nav button */
 .nav-btn {
-  width: 32px; height: 32px;
+  width: 32px;
+  height: 32px;
   border-radius: var(--radius-sm);
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--text-muted);
   transition: color var(--transition-fast), background var(--transition-fast);
 }
-.nav-btn:hover { color: var(--text-secondary); background: var(--bg-hover); }
 
-/* === 左侧面板 === */
+.nav-btn:hover {
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+}
+
+/* ================================
+   Left Panel — Avatar Section
+   ================================ */
 #left-panel .avatar-section {
   display: flex;
   flex-direction: column;
@@ -132,51 +165,71 @@
 }
 
 #left-panel .avatar-img {
-  width: 64px; height: 64px;
+  width: 64px;
+  height: 64px;
   border-radius: var(--radius-full);
   background: linear-gradient(135deg, var(--border-color), var(--border-active));
   border: 2px solid var(--text-dim);
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: var(--space-sm);
 }
 
 #left-panel .char-name {
-  font-size: 16px; font-weight: 600; color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 #left-panel .char-subtitle {
-  font-size: 10px; color: var(--text-muted); margin-top: 2px;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
 }
 
+/* Affection mini bar */
 #left-panel .affection-mini {
-  width: 100%; margin-top: 10px;
+  width: 100%;
+  margin-top: 10px;
 }
 
 #left-panel .affection-mini .aff-row {
-  display: flex; justify-content: space-between; align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 3px;
 }
 
 #left-panel .affection-mini .aff-label {
-  font-size: 9px; color: var(--text-dim);
+  font-size: 9px;
+  color: var(--text-dim);
 }
 
 #left-panel .affection-mini .aff-value {
-  font-size: 11px; color: var(--success);
+  font-size: 11px;
+  color: var(--success);
 }
 
 #left-panel .affection-mini .aff-bar {
-  height: 2px; background: var(--border-color); border-radius: 1px;
+  height: 2px;
+  background: var(--border-color);
+  border-radius: 1px;
 }
 
 #left-panel .affection-mini .aff-bar-fill {
-  height: 100%; background: var(--accent); border-radius: 1px;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 1px;
   transition: width var(--transition-normal);
 }
 
-/* 折叠模块 */
+/* ================================
+   Left Panel — Status Modules
+   ================================ */
 #left-panel .status-modules {
-  overflow-y: auto; flex: 1;
+  overflow-y: auto;
+  flex: 1;
 }
 
 #left-panel details {
@@ -201,7 +254,9 @@
 }
 
 #left-panel details summary .chevron {
-  width: 10px; height: 10px;
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
   transition: transform var(--transition-normal);
 }
 
@@ -228,6 +283,7 @@
   font-size: 10px;
 }
 
+/* Field rows */
 #left-panel .field-row {
   display: flex;
   justify-content: space-between;
@@ -248,6 +304,7 @@
   color: var(--text-muted);
 }
 
+/* Inner thought block */
 #left-panel .inner-thought {
   font-size: 10px;
   color: var(--text-tertiary);
@@ -259,6 +316,7 @@
   border-left: 2px solid var(--text-tertiary);
 }
 
+/* Action items with diamond bullets */
 #left-panel .action-item {
   font-size: 10px;
   color: var(--text-secondary);
@@ -272,11 +330,7 @@
   flex-shrink: 0;
 }
 
-#left-panel .divider-thin {
-  border-top: 1px solid var(--border-color);
-  margin: 2px 0;
-}
-
+/* Section label */
 #left-panel .section-label {
   font-size: 9px;
   color: var(--text-dim);
@@ -285,8 +339,14 @@
   margin-bottom: -2px;
 }
 
+/* Thin divider */
+#left-panel .divider-thin {
+  border-top: 1px solid var(--border-color);
+  margin: 2px 0;
+}
+
 /* ================================
-   聊天区
+   Chat Area — Messages
    ================================ */
 #chat-messages {
   flex: 1;
@@ -304,8 +364,13 @@
   animation: msgIn 300ms ease-out;
 }
 
-.chat-msg.char { align-items: flex-start; }
-.chat-msg.user { align-items: flex-end; }
+.chat-msg.char {
+  align-items: flex-start;
+}
+
+.chat-msg.user {
+  align-items: flex-end;
+}
 
 .chat-msg .msg-label {
   font-size: 10px;
@@ -315,6 +380,7 @@
 }
 
 .chat-msg .msg-bubble {
+  position: relative;
   padding: 10px 14px;
   border-radius: var(--radius-xl);
   font-size: 14px;
@@ -336,7 +402,7 @@
   max-width: 60%;
 }
 
-/* 消息内标记 */
+/* Message text variants */
 .msg-bubble .action-text {
   color: var(--text-tertiary);
   font-style: italic;
@@ -354,7 +420,7 @@
   color: #d0dce6;
 }
 
-/* 叙述段落 */
+/* Narration block */
 .chat-narration {
   align-self: stretch;
   text-align: center;
@@ -367,8 +433,76 @@
   margin: 4px 0;
 }
 
+/* Bookmark button on hover */
+.msg-bookmark-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--transition-fast), color var(--transition-fast);
+}
+
+.msg-bubble:hover .msg-bookmark-btn {
+  opacity: 1;
+}
+
+.msg-bookmark-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent-dim);
+}
+
 /* ================================
-   底部输入栏
+   Empty States
+   ================================ */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3xl) var(--space-lg);
+  text-align: center;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.empty-state .empty-icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--space-md);
+  border-radius: var(--radius-full);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-state .empty-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-xs);
+}
+
+.empty-state .empty-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  max-width: 240px;
+  line-height: 1.5;
+}
+
+/* ================================
+   Input Bar
    ================================ */
 #input-bar .msg-input {
   flex: 1;
@@ -383,7 +517,7 @@
   max-height: 120px;
   line-height: 1.5;
   transition: border-color var(--transition-fast);
-  field-sizing: content; /* 自适应高度 */
+  field-sizing: content;
 }
 
 #input-bar .msg-input:focus {
@@ -394,6 +528,7 @@
   color: var(--text-dim);
 }
 
+/* Token count display */
 #input-bar .token-count {
   font-size: 11px;
   color: var(--text-muted);
@@ -403,8 +538,19 @@
   text-align: center;
 }
 
-/* 操作菜单 */
-.action-menu-wrap { position: relative; }
+#input-bar .token-count.warning {
+  color: var(--warning);
+}
+
+#input-bar .token-count.danger {
+  color: var(--danger);
+}
+
+/* Action menu */
+.action-menu-wrap {
+  position: relative;
+}
+
 .action-menu {
   position: absolute;
   bottom: calc(100% + 8px);
@@ -415,10 +561,18 @@
   padding: var(--space-xs);
   min-width: 140px;
   box-shadow: var(--shadow-md);
-  display: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity var(--transition-fast), transform var(--transition-fast), visibility 0ms 150ms;
 }
 
-.action-menu.show { display: block; }
+.action-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition: opacity var(--transition-fast), transform var(--transition-fast), visibility 0ms 0ms;
+}
 
 .action-menu button {
   display: block;
@@ -436,9 +590,18 @@
   color: var(--text-primary);
 }
 
-/* 发送按钮 */
+.action-menu button.danger {
+  color: var(--danger);
+}
+
+.action-menu button.danger:hover {
+  background: var(--danger-bg);
+}
+
+/* Send button */
 #btn-send {
-  width: 40px; height: 40px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-full);
   background: var(--accent);
   color: var(--bg-primary);
@@ -458,7 +621,7 @@
 }
 
 /* ================================
-   右侧面板 · 标签页
+   Right Panel — Tab Bar
    ================================ */
 #right-panel .tab-bar {
   display: flex;
@@ -479,13 +642,16 @@
   font-family: inherit;
 }
 
-#right-panel .tab-btn:hover { color: var(--text-secondary); }
+#right-panel .tab-btn:hover {
+  color: var(--text-secondary);
+}
 
 #right-panel .tab-btn.active {
   color: var(--text-primary);
   font-weight: 600;
 }
 
+/* Tab bar active indicator with animated underline */
 #right-panel .tab-btn.active::after {
   content: '';
   position: absolute;
@@ -494,7 +660,19 @@
   right: 12px;
   height: 2px;
   background: var(--accent);
-  transition: left var(--transition-normal), right var(--transition-normal);
+  border-radius: 1px 1px 0 0;
+  animation: tabIndicatorIn 250ms ease-out;
+}
+
+@keyframes tabIndicatorIn {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
 }
 
 #right-panel .tab-content {
@@ -504,9 +682,13 @@
   padding: var(--space-md);
 }
 
-#right-panel .tab-content.active { display: block; }
+#right-panel .tab-content.active {
+  display: block;
+}
 
-/* 角色设定表单 */
+/* ================================
+   Character Form Fields
+   ================================ */
 .char-field {
   margin-bottom: var(--space-md);
 }
@@ -546,7 +728,9 @@
   line-height: 1.5;
 }
 
-/* 切换开关（toggle button） */
+/* ================================
+   Toggle Switch
+   ================================ */
 .toggle-btn {
   width: 44px;
   height: 24px;
@@ -559,12 +743,16 @@
   padding: 0;
 }
 
-.toggle-btn.active { background: var(--accent); }
+.toggle-btn.active {
+  background: var(--accent);
+}
 
 .toggle-btn .toggle-thumb {
   position: absolute;
-  top: 2px; left: 2px;
-  width: 20px; height: 20px;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: white;
   transition: transform var(--transition-fast);
@@ -575,7 +763,7 @@
 }
 
 /* ================================
-   世界书 (World Book)
+   World Book (WB)
    ================================ */
 .wb-toolbar {
   display: flex;
@@ -584,9 +772,15 @@
   margin-bottom: var(--space-md);
 }
 
-.wb-toolbar .wb-count { font-size: 11px; color: var(--text-tertiary); }
+.wb-toolbar .wb-count {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
 
-.wb-toolbar .wb-actions { display: flex; gap: var(--space-sm); }
+.wb-toolbar .wb-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
 
 .wb-toolbar .wb-actions button {
   font-size: 11px;
@@ -596,7 +790,9 @@
   transition: color var(--transition-fast);
 }
 
-.wb-toolbar .wb-actions button:hover { color: var(--text-secondary); }
+.wb-toolbar .wb-actions button:hover {
+  color: var(--text-secondary);
+}
 
 .wb-toolbar .btn-add {
   font-size: 11px;
@@ -607,7 +803,7 @@
   font-weight: 600;
 }
 
-/* 条目卡片 */
+/* WB Entry Card */
 .wb-entry {
   background: var(--bg-surface);
   border-radius: var(--radius-md);
@@ -617,7 +813,9 @@
   transition: border-color var(--transition-fast);
 }
 
-.wb-entry.editing { border-color: var(--border-active); }
+.wb-entry.editing {
+  border-color: var(--border-active);
+}
 
 .wb-entry-header {
   padding: 10px 12px;
@@ -647,12 +845,18 @@
 }
 
 .wb-entry-header .entry-status {
-  width: 6px; height: 6px;
+  width: 6px;
+  height: 6px;
   border-radius: var(--radius-full);
 }
 
-.wb-entry-header .entry-status.enabled { background: var(--success); }
-.wb-entry-header .entry-status.disabled { background: var(--text-dim); }
+.wb-entry-header .entry-status.enabled {
+  background: var(--success);
+}
+
+.wb-entry-header .entry-status.disabled {
+  background: var(--text-dim);
+}
 
 .wb-entry-body {
   display: none;
@@ -661,7 +865,9 @@
   gap: 8px;
 }
 
-.wb-entry.editing .wb-entry-body { display: flex; }
+.wb-entry.editing .wb-entry-body {
+  display: flex;
+}
 
 .wb-entry-body .wb-field label {
   display: block;
@@ -680,6 +886,7 @@
   padding: 6px 8px;
   font-size: 11px;
   color: var(--text-secondary);
+  font-family: inherit;
 }
 
 .wb-entry-body .wb-field textarea {
@@ -687,7 +894,14 @@
   resize: vertical;
 }
 
-/* 关键词标签 */
+.wb-entry-body .wb-field input:focus,
+.wb-entry-body .wb-field textarea:focus,
+.wb-entry-body .wb-field select:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+/* WB Keywords */
 .wb-keywords {
   display: flex;
   flex-wrap: wrap;
@@ -722,10 +936,17 @@
   font-size: 11px !important;
 }
 
-/* 深度和出口名称（条件显示） */
-.wb-conditional { display: none; }
-.wb-conditional.show { display: flex; gap: var(--space-sm); }
+/* WB Conditional Fields */
+.wb-conditional {
+  display: none;
+}
 
+.wb-conditional.show {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+/* WB Entry Actions */
 .wb-entry-actions {
   display: flex;
   gap: var(--space-sm);
@@ -740,16 +961,27 @@
   border-radius: var(--radius-sm);
 }
 
-.wb-btn-save { background: var(--accent); color: var(--bg-primary); }
-.wb-btn-cancel { color: var(--text-muted); }
-.wb-btn-delete { color: var(--danger); }
+.wb-btn-save {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
 
-/* 删除确认 */
+.wb-btn-cancel {
+  color: var(--text-muted);
+}
+
+.wb-btn-delete {
+  color: var(--danger);
+}
+
+/* WB Delete Confirmation */
 .wb-delete-confirm {
   background: var(--danger-bg);
   border: 1px solid var(--danger);
   border-radius: var(--radius-md);
   padding: 10px 12px;
   font-size: 11px;
+  color: var(--text-secondary);
   margin-bottom: var(--space-sm);
+  line-height: 1.5;
 }

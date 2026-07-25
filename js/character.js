@@ -1,10 +1,44 @@
-// js/character.js
-const CharacterSettings = {
-  fields: {},
+/**
+ * js/character.js — 角色设定与管理
+ *
+ * 三个模块：
+ * - CharacterSettings — 右侧面板"角色"标签页的快速设定
+ * - CharacterManager — 角色卡列表的导入/导出/删除
+ * - CharacterEditor   — 角色卡详细编辑器（表单/JSON 双视图）
+ *
+ * @namespace CharacterSettings
+ * @namespace CharacterManager
+ * @namespace CharacterEditor
+ */
 
-  init() {
-    // Initialize field references
-    this.fields = {
+// =============================================================================
+// CharacterSettings — 角色快速设定
+// =============================================================================
+
+/**
+ * 右侧面板"角色"标签页的快速设定表单
+ *
+ * 与 storage 中的 character_card 同步，
+ * 支持 Tab 切换和简单的字段读写。
+ *
+ * @namespace CharacterSettings
+ */
+const CharacterSettings = (function () {
+  'use strict';
+
+  /** @type {Object<string,HTMLInputElement|HTMLTextAreaElement>} 字段引用缓存 */
+  var _fields = {};
+
+  // ===========================================================================
+  // Public API
+  // ===========================================================================
+
+  /**
+   * 初始化 — 缓存字段引用、绑定 Tab 切换、加载数据
+   */
+  function init() {
+    // 缓存字段引用
+    _fields = {
       name: document.getElementById('cs-name'),
       nickname: document.getElementById('cs-nickname'),
       age: document.getElementById('cs-age'),
@@ -14,425 +48,715 @@ const CharacterSettings = {
       background: document.getElementById('cs-background'),
       relationship: document.getElementById('cs-relationship'),
     };
-    this.loadFromCard();
 
-    // Tab switching
-    document.querySelectorAll('#right-panel .tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('#right-panel .tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('#right-panel .tab-content').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById(btn.dataset.tab).classList.add('active');
+    loadFromCard();
+
+    // Tab 切换
+    var panel = document.getElementById('right-panel');
+    if (panel) {
+      var tabs = panel.querySelectorAll('.tab-btn');
+      tabs.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          // 清除所有激活状态
+          tabs.forEach(function (b) { b.classList.remove('active'); });
+          panel.querySelectorAll('.tab-content').forEach(function (c) { c.classList.remove('active'); });
+          // 激活当前
+          btn.classList.add('active');
+          var content = document.getElementById(btn.getAttribute('data-tab'));
+          if (content) content.classList.add('active');
+        });
       });
-    });
-  },
-
-  loadFromCard() {
-    const card = window.storage?.get('character_card');
-    if (!card) return;
-    const d = card.data || card;
-    this.setVal('name', d.name || '');
-    this.setVal('nickname', d.description || '');
-    this.setVal('personality', d.personality || '');
-    this.setVal('background', d.scenario || '');
-  },
-
-  setVal(key, val) {
-    if (this.fields[key]) this.fields[key].value = val;
-  },
-
-  getVal(key) {
-    return this.fields[key]?.value || '';
-  },
-
-  save() {
-    const card = window.storage?.get('character_card') || {};
-    card.data = card.data || {};
-    card.data.name = this.getVal('name');
-    card.data.personality = this.getVal('personality');
-    card.data.scenario = this.getVal('background');
-    window.storage?.set('character_card', card);
-    window.notifications?.show('success', '已保存', '角色设定已更新');
+    }
   }
-};
 
-// Initialize on DOM ready
-document.addEventListener('DOMContentLoaded', () => {
-  CharacterSettings.init();
-});
+  /**
+   * 从 storage 中的 character_card 加载数据到表单
+   */
+  function loadFromCard() {
+    if (typeof window.storage === 'undefined') return;
+    var card = window.storage.get('character_card');
+    if (!card) return;
 
-/* ---- 角色卡管理 ---- */
-const CharacterManager = {
-  cards: [],
+    var d = card.data || card;
+    _setVal('name', d.name || '');
+    _setVal('nickname', d.description || '');
+    _setVal('personality', d.personality || '');
+    _setVal('background', d.scenario || '');
+  }
 
-  init() {
-    // 按钮由 modals.js 统一绑定（data-view）
-    this.setupDragDrop();
-  },
+  /**
+   * 设置字段值（通过字段 key）
+   * @param {string} key — 字段名
+   * @param {string} val — 值
+   */
+  function setVal(key, val) {
+    _setVal(key, val);
+  }
 
-  renderList() {
-    const list = document.getElementById('char-card-list');
+  /**
+   * 获取字段值
+   * @param {string} key — 字段名
+   * @returns {string}
+   */
+  function getVal(key) {
+    var el = _fields[key];
+    return el ? el.value : '';
+  }
+
+  /**
+   * 保存当前表单数据到 character_card
+   */
+  function save() {
+    try {
+      if (typeof window.storage === 'undefined') return;
+      var card = window.storage.get('character_card') || {};
+      card.data = card.data || {};
+      card.data.name = getVal('name');
+      card.data.personality = getVal('personality');
+      card.data.scenario = getVal('background');
+      window.storage.set('character_card', card);
+
+      if (typeof window.notifications !== 'undefined') {
+        window.notifications.show('success', '已保存', '角色设定已更新');
+      }
+    } catch (e) {
+      console.warn('[CharacterSettings] 保存失败:', e.message);
+    }
+  }
+
+  // ===========================================================================
+  // Private Helpers
+  // ===========================================================================
+
+  /**
+   * @param {string} key
+   * @param {string} val
+   * @private
+   */
+  function _setVal(key, val) {
+    var el = _fields[key];
+    if (el) el.value = val;
+  }
+
+  // ===========================================================================
+  // Export
+  // ===========================================================================
+
+  return {
+    init: init,
+    loadFromCard: loadFromCard,
+    setVal: setVal,
+    getVal: getVal,
+    save: save,
+  };
+})();
+
+// =============================================================================
+// CharacterManager — 角色卡列表管理
+// =============================================================================
+
+/**
+ * 角色卡管理器
+ *
+ * 支持拖拽/点击导入 JSON 或 PNG 角色卡，
+ * 管理角色卡列表的 CRUD，自动应用角色卡到 UI。
+ *
+ * @namespace CharacterManager
+ */
+const CharacterManager = (function () {
+  'use strict';
+
+  /** @type {Object[]} 角色卡列表 */
+  var _cards = [];
+
+  // ===========================================================================
+  // Public API
+  // ===========================================================================
+
+  /**
+   * 初始化 — 加载存储数据，设置拖拽区域
+   */
+  function init() {
+    loadFromStorage();
+    setupDragDrop();
+  }
+
+  /**
+   * 渲染角色卡列表到 #char-card-list
+   */
+  function renderList() {
+    var list = document.getElementById('char-card-list');
     if (!list) return;
-    const cards = this.cards;
-    if (!cards.length) {
+
+    if (!_cards.length) {
       list.innerHTML = '<div class="empty-list-msg">暂无角色卡，拖拽 JSON 文件到上方导入</div>';
       return;
     }
-    list.innerHTML = cards.map((card, i) => {
-      const name = card.data?.name || card.name || '未命名';
-      const desc = card.data?.description || card.description || '';
-      return `
-        <div class="char-card-item" data-index="${i}">
-          <div class="char-card-info">
-            <span class="char-card-name">${this.escapeHtml(name)}</span>
-            <span class="char-card-desc">${this.escapeHtml(desc)}</span>
-          </div>
-          <div class="char-card-actions">
-            <button class="btn-card-edit" data-index="${i}" title="编辑">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            </button>
-            <button class="btn-card-delete" data-index="${i}" title="删除">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-            </button>
-          </div>
-        </div>
-      `;
-    }).join('');
 
-    // Bind edit buttons
-    list.querySelectorAll('.btn-card-edit').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const idx = parseInt(btn.dataset.index);
-        const card = this.cards[idx];
+    var html = '';
+    for (var i = 0; i < _cards.length; i++) {
+      var card = _cards[i];
+      var name = (card.data && card.data.name) || card.name || '未命名';
+      var desc = (card.data && card.data.description) || card.description || '';
+      html +=
+        '<div class="char-card-item" data-index="' + i + '">' +
+          '<div class="char-card-info">' +
+            '<span class="char-card-name">' + escapeHtml(name) + '</span>' +
+            '<span class="char-card-desc">' + escapeHtml(desc) + '</span>' +
+          '</div>' +
+          '<div class="char-card-actions">' +
+            '<button class="btn-card-edit" data-index="' + i + '" title="编辑">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
+            '</button>' +
+            '<button class="btn-card-delete" data-index="' + i + '" title="删除">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>' +
+            '</button>' +
+          '</div>' +
+        '</div>';
+    }
+    list.innerHTML = html;
+
+    // 绑定编辑按钮
+    list.querySelectorAll('.btn-card-edit').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var idx = parseInt(btn.getAttribute('data-index'), 10);
+        var card = _cards[idx];
         if (card && typeof CharacterEditor !== 'undefined') {
           CharacterEditor.loadCard(card);
           CharacterEditor.currentIndex = idx;
-          ModalManager.open('modal-char-editor');
+          if (typeof ModalManager !== 'undefined') {
+            ModalManager.open('modal-char-editor');
+          }
         }
       });
     });
 
-    // Bind delete buttons
-    list.querySelectorAll('.btn-card-delete').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const idx = parseInt(btn.dataset.index);
-        this.deleteCard(idx);
+    // 绑定删除按钮
+    list.querySelectorAll('.btn-card-delete').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var idx = parseInt(btn.getAttribute('data-index'), 10);
+        deleteCard(idx);
       });
     });
-  },
+  }
 
-  setupDragDrop() {
-    const zone = document.getElementById('char-drop-zone');
-    const input = document.getElementById('char-file-input');
+  /**
+   * 设置拖拽上传区域
+   */
+  function setupDragDrop() {
+    var zone = document.getElementById('char-drop-zone');
+    var input = document.getElementById('char-file-input');
     if (!zone || !input) return;
 
-    zone.addEventListener('click', () => input.click());
+    // 点击触发文件选择
+    zone.addEventListener('click', function () { input.click(); });
 
-    zone.addEventListener('dragover', (e) => {
+    // 拖拽事件
+    zone.addEventListener('dragover', function (e) {
       e.preventDefault();
       zone.classList.add('drag-over');
     });
-
-    zone.addEventListener('dragleave', () => {
+    zone.addEventListener('dragleave', function () {
       zone.classList.remove('drag-over');
     });
-
-    zone.addEventListener('drop', (e) => {
+    zone.addEventListener('drop', function (e) {
       e.preventDefault();
       zone.classList.remove('drag-over');
-      const file = e.dataTransfer.files[0];
+      var file = e.dataTransfer.files[0];
       if (file && (file.name.endsWith('.json') || file.name.endsWith('.png'))) {
-        this.readFile(file);
+        readFile(file);
       }
     });
 
-    input.addEventListener('change', () => {
-      const file = input.files[0];
-      if (file) this.readFile(file);
+    // 文件选择事件
+    input.addEventListener('change', function () {
+      var file = input.files[0];
+      if (file) readFile(file);
       input.value = '';
     });
-  },
+  }
 
-  readFile(file) {
-    // PNG 角色卡（SillyTavern PNG 嵌入）
-    if (file.type.includes('png') && window.ST && ST.Importer && ST.Importer.extractCardFromPng) {
-      ST.Importer.extractCardFromPng(file).then(card => {
-        this.importCard(card);
-      }).catch(err => {
-        window.notifications?.show('error', '导入失败', err.message);
-      });
+  /**
+   * 读取上传的角色卡文件（JSON 或 PNG）
+   *
+   * @param {File} file
+   */
+  function readFile(file) {
+    // PNG 角色卡 — 使用 ST.Importer 提取
+    if (file.type.indexOf('png') !== -1 || file.name.endsWith('.png')) {
+      if (window.ST && ST.Importer && typeof ST.Importer.extractCardFromPng === 'function') {
+        ST.Importer.extractCardFromPng(file).then(function (card) {
+          importCard(card);
+        }).catch(function (err) {
+          if (typeof window.notifications !== 'undefined') {
+            window.notifications.show('error', '导入失败', err.message || String(err));
+          }
+        });
+      } else {
+        if (typeof window.notifications !== 'undefined') {
+          window.notifications.show('warning', '不支持', 'PNG 角色卡需要 ST 模块支持');
+        }
+      }
       return;
     }
+
     // JSON 角色卡
-    const reader = new FileReader();
-    reader.onload = (e) => {
+    var reader = new FileReader();
+    reader.onload = function (e) {
       try {
-        const raw = JSON.parse(e.target.result);
-        const card = (window.ST && ST.Importer && ST.Importer.importCharacterCard)
+        var raw = JSON.parse(e.target.result);
+        var card = (window.ST && ST.Importer && typeof ST.Importer.importCharacterCard === 'function')
           ? ST.Importer.importCharacterCard(raw)
           : raw;
-        this.importCard(card);
+        importCard(card);
       } catch (err) {
-        window.notifications?.show('error', '导入失败', 'JSON 解析错误：' + err.message);
+        if (typeof window.notifications !== 'undefined') {
+          window.notifications.show('error', '导入失败', 'JSON 解析错误：' + err.message);
+        }
+      }
+    };
+    reader.onerror = function () {
+      if (typeof window.notifications !== 'undefined') {
+        window.notifications.show('error', '读取失败', '无法读取文件');
       }
     };
     reader.readAsText(file);
-  },
+  }
 
-  importCard(card) {
-    this.cards.push(card);
-    this.saveToStorage();
-    this.renderList();
-    const name = card.name || card.data?.name || '角色卡';
-    window.notifications?.show('success', '导入成功', `已导入「${name}」`);
+  /**
+   * 导入角色卡 — 添加到列表、保存、应用到 UI
+   *
+   * @param {Object} card
+   */
+  function importCard(card) {
+    _cards.push(card);
+    saveToStorage();
+    renderList();
+
+    var name = (card.data && card.data.name) || card.name || '角色卡';
+    if (typeof window.notifications !== 'undefined') {
+      window.notifications.show('success', '导入成功', '已导入「' + name + '」');
+    }
 
     // 自动应用为当前角色
-    if (window.ST && ST.Importer && ST.Importer.applyCharacterCard) {
+    if (window.ST && ST.Importer && typeof ST.Importer.applyCharacterCard === 'function') {
       ST.Importer.applyCharacterCard(card);
+    } else if (typeof CharacterSettings !== 'undefined') {
+      CharacterSettings.loadFromCard();
     }
-  },
+  }
 
-  exportCard(index) {
-    const card = this.cards[index];
+  /**
+   * 导出角色卡 JSON 文件
+   *
+   * @param {number} index — 卡片索引
+   */
+  function exportCard(index) {
+    var card = _cards[index];
     if (!card) return;
-    const name = card.data?.name || card.name || 'character';
-    const blob = new Blob([JSON.stringify(card, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    var name = (card.data && card.data.name) || card.name || 'character';
+    var json = JSON.stringify(card, null, 2);
+    var blob = new Blob([json], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
     a.href = url;
-    a.download = `${name}.json`;
+    a.download = name + '.json';
     a.click();
     URL.revokeObjectURL(url);
-  },
+  }
 
-  deleteCard(index) {
-    if (index < 0 || index >= this.cards.length) return;
-    this.cards.splice(index, 1);
-    this.saveToStorage();
-    this.renderList();
+  /**
+   * 删除指定索引的角色卡
+   *
+   * @param {number} index
+   */
+  function deleteCard(index) {
+    if (index < 0 || index >= _cards.length) return;
+    _cards.splice(index, 1);
+    saveToStorage();
+    renderList();
     if (typeof window.notifications !== 'undefined') {
       window.notifications.show('info', '已删除', '角色卡已移除');
     }
-  },
+  }
 
-  saveToStorage() {
+  /**
+   * 保存角色卡列表到 localStorage
+   */
+  function saveToStorage() {
     if (typeof window.storage !== 'undefined') {
-      window.storage.set('character_cards', this.cards);
+      window.storage.set('character_cards', _cards);
     }
-  },
+  }
 
-  loadFromStorage() {
+  /**
+   * 从 localStorage 加载角色卡列表
+   */
+  function loadFromStorage() {
     if (typeof window.storage !== 'undefined') {
-      this.cards = window.storage.get('character_cards') || [];
+      var data = window.storage.get('character_cards');
+      _cards = Array.isArray(data) ? data : [];
     }
-  },
+  }
 
-  escapeHtml(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
+  // ===========================================================================
+  // Private Helpers
+  // ===========================================================================
+
+  /**
+   * HTML 安全转义
+   * @param {string} str
+   * @returns {string}
+   * @private
+   */
+  function escapeHtml(str) {
+    if (!str && str !== 0) return '';
+    var div = document.createElement('div');
+    div.textContent = String(str);
     return div.innerHTML;
   }
-};
 
-/* ---- 角色卡编辑器 ---- */
-const CharacterEditor = {
-  currentIndex: -1,
+  // ===========================================================================
+  // Export
+  // ===========================================================================
 
-  init() {
-    // Range slider sync
-    const range = document.getElementById('editor-talkativeness');
-    const val = document.getElementById('editor-talkativeness-val');
+  return {
+    cards: _cards, // 向后兼容
+    init: init,
+    renderList: renderList,
+    setupDragDrop: setupDragDrop,
+    readFile: readFile,
+    importCard: importCard,
+    exportCard: exportCard,
+    deleteCard: deleteCard,
+    saveToStorage: saveToStorage,
+    loadFromStorage: loadFromStorage,
+  };
+})();
+
+// =============================================================================
+// CharacterEditor — 角色卡编辑器
+// =============================================================================
+
+/**
+ * 角色卡详细编辑器
+ *
+ * 支持表单视图和 JSON 原始视图双模式切换，
+ * 含标签（tags）的内联添加/删除，
+ * 以及健谈度（talkativeness）滑块。
+ *
+ * @namespace CharacterEditor
+ */
+const CharacterEditor = (function () {
+  'use strict';
+
+  /** @type {number} 当前编辑的角色卡在 CharacterManager.cards 中的索引 */
+  var _currentIndex = -1;
+
+  // ===========================================================================
+  // Public API
+  // ===========================================================================
+
+  /**
+   * 初始化编辑器 — 绑定所有编辑控件
+   */
+  function init() {
+    // 健谈度滑块
+    var range = document.getElementById('editor-talkativeness');
+    var val = document.getElementById('editor-talkativeness-val');
     if (range && val) {
-      range.addEventListener('input', () => {
+      range.addEventListener('input', function () {
         val.textContent = range.value;
       });
     }
 
-    // Tags inline input
-    const tagInput = document.getElementById('editor-tags-input');
+    // 标签输入（回车添加）
+    var tagInput = document.getElementById('editor-tags-input');
     if (tagInput) {
-      tagInput.addEventListener('keydown', (e) => {
+      tagInput.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
           e.preventDefault();
-          const text = tagInput.value.trim();
-          if (text) this.addTag(text);
+          var text = tagInput.value.trim();
+          if (text) addTag(text);
           tagInput.value = '';
         }
       });
     }
 
-    // Toggle view button
-    const toggleBtn = document.getElementById('editor-toggle-view');
+    // 视图切换按钮
+    var toggleBtn = document.getElementById('editor-toggle-view');
     if (toggleBtn) {
-      toggleBtn.addEventListener('click', () => this.toggleView());
+      toggleBtn.addEventListener('click', function () { toggleView(); });
     }
 
-    // Save button
-    const saveBtn = document.getElementById('editor-save');
+    // 保存按钮
+    var saveBtn = document.getElementById('editor-save');
     if (saveBtn) {
-      saveBtn.addEventListener('click', () => this.save());
+      saveBtn.addEventListener('click', function () { save(); });
     }
-  },
+  }
 
-  loadCard(card) {
-    const d = card.data || card;
-    this.setVal('editor-name', d.name || '');
-    this.setVal('editor-description', d.description || '');
-    this.setVal('editor-personality', d.personality || '');
-    this.setVal('editor-scenario', d.scenario || '');
-    this.setVal('editor-first-mes', d.first_mes || '');
-    this.setVal('editor-mes-example', d.mes_example || '');
-    this.setVal('editor-talkativeness', d.talkativeness ?? 50);
-    const tv = document.getElementById('editor-talkativeness-val');
-    if (tv) tv.textContent = d.talkativeness ?? 50;
+  /**
+   * 加载角色卡数据到编辑器表单
+   *
+   * @param {Object} card — 角色卡对象
+   */
+  function loadCard(card) {
+    var d = card.data || card;
 
-    // Tags
-    const container = document.getElementById('editor-tags-container');
+    _setElementValue('editor-name', d.name || '');
+    _setElementValue('editor-description', d.description || '');
+    _setElementValue('editor-personality', d.personality || '');
+    _setElementValue('editor-scenario', d.scenario || '');
+    _setElementValue('editor-first-mes', d.first_mes || '');
+    _setElementValue('editor-mes-example', d.mes_example || '');
+
+    var talkativeness = d.talkativeness != null ? d.talkativeness : 50;
+    _setElementValue('editor-talkativeness', talkativeness);
+    var tv = document.getElementById('editor-talkativeness-val');
+    if (tv) tv.textContent = talkativeness;
+
+    // 标签
+    var container = document.getElementById('editor-tags-container');
     if (container) {
-      // Remove old chips, keep input
-      container.querySelectorAll('.tag-chip').forEach(el => el.remove());
-      const input = container.querySelector('.tag-input-inline');
+      // 移除旧 chip（保留 input）
+      container.querySelectorAll('.tag-chip').forEach(function (el) { el.remove(); });
       if (Array.isArray(d.tags)) {
-        d.tags.forEach(tag => this.addTag(tag));
+        d.tags.forEach(function (tag) { addTag(tag); });
       }
     }
 
-    // Sync JSON textarea
-    this.syncJsonView();
-    // Ensure form view is visible
-    this.showFormView();
-  },
+    // 同步 JSON 视图
+    syncJsonView();
+    // 确保显示表单视图
+    showFormView();
+  }
 
-  setVal(id, val) {
-    const el = document.getElementById(id);
-    if (el) el.value = val;
-  },
-
-  getVal(id) {
-    const el = document.getElementById(id);
-    return el ? el.value : '';
-  },
-
-  addTag(text) {
-    const container = document.getElementById('editor-tags-container');
-    if (!container) return;
-    const input = container.querySelector('.tag-input-inline');
-    const chip = document.createElement('span');
-    chip.className = 'tag-chip';
-    chip.innerHTML = `${this.escapeHtml(text)}<span class="tag-remove" data-tag="${this.escapeHtml(text)}">
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </span>`;
-    chip.querySelector('.tag-remove').addEventListener('click', () => {
-      chip.remove();
-    });
-    container.insertBefore(chip, input);
-  },
-
-  getTags() {
-    const container = document.getElementById('editor-tags-container');
-    if (!container) return [];
-    return Array.from(container.querySelectorAll('.tag-chip')).map(chip => {
-      return chip.textContent.trim();
-    });
-  },
-
-  toggleView() {
-    const formView = document.getElementById('editor-form-view');
-    const jsonView = document.getElementById('editor-json-view');
-    const toggleBtn = document.getElementById('editor-toggle-view');
+  /**
+   * 切换表单视图 / JSON 视图
+   */
+  function toggleView() {
+    var formView = document.getElementById('editor-form-view');
+    var jsonView = document.getElementById('editor-json-view');
+    var toggleBtn = document.getElementById('editor-toggle-view');
     if (!formView || !jsonView || !toggleBtn) return;
 
-    const isFormVisible = formView.style.display !== 'none';
-    if (isFormVisible) {
-      // Switch to JSON view: sync before showing
-      this.syncJsonView();
+    var isForm = formView.style.display !== 'none';
+    if (isForm) {
+      // 切换到 JSON 视图
+      syncJsonView();
       formView.style.display = 'none';
       jsonView.style.display = 'block';
       toggleBtn.textContent = '表单视图';
     } else {
-      // Switch to form view: parse JSON back
-      this.parseJsonView();
+      // 切换到表单视图
+      parseJsonView();
       jsonView.style.display = 'none';
       formView.style.display = 'block';
       toggleBtn.textContent = 'JSON 视图';
     }
-  },
+  }
 
-  syncJsonView() {
-    const textarea = document.getElementById('editor-json-textarea');
+  /**
+   * 同步 JSON 视图 — 将表单数据序列化到 textarea
+   */
+  function syncJsonView() {
+    var textarea = document.getElementById('editor-json-textarea');
     if (!textarea) return;
-    const card = this.collectCard();
+    var card = collectCard();
     textarea.value = JSON.stringify(card, null, 2);
-  },
+  }
 
-  parseJsonView() {
-    const textarea = document.getElementById('editor-json-textarea');
+  /**
+   * 解析 JSON 视图 — 尝试解析 textarea 内容并回填表单
+   */
+  function parseJsonView() {
+    var textarea = document.getElementById('editor-json-textarea');
     if (!textarea) return;
     try {
-      const data = JSON.parse(textarea.value);
-      this.loadCard(data);
+      var data = JSON.parse(textarea.value);
+      loadCard(data);
     } catch (e) {
       if (typeof window.notifications !== 'undefined') {
         window.notifications.show('error', 'JSON 解析错误', '请检查格式后再切换');
       }
     }
-  },
+  }
 
-  collectCard() {
+  /**
+   * 收集表单数据，组装角色卡对象
+   *
+   * @returns {Object}
+   */
+  function collectCard() {
     return {
-      name: this.getVal('editor-name'),
-      description: this.getVal('editor-description'),
-      personality: this.getVal('editor-personality'),
-      scenario: this.getVal('editor-scenario'),
-      first_mes: this.getVal('editor-first-mes'),
-      mes_example: this.getVal('editor-mes-example'),
-      talkativeness: parseInt(this.getVal('editor-talkativeness')) || 50,
-      tags: this.getTags()
+      name: _getElementValue('editor-name'),
+      description: _getElementValue('editor-description'),
+      personality: _getElementValue('editor-personality'),
+      scenario: _getElementValue('editor-scenario'),
+      first_mes: _getElementValue('editor-first-mes'),
+      mes_example: _getElementValue('editor-mes-example'),
+      talkativeness: parseInt(_getElementValue('editor-talkativeness'), 10) || 50,
+      tags: getTags(),
     };
-  },
+  }
 
-  save() {
-    const card = this.collectCard();
-    // Update card in CharacterManager if exists
+  /**
+   * 保存当前编辑的角色卡
+   */
+  function save() {
+    var card = collectCard();
     if (typeof CharacterManager !== 'undefined') {
-      if (this.currentIndex >= 0 && this.currentIndex < CharacterManager.cards.length) {
-        CharacterManager.cards[this.currentIndex] = { data: card };
+      if (_currentIndex >= 0 && _currentIndex < CharacterManager.cards.length) {
+        // 更新已有卡片
+        CharacterManager.cards[_currentIndex] = { data: card };
         CharacterManager.saveToStorage();
         CharacterManager.renderList();
       } else {
-        // Save as new
+        // 保存为新卡片
         CharacterManager.cards.push({ data: card });
         CharacterManager.saveToStorage();
+        CharacterManager.renderList();
       }
     }
     if (typeof window.notifications !== 'undefined') {
-      window.notifications.show('success', '已保存', `角色卡「${card.name}」已更新`);
+      window.notifications.show('success', '已保存', '角色卡「' + card.name + '」已更新');
     }
     if (typeof ModalManager !== 'undefined') {
       ModalManager.close();
     }
-  },
+  }
 
-  showFormView() {
-    const formView = document.getElementById('editor-form-view');
-    const jsonView = document.getElementById('editor-json-view');
-    const toggleBtn = document.getElementById('editor-toggle-view');
+  /**
+   * 添加标签 chip
+   *
+   * @param {string} text
+   */
+  function addTag(text) {
+    var container = document.getElementById('editor-tags-container');
+    if (!container) return;
+
+    var input = container.querySelector('.tag-input-inline');
+    var chip = document.createElement('span');
+    chip.className = 'tag-chip';
+    chip.innerHTML =
+      escapeHtml(text) +
+      '<span class="tag-remove" data-tag="' + escapeHtml(text) + '">' +
+        '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+      '</span>';
+
+    var removeBtn = chip.querySelector('.tag-remove');
+    if (removeBtn) {
+      removeBtn.addEventListener('click', function () {
+        chip.remove();
+      });
+    }
+
+    container.insertBefore(chip, input || null);
+  }
+
+  /**
+   * 获取当前所有标签文本
+   *
+   * @returns {string[]}
+   */
+  function getTags() {
+    var container = document.getElementById('editor-tags-container');
+    if (!container) return [];
+    var chips = container.querySelectorAll('.tag-chip');
+    var tags = [];
+    chips.forEach(function (chip) {
+      tags.push(chip.childNodes[0].textContent.trim());
+    });
+    return tags;
+  }
+
+  // ===========================================================================
+  // Accessors for external use
+  // ===========================================================================
+
+  Object.defineProperty(CharacterEditor, 'currentIndex', {
+    get: function () { return _currentIndex; },
+    set: function (v) { _currentIndex = v; },
+    enumerable: true,
+    configurable: true,
+  });
+
+  // ===========================================================================
+  // Private Helpers
+  // ===========================================================================
+
+  /**
+   * @param {string} id
+   * @param {string} val
+   * @private
+   */
+  function _setElementValue(id, val) {
+    var el = document.getElementById(id);
+    if (el) el.value = val;
+  }
+
+  /**
+   * @param {string} id
+   * @returns {string}
+   * @private
+   */
+  function _getElementValue(id) {
+    var el = document.getElementById(id);
+    return el ? el.value : '';
+  }
+
+  /**
+   * 显示表单视图（隐藏 JSON 视图）
+   * @private
+   */
+  function showFormView() {
+    var formView = document.getElementById('editor-form-view');
+    var jsonView = document.getElementById('editor-json-view');
+    var toggleBtn = document.getElementById('editor-toggle-view');
     if (formView) formView.style.display = 'block';
     if (jsonView) jsonView.style.display = 'none';
     if (toggleBtn) toggleBtn.textContent = 'JSON 视图';
-  },
+  }
 
-  escapeHtml(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
+  /**
+   * @param {string} str
+   * @returns {string}
+   * @private
+   */
+  function escapeHtml(str) {
+    if (!str && str !== 0) return '';
+    var div = document.createElement('div');
+    div.textContent = String(str);
     return div.innerHTML;
   }
-};
 
-// Initialize after DOM ready
-document.addEventListener('DOMContentLoaded', () => {
-  CharacterManager.init();
-  CharacterEditor.init();
+  // ===========================================================================
+  // Export
+  // ===========================================================================
+
+  return {
+    init: init,
+    loadCard: loadCard,
+    toggleView: toggleView,
+    syncJsonView: syncJsonView,
+    parseJsonView: parseJsonView,
+    collectCard: collectCard,
+    save: save,
+    addTag: addTag,
+    getTags: getTags,
+  };
+})();
+
+// =============================================================================
+// DOMContentLoaded 初始化
+// =============================================================================
+
+document.addEventListener('DOMContentLoaded', function () {
+  try { CharacterSettings.init(); } catch (e) { console.warn('[character.js] CharacterSettings.init 失败:', e.message); }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  try { CharacterManager.init(); } catch (e) { console.warn('[character.js] CharacterManager.init 失败:', e.message); }
+  try { CharacterEditor.init(); } catch (e) { console.warn('[character.js] CharacterEditor.init 失败:', e.message); }
 });

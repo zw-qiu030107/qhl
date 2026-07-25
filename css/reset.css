@@ -1,14 +1,146 @@
 /* css/reset.css */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-body { font-family: var(--font-sans); line-height: 1.6; color: var(--text-secondary); background: var(--bg-primary); overflow: hidden; height: 100vh; }
-img, svg { display: block; max-width: 100%; }
-button, input, textarea, select { font: inherit; color: inherit; border: none; background: none; outline: none; }
-button { cursor: pointer; }
-a { color: inherit; text-decoration: none; }
-ul, ol { list-style: none; }
-details summary { list-style: none; }
-details summary::-webkit-details-marker { display: none; }
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+
+/* --- Box sizing & margin reset --- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- Root element --- */
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Body defaults --- */
+body {
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* --- Media elements --- */
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* --- Form elements global reset --- */
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  border: none;
+  background: none;
+  outline: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* --- Links --- */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* --- Lists --- */
+ul,
+ol {
+  list-style: none;
+}
+
+/* --- Details / Summary marker removal --- */
+details summary {
+  list-style: none;
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+/* --- Custom scrollbar (thin) --- */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-active);
+}
+
+/* --- Selection color --- */
+::selection {
+  background: rgba(126, 184, 218, 0.3);
+  color: var(--text-primary);
+}
+
+::-moz-selection {
+  background: rgba(126, 184, 218, 0.3);
+  color: var(--text-primary);
+}
+
+/* --- Focus visible ring --- */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Elements that manage their own focus styling should suppress the ring */
+.nav-pill:focus-visible,
+.tab-btn:focus-visible,
+.modal-close:focus-visible,
+.game-option-btn:focus-visible,
+details summary:focus-visible,
+.wb-entry-header:focus-visible,
+.char-card-item:focus-visible,
+.history-session:focus-visible {
+  outline: none;
+}
+
+.nav-pill:focus-visible,
+.tab-btn:focus-visible,
+.game-option-btn:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+/* --- Hidden attribute --- */
+[hidden] {
+  display: none !important;
+}
+
+/* --- Disabled state --- */
+button:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+button:disabled {
+  background: var(--border-color) !important;
+  box-shadow: none !important;
+}

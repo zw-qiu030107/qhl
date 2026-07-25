@@ -1,21 +1,27 @@
 /**
- * SillyTavern Import/Export Adapter
+ * SillyTavern Import / Export Adapter — Vanilla JavaScript
  *
- * Converts between SillyTavern lorebook/preset JSON formats and the
- * internal representation used by the app.
+ * Converts between SillyTavern file formats (lorebook v2/v3, preset JSON,
+ * character cards v2/v3, PNG-embedded cards) and the internal application
+ * data model.
  *
  * @namespace ST.Importer
+ * @module sillytavern/importer
  */
-window.ST = window.ST || {};
-
-ST.Importer = (function () {
+(function () {
   'use strict';
 
-  // ==================================================================
-  // Position maps — ST numeric position ↔ internal string position
-  // ==================================================================
+  // Ensure namespace
+  window.ST = window.ST || {};
 
-  /** @type {Object<number, string>} */
+  // =========================================================================
+  // Position Maps (numeric <-> string)
+  // =========================================================================
+
+  /**
+   * SillyTavern numeric position values mapped to internal string positions.
+   * @type {Object<number, string>}
+   */
   var POSITION_MAP = {
     0: 'before_char',
     1: 'after_char',
@@ -24,10 +30,13 @@ ST.Importer = (function () {
     4: 'at_depth',
     5: 'example_msg_top',
     6: 'example_msg_bottom',
-    7: 'outlet'
+    7: 'outlet',
   };
 
-  /** @type {Object<string, number>} */
+  /**
+   * Reverse lookup: internal string position to ST numeric position.
+   * @type {Object<string, number>}
+   */
   var REVERSE_POSITION_MAP = {
     'before_char': 0,
     'after_char': 1,
@@ -36,147 +45,229 @@ ST.Importer = (function () {
     'at_depth': 4,
     'example_msg_top': 5,
     'example_msg_bottom': 6,
-    'outlet': 7
+    'outlet': 7,
   };
 
-  // ==================================================================
-  // Selective logic maps
-  // ==================================================================
+  // =========================================================================
+  // Selective Logic Maps (numeric <-> string)
+  // =========================================================================
 
-  /** @type {Object<number, string>} */
+  /**
+   * ST numeric selective logic values mapped to internal string values.
+   * @type {Object<number, string>}
+   */
   var LOGIC_MAP = {
     0: 'and_any',
     1: 'not_all',
     2: 'not_any',
-    3: 'and_all'
+    3: 'and_all',
   };
 
-  /** @type {Object<string, number>} */
+  /**
+   * Reverse lookup: internal string logic to ST numeric logic.
+   * @type {Object<string, number>}
+   */
   var REVERSE_LOGIC_MAP = {
     'and_any': 0,
     'not_all': 1,
     'not_any': 2,
-    'and_all': 3
+    'and_all': 3,
   };
 
-  // ==================================================================
-  // Lorebook import/export
-  // ==================================================================
+  // =========================================================================
+  // Internal Helpers
+  // =========================================================================
+
+  /**
+   * Generate a short unique ID string.
+   * Uses timestamp + random for collision resistance.
+   *
+   * @returns {string}
+   */
+  function generateUID() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+
+  /**
+   * Generate a UUID v4 string (prefers crypto.randomUUID).
+   *
+   * @returns {string}
+   */
+  function generateUUID() {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      var r = Math.random() * 16 | 0;
+      var v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  /**
+   * Convert a ST-format lorebook entry to an internal entry.
+   *
+   * @param {Object} rawEntry — Entry from ST lorebook JSON
+   * @returns {Object} Internal entry object
+   * @private
+   */
+  function _convertEntry(rawEntry) {
+    return {
+      id: generateUUID(),
+      keys: rawEntry.key || [],
+      secondaryKeys: rawEntry.keysecondary || [],
+      content: rawEntry.content || '',
+      comment: typeof rawEntry.comment === 'string' ? rawEntry.comment : '',
+      order: rawEntry.order != null ? rawEntry.order : 100,
+      position: POSITION_MAP[rawEntry.position] || POSITION_MAP[1] || 'after_char',
+      depth: rawEntry.depth != null ? rawEntry.depth : null,
+      role: rawEntry.role != null ? rawEntry.role : 0,
+      selective: rawEntry.selective != null ? rawEntry.selective : false,
+      selectiveLogic: LOGIC_MAP[rawEntry.selectiveLogic] || LOGIC_MAP[1] || 'not_all',
+      constant: rawEntry.constant != null ? rawEntry.constant : false,
+      probability: rawEntry.useProbability ? (rawEntry.probability != null ? rawEntry.probability : 100) : 100,
+      useProbability: rawEntry.useProbability != null ? rawEntry.useProbability : false,
+      addMemo: rawEntry.addMemo != null ? rawEntry.addMemo : false,
+      sticky: rawEntry.sticky != null ? rawEntry.sticky : 0,
+      cooldown: rawEntry.cooldown != null ? rawEntry.cooldown : 0,
+      delay: rawEntry.delay != null ? rawEntry.delay : 0,
+      weight: rawEntry.weight != null ? rawEntry.weight : 100,
+      scanDepth: rawEntry.scanDepth != null ? rawEntry.scanDepth : 0,
+      caseSensitive: rawEntry.caseSensitive != null ? rawEntry.caseSensitive : false,
+      matchWholeWords: rawEntry.matchWholeWords != null ? rawEntry.matchWholeWords : false,
+      excludeRecursion: rawEntry.excludeRecursion != null ? rawEntry.excludeRecursion : false,
+      preventRecursion: rawEntry.preventRecursion != null ? rawEntry.preventRecursion : false,
+      useGroupScoring: rawEntry.useGroupScoring != null ? rawEntry.useGroupScoring : false,
+      matchPersonaDescription: rawEntry.matchPersonaDescription != null ? rawEntry.matchPersonaDescription : false,
+      matchCharacterDescription: rawEntry.matchCharacterDescription != null ? rawEntry.matchCharacterDescription : false,
+      matchCharacterPersonality: rawEntry.matchCharacterPersonality != null ? rawEntry.matchCharacterPersonality : false,
+      matchCharacterDepthPrompt: rawEntry.matchCharacterDepthPrompt != null ? rawEntry.matchCharacterDepthPrompt : false,
+      matchScenario: rawEntry.matchScenario != null ? rawEntry.matchScenario : false,
+      matchCreatorNotes: rawEntry.matchCreatorNotes != null ? rawEntry.matchCreatorNotes : false,
+      group: rawEntry.group || '',
+      decorators: rawEntry.decorators || [],
+      characterFilter: rawEntry.characterFilter || { isExclude: false, names: [], tags: [] },
+    };
+  }
+
+  /**
+   * Convert an internal entry to ST-format entry.
+   *
+   * @param {Object} entry — Internal entry
+   * @param {number} index — Index for uid assignment
+   * @returns {Object} ST-format entry
+   * @private
+   */
+  function _reverseConvertEntry(entry, index) {
+    return {
+      uid: index,
+      key: entry.keys || [],
+      keysecondary: entry.secondaryKeys || [],
+      comment: entry.comment || (entry.content ? entry.content.slice(0, 50) : ''),
+      content: entry.content || '',
+      constant: entry.constant != null ? entry.constant : false,
+      selective: entry.selective != null ? entry.selective : false,
+      selectiveLogic: (REVERSE_LOGIC_MAP[entry.selectiveLogic] != null ? REVERSE_LOGIC_MAP[entry.selectiveLogic] : 1),
+      addMemo: entry.addMemo != null ? entry.addMemo : false,
+      order: entry.order != null ? entry.order : 100,
+      position: REVERSE_POSITION_MAP[entry.position] != null ? REVERSE_POSITION_MAP[entry.position] : 1,
+      role: entry.role != null ? entry.role : 0,
+      disable: false,
+      probability: entry.probability != null ? entry.probability : 100,
+      depth: entry.depth != null ? entry.depth : 4,
+      group: entry.group || '',
+      useProbability: entry.useProbability != null ? entry.useProbability : (entry.probability < 100),
+      excluded: false,
+      sticky: entry.sticky != null ? entry.sticky : 0,
+      cooldown: entry.cooldown != null ? entry.cooldown : 0,
+      delay: entry.delay != null ? entry.delay : 0,
+      weight: entry.weight != null ? entry.weight : 100,
+      scanDepth: entry.scanDepth != null ? entry.scanDepth : 0,
+      caseSensitive: entry.caseSensitive != null ? entry.caseSensitive : false,
+      matchWholeWords: entry.matchWholeWords != null ? entry.matchWholeWords : false,
+      excludeRecursion: entry.excludeRecursion != null ? entry.excludeRecursion : false,
+      preventRecursion: entry.preventRecursion != null ? entry.preventRecursion : false,
+      useGroupScoring: entry.useGroupScoring != null ? entry.useGroupScoring : false,
+      matchPersonaDescription: entry.matchPersonaDescription != null ? entry.matchPersonaDescription : false,
+      matchCharacterDescription: entry.matchCharacterDescription != null ? entry.matchCharacterDescription : false,
+      matchCharacterPersonality: entry.matchCharacterPersonality != null ? entry.matchCharacterPersonality : false,
+      matchCharacterDepthPrompt: entry.matchCharacterDepthPrompt != null ? entry.matchCharacterDepthPrompt : false,
+      matchScenario: entry.matchScenario != null ? entry.matchScenario : false,
+      matchCreatorNotes: entry.matchCreatorNotes != null ? entry.matchCreatorNotes : false,
+      decorators: entry.decorators || [],
+      characterFilter: entry.characterFilter || { isExclude: false, names: [], tags: [] },
+    };
+  }
+
+  // =========================================================================
+  // Lorebook Import / Export
+  // =========================================================================
 
   /**
    * Import a SillyTavern-format lorebook JSON into the internal format.
-   * Supports both v2 and v3 spec formats.
+   * Supports both v2 and v3 spec lorebook structures.
    *
-   * @param {Object} data - ST lorebook JSON (with .entries, .name, .description, .settings)
-   * @returns {Object} internal lorebook (without id/createdAt/updatedAt)
+   * @param {Object} data — ST lorebook JSON (with .entries, .name,
+   *   .description, .settings)
+   * @returns {Object} Internal lorebook object (without id/createdAt/updatedAt
+   *   — those are assigned by the database layer)
+   *
+   * @example
+   * var internalLb = ST.Importer.importLorebook(stLorebookJson);
+   * // internalLb.entries[i].position is a string like 'before_char'
+   * // internalLb.entries[i].selectiveLogic is a string like 'and_any'
    */
   function importLorebook(data) {
+    if (!data || !data.entries) {
+      return {
+        name: '导入的世界书',
+        description: '',
+        entries: [],
+        recursiveScanning: false,
+        caseSensitive: false,
+        matchWholeWords: false,
+      };
+    }
+
     var rawEntries = Object.values(data.entries || {});
     var entries = [];
 
     for (var i = 0; i < rawEntries.length; i++) {
       var e = rawEntries[i];
-      // Skip disabled or excluded entries
-      if (e.disable || e.excluded) continue;
 
-      entries.push({
-        id: crypto.randomUUID ? crypto.randomUUID() : uid(),
-        keys: e.key || [],
-        secondaryKeys: e.keysecondary || [],
-        content: e.content || '',
-        comment: typeof e.comment === 'string' ? e.comment : '',
-        order: e.order != null ? e.order : 100,
-        position: POSITION_MAP[e.position] || POSITION_MAP[e.position != null ? e.position : 1] || 'after_char',
-        depth: e.depth != null ? e.depth : null,
-        role: e.role != null ? e.role : 0,
-        selective: e.selective != null ? e.selective : false,
-        selectiveLogic: LOGIC_MAP[e.selectiveLogic] || LOGIC_MAP[e.selectiveLogic != null ? e.selectiveLogic : 1] || 'not_all',
-        constant: e.constant != null ? e.constant : false,
-        probability: e.useProbability ? (e.probability != null ? e.probability : 100) : 100,
-        useProbability: e.useProbability != null ? e.useProbability : false,
-        addMemo: e.addMemo != null ? e.addMemo : false,
-        sticky: e.sticky != null ? e.sticky : 0,
-        cooldown: e.cooldown != null ? e.cooldown : 0,
-        delay: e.delay != null ? e.delay : 0,
-        weight: e.weight != null ? e.weight : 100,
-        scanDepth: e.scanDepth != null ? e.scanDepth : 0,
-        caseSensitive: e.caseSensitive != null ? e.caseSensitive : false,
-        matchWholeWords: e.matchWholeWords != null ? e.matchWholeWords : false,
-        excludeRecursion: e.excludeRecursion != null ? e.excludeRecursion : false,
-        preventRecursion: e.preventRecursion != null ? e.preventRecursion : false,
-        useGroupScoring: e.useGroupScoring != null ? e.useGroupScoring : false,
-        matchPersonaDescription: e.matchPersonaDescription != null ? e.matchPersonaDescription : false,
-        matchCharacterDescription: e.matchCharacterDescription != null ? e.matchCharacterDescription : false,
-        matchCharacterPersonality: e.matchCharacterPersonality != null ? e.matchCharacterPersonality : false,
-        matchCharacterDepthPrompt: e.matchCharacterDepthPrompt != null ? e.matchCharacterDepthPrompt : false,
-        matchScenario: e.matchScenario != null ? e.matchScenario : false,
-        matchCreatorNotes: e.matchCreatorNotes != null ? e.matchCreatorNotes : false,
-        group: e.group || '',
-        decorators: e.decorators || [],
-        characterFilter: e.characterFilter || { isExclude: false, names: [], tags: [] }
-      });
+      // Skip disabled or excluded entries
+      if (e.disable || e.excluded) {
+        continue;
+      }
+
+      entries.push(_convertEntry(e));
     }
 
     return {
       name: data.name || '导入的世界书',
       description: typeof data.description === 'string' ? data.description : '',
       entries: entries,
-      recursiveScanning: (data.settings && data.settings.recursive_scanning) ? true : false,
-      caseSensitive: (data.settings && data.settings.case_sensitive) ? true : false,
-      matchWholeWords: (data.settings && data.settings.match_whole_words) ? true : false
+      recursiveScanning: !!(data.settings && data.settings.recursive_scanning),
+      caseSensitive: !!(data.settings && data.settings.case_sensitive),
+      matchWholeWords: !!(data.settings && data.settings.match_whole_words),
     };
   }
 
   /**
    * Export an internal lorebook to SillyTavern-compatible JSON.
    *
-   * @param {Object} lorebook - internal lorebook object
-   * @returns {Object} ST-format lorebook JSON
+   * @param {Object} lorebook — Internal lorebook object
+   * @returns {Object} ST-format lorebook JSON ready for file export
    */
   function exportLorebook(lorebook) {
+    if (!lorebook) {
+      return { name: '', description: '', entries: {}, settings: {} };
+    }
+
     var entries = {};
 
     for (var i = 0; i < lorebook.entries.length; i++) {
-      var e = lorebook.entries[i];
-
-      entries[String(i)] = {
-        uid: i,
-        key: e.keys || [],
-        keysecondary: e.secondaryKeys || [],
-        comment: e.comment || (e.content ? e.content.slice(0, 50) : ''),
-        content: e.content || '',
-        constant: e.constant != null ? e.constant : false,
-        selective: e.selective != null ? e.selective : false,
-        selectiveLogic: (REVERSE_LOGIC_MAP[e.selectiveLogic] != null ? REVERSE_LOGIC_MAP[e.selectiveLogic] : 1),
-        addMemo: e.addMemo != null ? e.addMemo : false,
-        order: e.order != null ? e.order : 100,
-        position: REVERSE_POSITION_MAP[e.position] != null ? REVERSE_POSITION_MAP[e.position] : 1,
-        role: e.role != null ? e.role : 0,
-        disable: false,
-        probability: e.probability != null ? e.probability : 100,
-        depth: e.depth != null ? e.depth : 4,
-        group: e.group || '',
-        useProbability: e.useProbability != null ? e.useProbability : (e.probability < 100),
-        excluded: false,
-        sticky: e.sticky != null ? e.sticky : 0,
-        cooldown: e.cooldown != null ? e.cooldown : 0,
-        delay: e.delay != null ? e.delay : 0,
-        weight: e.weight != null ? e.weight : 100,
-        scanDepth: e.scanDepth != null ? e.scanDepth : 0,
-        caseSensitive: e.caseSensitive != null ? e.caseSensitive : false,
-        matchWholeWords: e.matchWholeWords != null ? e.matchWholeWords : false,
-        excludeRecursion: e.excludeRecursion != null ? e.excludeRecursion : false,
-        preventRecursion: e.preventRecursion != null ? e.preventRecursion : false,
-        useGroupScoring: e.useGroupScoring != null ? e.useGroupScoring : false,
-        matchPersonaDescription: e.matchPersonaDescription != null ? e.matchPersonaDescription : false,
-        matchCharacterDescription: e.matchCharacterDescription != null ? e.matchCharacterDescription : false,
-        matchCharacterPersonality: e.matchCharacterPersonality != null ? e.matchCharacterPersonality : false,
-        matchCharacterDepthPrompt: e.matchCharacterDepthPrompt != null ? e.matchCharacterDepthPrompt : false,
-        matchScenario: e.matchScenario != null ? e.matchScenario : false,
-        matchCreatorNotes: e.matchCreatorNotes != null ? e.matchCreatorNotes : false,
-        decorators: e.decorators || [],
-        characterFilter: e.characterFilter || { isExclude: false, names: [], tags: [] }
-      };
+      entries[String(i)] = _reverseConvertEntry(lorebook.entries[i], i);
     }
 
     return {
@@ -186,37 +277,45 @@ ST.Importer = (function () {
       settings: {
         recursive_scanning: lorebook.recursiveScanning || false,
         case_sensitive: lorebook.caseSensitive || false,
-        match_whole_words: lorebook.matchWholeWords || false
-      }
+        match_whole_words: lorebook.matchWholeWords || false,
+      },
     };
   }
 
-  // ==================================================================
-  // Preset import/export
-  // ==================================================================
+  // =========================================================================
+  // Preset Import / Export
+  // =========================================================================
 
   /**
    * Import a SillyTavern-format preset into the internal format.
    *
-   * @param {Object} data - ST preset JSON
-   * @returns {Object} internal preset (without id/createdAt/updatedAt)
+   * @param {Object} data — ST preset JSON
+   * @returns {Object} Internal preset object (without id/createdAt/updatedAt)
    */
   function importPreset(data) {
+    if (!data) {
+      return { name: '导入的预设', description: '', settings: {} };
+    }
+
     var name = data.preset || data.name || '导入的预设';
     return {
       name: name,
       description: typeof data.description === 'string' ? data.description : '',
-      settings: data
+      settings: data,
     };
   }
 
   /**
    * Export an internal preset to SillyTavern-compatible JSON.
    *
-   * @param {Object} preset - internal preset object
+   * @param {Object} preset — Internal preset object
    * @returns {Object} ST-format preset JSON
    */
   function exportPreset(preset) {
+    if (!preset) {
+      return {};
+    }
+
     var out = {};
     var keys = Object.keys(preset.settings || {});
     for (var i = 0; i < keys.length; i++) {
@@ -227,19 +326,27 @@ ST.Importer = (function () {
     return out;
   }
 
-  // ==================================================================
-  // Multi-import
-  // ==================================================================
+  // =========================================================================
+  // Multi-Import
+  // =========================================================================
 
   /**
    * Import multiple lorebook JSON objects at once.
+   * Each input is an object with a `fileName` and a `json` property.
    *
    * @param {Array<{fileName: string, json: Object}>} inputs
-   * @returns {{successes: Array<{fileName:string, lorebook:Object}>, failures: Array<{fileName:string, error:string}>}}
+   * @returns {{
+   *   successes: Array<{fileName: string, lorebook: Object}>,
+   *   failures: Array<{fileName: string, error: string}>
+   * }}
    */
   function importMultipleLorebooks(inputs) {
     var successes = [];
     var failures = [];
+
+    if (!Array.isArray(inputs)) {
+      return { successes: successes, failures: failures };
+    }
 
     for (var i = 0; i < inputs.length; i++) {
       var input = inputs[i];
@@ -257,13 +364,23 @@ ST.Importer = (function () {
     return { successes: successes, failures: failures };
   }
 
+  // =========================================================================
+  // Lorebook Rename
+  // =========================================================================
+
   /**
-   * Rename a lorebook (returns new object).
-   * @param {Object} lb
-   * @param {string} newName
-   * @returns {Object}
+   * Create a copy of a lorebook with a new name.
+   * The original object is not mutated.
+   *
+   * @param {Object} lb — Internal lorebook object
+   * @param {string} newName — New name for the lorebook
+   * @returns {Object} New lorebook object with updated name and timestamp
    */
   function renameLorebook(lb, newName) {
+    if (!lb) {
+      return null;
+    }
+
     var copy = {};
     var keys = Object.keys(lb);
     for (var i = 0; i < keys.length; i++) {
@@ -274,22 +391,30 @@ ST.Importer = (function () {
     return copy;
   }
 
-  // ==================================================================
-  // File helpers
-  // ==================================================================
+  // =========================================================================
+  // File Helpers
+  // =========================================================================
 
   /**
    * Open a file picker dialog and return the parsed JSON content.
-   * @returns {Promise<Object|null>}
+   * The user is prompted to select a .json file.
+   *
+   * @returns {Promise<Object|null>} Parsed JSON content, or null if the
+   *   user cancelled or the file could not be parsed
    */
   function importJsonFile() {
     return new Promise(function (resolve) {
       var input = document.createElement('input');
       input.type = 'file';
       input.accept = '.json,application/json';
+
       input.onchange = function (e) {
         var file = e.target.files ? e.target.files[0] : null;
-        if (!file) { resolve(null); return; }
+        if (!file) {
+          resolve(null);
+          return;
+        }
+
         var reader = new FileReader();
         reader.onload = function () {
           try {
@@ -303,47 +428,58 @@ ST.Importer = (function () {
         };
         reader.readAsText(file);
       };
+
       input.click();
     });
   }
 
   /**
    * Trigger a file download of JSON data.
-   * @param {*} data
-   * @param {string} filename
+   *
+   * @param {*} data — Data to serialize as JSON
+   * @param {string} filename — Suggested download filename
    */
   function exportToJson(data, filename) {
     var json = JSON.stringify(data, null, 2);
     var blob = new Blob([json], { type: 'application/json' });
     var url = URL.createObjectURL(blob);
+
     var a = document.createElement('a');
     a.href = url;
     a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+
     URL.revokeObjectURL(url);
   }
 
-  // ==================================================================
-  // Helpers
-  // ==================================================================
-
-  function uid() {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-  }
-
-  // ==================================================================
-  // Character Card Import/Export (SillyTavern v2/v3 spec)
-  // ==================================================================
+  // =========================================================================
+  // Character Card Import / Export
+  // =========================================================================
 
   /**
-   * Import a SillyTavern character card JSON (v2/v3 spec).
-   * Reads spec version, normalizes to internal format.
-   * @param {Object} json - Raw character card JSON
-   * @returns {Object} Normalized character card object
+   * Import a SillyTavern character card JSON (v2 or v3 spec).
+   * Normalizes the card to the internal representation regardless of
+   * spec version.
+   *
+   * @param {Object} json — Raw character card JSON
+   * @returns {Object} Normalized character card object with keys:
+   *   spec, specVersion, name, description, personality, scenario,
+   *   firstMes, mesExample, creatorNotes, systemPrompt,
+   *   postHistoryInstructions, alternateGreetings, tags, creator,
+   *   characterVersion, extensions, raw
+   *
+   * @example
+   * var card = ST.Importer.importCharacterCard(v3CardJson);
+   * console.log(card.name);          // Character name
+   * console.log(card.personality);   // Personality description
    */
   function importCharacterCard(json) {
+    if (!json) {
+      return createEmptyCard();
+    }
+
     var spec = json.spec || 'chara_card_v2';
     var data = json.data || json; // v3 wraps in .data, v2 is flat
 
@@ -364,17 +500,50 @@ ST.Importer = (function () {
       creator: data.creator || json.creator || '',
       characterVersion: data.character_version || '',
       extensions: data.extensions || json.extensions || {},
-      // Raw v3 data block
+      // Raw v3 data block (for round-trip preservation)
       raw: data,
     };
   }
 
   /**
-   * Export an internal character card to ST v3 JSON.
-   * @param {Object} card - Internal card object
-   * @returns {Object} ST v3 spec JSON
+   * Create an empty character card with all fields defaulted.
+   *
+   * @returns {Object} Empty character card
+   * @private
+   */
+  function createEmptyCard() {
+    return {
+      spec: 'chara_card_v3',
+      specVersion: '3.0',
+      name: '',
+      description: '',
+      personality: '',
+      scenario: '',
+      firstMes: '',
+      mesExample: '',
+      creatorNotes: '',
+      systemPrompt: '',
+      postHistoryInstructions: '',
+      alternateGreetings: [],
+      tags: [],
+      creator: '',
+      characterVersion: '',
+      extensions: {},
+      raw: {},
+    };
+  }
+
+  /**
+   * Export an internal character card to ST v3 spec JSON.
+   *
+   * @param {Object} card — Internal card object
+   * @returns {Object} ST v3 spec JSON ready for file export
    */
   function exportCharacterCard(card) {
+    if (!card) {
+      return { spec: 'chara_card_v3', spec_version: '3.0', data: {} };
+    }
+
     return {
       spec: 'chara_card_v3',
       spec_version: '3.0',
@@ -397,11 +566,26 @@ ST.Importer = (function () {
     };
   }
 
+  // =========================================================================
+  // PNG Character Card Extraction
+  // =========================================================================
+
   /**
-   * Extract character card JSON from a PNG file (SillyTavern PNG embedding).
-   * ST embeds base64-encoded JSON in the tEXt chunk with keyword "chara".
-   * @param {File} file - PNG file
-   * @returns {Promise<Object>} Parsed character card
+   * Extract a character card JSON from a PNG file using the SillyTavern
+   * PNG embedding convention (tEXt chunk with keyword "chara").
+   *
+   * The embedded data may be base64-encoded JSON or raw JSON text.
+   *
+   * @param {File} file — PNG file from a file input or drop event
+   * @returns {Promise<Object>} Normalized character card object
+   * @throws {Error} If the file is not a PNG, contains no chara data,
+   *   or cannot be parsed
+   *
+   * @example
+   * var file = event.target.files[0];
+   * ST.Importer.extractCardFromPng(file)
+   *   .then(function (card) { console.log(card.name); })
+   *   .catch(function (err) { console.error(err.message); });
    */
   function extractCardFromPng(file) {
     return new Promise(function (resolve, reject) {
@@ -409,46 +593,78 @@ ST.Importer = (function () {
         reject(new Error('仅支持 PNG 格式的角色卡图片'));
         return;
       }
+
       var reader = new FileReader();
+
       reader.onload = function () {
         try {
           var bytes = new Uint8Array(reader.result);
           var json = null;
 
-          // Scan for tEXt "chara" chunk in PNG binary
-          var offset = 8; // skip PNG signature
+          // Walk PNG chunks — skip 8-byte PNG signature
+          var offset = 8;
           while (offset < bytes.length) {
-            var length = (bytes[offset] << 24) | (bytes[offset + 1] << 16) | (bytes[offset + 2] << 8) | bytes[offset + 3];
-            var type = String.fromCharCode(bytes[offset + 4], bytes[offset + 5], bytes[offset + 6], bytes[offset + 7]);
+            // Chunk length is a 4-byte big-endian integer
+            var length = (bytes[offset] << 24)
+                       | (bytes[offset + 1] << 16)
+                       | (bytes[offset + 2] << 8)
+                       | bytes[offset + 3];
+
+            // Chunk type is 4 ASCII characters
+            var type = String.fromCharCode(
+              bytes[offset + 4],
+              bytes[offset + 5],
+              bytes[offset + 6],
+              bytes[offset + 7]
+            );
+
             if (type === 'tEXt') {
               var dataStart = offset + 8;
+
+              // Find the null separator between keyword and content
               var nullIdx = -1;
-              for (var i = dataStart; i < dataStart + length; i++) {
-                if (bytes[i] === 0) { nullIdx = i; break; }
+              for (var j = dataStart; j < dataStart + length; j++) {
+                if (bytes[j] === 0) {
+                  nullIdx = j;
+                  break;
+                }
               }
+
               if (nullIdx > dataStart) {
+                // Read keyword
                 var keyword = '';
                 for (var k = dataStart; k < nullIdx; k++) {
                   keyword += String.fromCharCode(bytes[k]);
                 }
+
                 if (keyword === 'chara') {
+                  // Read content
                   var contentStart = nullIdx + 1;
                   var content = '';
                   for (var c = contentStart; c < dataStart + length; c++) {
                     content += String.fromCharCode(bytes[c]);
                   }
-                  // Try base64 decode
+
+                  // Try base64 decode first, then raw JSON
                   try {
                     var decoded = atob(content);
                     json = JSON.parse(decoded);
+                  } catch (e1) {
+                    try {
+                      json = JSON.parse(content);
+                    } catch (e2) {
+                      // Both attempts failed
+                    }
+                  }
+
+                  if (json) {
                     break;
-                  } catch (e) {
-                    // maybe raw JSON
-                    try { json = JSON.parse(content); break; } catch (e2) {}
                   }
                 }
               }
             }
+
+            // Advance to next chunk: 4 (length) + 4 (type) + length + 4 (CRC)
             offset += 12 + length;
           }
 
@@ -458,73 +674,129 @@ ST.Importer = (function () {
             reject(new Error('PNG 中未找到角色卡数据（chara 块）'));
           }
         } catch (e) {
-          reject(new Error('解析 PNG 失败: ' + e.message));
+          reject(new Error('解析 PNG 失败: ' + (e.message || e)));
         }
       };
-      reader.onerror = function () { reject(new Error('读取文件失败')); };
+
+      reader.onerror = function () {
+        reject(new Error('读取文件失败'));
+      };
+
       reader.readAsArrayBuffer(file);
     });
   }
 
+  // =========================================================================
+  // Apply Character Card to UI
+  // =========================================================================
+
   /**
-   * Apply a character card to the UI: left panel, right panel character settings, and storage.
-   * @param {Object} card - Parsed character card (from importCharacterCard)
+   * Apply a character card to the application UI and storage.
+   * Updates the left sidebar display, right-panel form fields,
+   * localStorage, and the ST database settings.
+   *
+   * @param {Object} card — Parsed character card (from importCharacterCard)
+   *
+   * @example
+   * var card = ST.Importer.importCharacterCard(json);
+   * ST.Importer.applyCharacterCard(card);
    */
   function applyCharacterCard(card) {
-    // 左侧状态栏
-    var el = function (id) { return document.getElementById(id); };
-    if (el('char-name-display')) el('char-name-display').textContent = card.name;
-    if (el('s-name')) el('s-name').textContent = card.name;
+    if (!card) {
+      return;
+    }
 
-    // 右侧角色设定表单
-    if (el('cs-name')) el('cs-name').value = card.name;
-    if (el('cs-nickname')) el('cs-nickname').value = card.description;
-    if (el('cs-personality')) el('cs-personality').value = card.personality;
-    if (el('cs-background')) el('cs-background').value = card.scenario;
+    /**
+     * Helper to safely get a DOM element by id.
+     * @param {string} id
+     * @returns {HTMLElement|null}
+     */
+    function getEl(id) {
+      return document.getElementById(id);
+    }
 
-    // 保存到 localStorage
-    if (window.storage) {
+    // --- Left sidebar display ---
+    if (getEl('char-name-display')) {
+      getEl('char-name-display').textContent = card.name;
+    }
+    if (getEl('s-name')) {
+      getEl('s-name').textContent = card.name;
+    }
+
+    // --- Right panel character settings form ---
+    if (getEl('cs-name')) {
+      getEl('cs-name').value = card.name;
+    }
+    if (getEl('cs-nickname')) {
+      getEl('cs-nickname').value = card.description;
+    }
+    if (getEl('cs-personality')) {
+      getEl('cs-personality').value = card.personality;
+    }
+    if (getEl('cs-background')) {
+      getEl('cs-background').value = card.scenario;
+    }
+
+    // --- Save to localStorage ---
+    if (window.storage && typeof window.storage.set === 'function') {
       window.storage.set('character_card', card);
     }
-    // 同步到 ST 数据库
+
+    // --- Sync character name to ST database settings ---
     if (ST.getSettings && ST.saveSettings) {
       ST.getSettings().then(function (s) {
         if (s) {
           s.characterName = card.name;
-          ST.saveSettings(s);
+          return ST.saveSettings(s);
         }
-      }).catch(function () {});
+      }).catch(function () {
+        // Silently ignore errors during settings sync
+      });
     }
 
-    window.notifications?.show('success', '角色卡已加载', '已应用: ' + card.name);
+    // --- Show notification ---
+    if (window.notifications && typeof window.notifications.show === 'function') {
+      window.notifications.show('success', '角色卡已加载', '已应用: ' + card.name);
+    }
   }
 
-  // ==================================================================
-  // Exported namespace
-  // ==================================================================
+  // =========================================================================
+  // Namespace Export
+  // =========================================================================
 
-  return {
+  ST.Importer = {
     // Character cards
     importCharacterCard: importCharacterCard,
     exportCharacterCard: exportCharacterCard,
     extractCardFromPng: extractCardFromPng,
     applyCharacterCard: applyCharacterCard,
+
     // Lorebooks
     importLorebook: importLorebook,
     exportLorebook: exportLorebook,
+
+    // Presets
     importPreset: importPreset,
     exportPreset: exportPreset,
+
+    // Multi-import
     importMultipleLorebooks: importMultipleLorebooks,
+
+    // Utilities
     renameLorebook: renameLorebook,
     importJsonFile: importJsonFile,
     exportToJson: exportToJson,
-    /** Position number → string map */
+
+    // Maps
     POSITION_MAP: POSITION_MAP,
-    /** Position string → number map */
     REVERSE_POSITION_MAP: REVERSE_POSITION_MAP,
-    /** Selective logic number → string map */
     LOGIC_MAP: LOGIC_MAP,
-    /** Selective logic string → number map */
-    REVERSE_LOGIC_MAP: REVERSE_LOGIC_MAP
+    REVERSE_LOGIC_MAP: REVERSE_LOGIC_MAP,
   };
+
+  // =========================================================================
+  // Init
+  // =========================================================================
+
+  console.log('[ST.importer] Import/export adapter initialized');
 })();

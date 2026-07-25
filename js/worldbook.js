@@ -1,9 +1,34 @@
-// js/worldbook.js — 世界书 (World Book)
-const WorldBook = {
-  entries: [],
-  container: null,
+/**
+ * js/worldbook.js — 世界书 (World Book / Lorebook) 管理
+ *
+ * 管理世界书条目（lorebook entries）的 CRUD，
+ * 支持关键词触发、条件触发、概率触发，
+ * 多种插入位置，以及导入/导出 JSON。
+ *
+ * 数据持久化：优先保存到 ST IndexedDB（ST.saveLorebook），
+ * 同时回退到 localStorage 以确保调试/离线可用。
+ *
+ * @namespace WorldBook
+ */
 
-  INSERT_POSITIONS: [
+const WorldBook = (function () {
+  'use strict';
+
+  /** @type {Object[]} 世界书条目列表 */
+  var _entries = [];
+
+  /** @type {HTMLElement|null} 条目列表容器 */
+  var _container = null;
+
+  // ===========================================================================
+  // 常量
+  // ===========================================================================
+
+  /**
+   * 插入位置选项
+   * @type {Array<{value:string, label:string, group:string}>}
+   */
+  var INSERT_POSITIONS = [
     { value: 'before_char', label: '角色定义之前', group: '提示词' },
     { value: 'after_char', label: '角色定义之后', group: '提示词' },
     { value: 'before_example', label: '示例消息之前', group: '提示词' },
@@ -11,35 +36,67 @@ const WorldBook = {
     { value: 'top_an', label: '作者注记顶部', group: '注记' },
     { value: 'bottom_an', label: '作者注记底部', group: '注记' },
     { value: 'at_depth', label: '@ 深度 D', group: '深度' },
-    { value: 'as_system', label: '⚙️ 系统角色消息', group: '角色' },
-    { value: 'as_user', label: '👤 用户角色消息', group: '角色' },
-    { value: 'as_assistant', label: '🤖 助手角色消息', group: '角色' },
+    { value: 'as_system', label: '系统角色消息', group: '角色' },
+    { value: 'as_user', label: '用户角色消息', group: '角色' },
+    { value: 'as_assistant', label: '助手角色消息', group: '角色' },
     { value: 'outlet', label: '输出口', group: '宏' },
-  ],
+  ];
 
-  TRIGGER_CONDITIONS: [
+  /**
+   * 触发条件选项
+   * @type {Array<{value:string, label:string}>}
+   */
+  var TRIGGER_CONDITIONS = [
     { value: 'keyword', label: '关键词匹配' },
     { value: 'always', label: '始终触发' },
     { value: 'probability', label: '概率触发' },
-  ],
+  ];
 
-  init() {
-    this.container = document.getElementById('wb-list');
-    const stored = window.storage?.get('worldbook_entries');
-    this.entries = (stored && stored.length > 0) ? stored : [];
-    this.render();
-    this.bindToolbar();
-  },
+  // ===========================================================================
+  // Public API
+  // ===========================================================================
 
-  // ---- CRUD ----
+  /**
+   * 初始化世界书 — 加载数据并渲染
+   */
+  function init() {
+    _container = document.getElementById('wb-list');
+    // 优先从 localStorage 加载（向后兼容及快速启动）
+    var stored = (window.storage && window.storage.get('worldbook_entries')) || [];
+    _entries = stored;
+    render();
+    bindToolbar();
+  }
 
-  getAll() {
-    return this.entries;
-  },
+  // ---------------------------------------------------------------------------
+  // CRUD
+  // ---------------------------------------------------------------------------
 
-  create(data) {
-    const entry = {
-      id: utils.uid(),
+  /**
+   * 获取所有条目
+   * @returns {Object[]}
+   */
+  function getAll() {
+    return _entries.slice();
+  }
+
+  /**
+   * 创建新条目
+   *
+   * @param {Object} [data={}] — 条目初始数据
+   * @param {string} [data.name] — 条目名称
+   * @param {string[]} [data.keywords] — 关键词列表
+   * @param {string} [data.content] — 条目内容
+   * @returns {Object} 创建的条目
+   */
+  function create(data) {
+    var uidFn = (window.utils && window.utils.uid)
+      ? window.utils.uid
+      : function () { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); };
+
+    var entry = {
+      id: uidFn(),
+      name: '',
       keywords: [],
       content: '',
       weight: 50,
@@ -48,315 +105,299 @@ const WorldBook = {
       outletName: '',
       triggerCondition: 'keyword',
       enabled: true,
-      order: this.entries.length,
-      ...data,
+      order: _entries.length,
     };
-    this.entries.push(entry);
-    this.save();
-    this.render();
-    window.notifications?.show('success', '已新建', `条目「${entry.name}」已创建`);
+    if (data) {
+      Object.keys(data).forEach(function (k) {
+        entry[k] = data[k];
+      });
+    }
+
+    _entries.push(entry);
+    save();
+    render();
+
+    if (window.notifications) {
+      window.notifications.show('success', '已新建', '条目「' + (entry.name || '(未命名)') + '」已创建');
+    }
+
     return entry;
-  },
+  }
 
-  update(id, data) {
-    const idx = this.entries.findIndex(e => e.id === id);
+  /**
+   * 更新指定条目
+   *
+   * @param {string} id — 条目 ID
+   * @param {Object} data — 更新的数据
+   */
+  function update(id, data) {
+    var idx = -1;
+    for (var i = 0; i < _entries.length; i++) {
+      if (_entries[i].id === id) { idx = i; break; }
+    }
     if (idx === -1) return;
-    Object.assign(this.entries[idx], data);
-    this.save();
-    this.render();
-    window.notifications?.show('success', '已保存', `条目「${this.entries[idx].name}」已更新`);
-  },
 
-  delete(id) {
-    const entry = this.entries.find(e => e.id === id);
-    this.entries = this.entries.filter(e => e.id !== id);
-    this.save();
-    this.render();
-    window.notifications?.show('info', '已删除', `条目「${entry?.name || ''}」已删除`);
-  },
+    Object.keys(data).forEach(function (k) {
+      _entries[idx][k] = data[k];
+    });
+    save();
+    render();
 
-  // ---- Rendering ----
+    if (window.notifications) {
+      window.notifications.show('success', '已保存', '条目「' + (_entries[idx].name || '(未命名)') + '」已更新');
+    }
+  }
 
-  render() {
-    if (!this.container) return;
-    const count = this.entries.length;
-    const el = document.getElementById('wb-count');
-    if (el) el.textContent = `${count} 条条目`;
+  /**
+   * 删除指定条目
+   *
+   * @param {string} id — 条目 ID
+   */
+  function remove(id) {
+    var entry = null;
+    for (var i = 0; i < _entries.length; i++) {
+      if (_entries[i].id === id) { entry = _entries[i]; break; }
+    }
+    _entries = _entries.filter(function (e) { return e.id !== id; });
+    save();
+    render();
 
-    this.container.innerHTML = '';
-    if (count === 0) {
-      this.container.innerHTML = '<div style="text-align:center;padding:48px 16px;color:var(--text-muted);font-size:13px">暂无世界书条目<br><span style="font-size:11px;color:var(--text-dim)">点击"+ 新建"或"导入"添加</span></div>';
+    if (window.notifications) {
+      window.notifications.show('info', '已删除', '条目「' + (entry ? entry.name || '' : '') + '」已删除');
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Rendering
+  // ---------------------------------------------------------------------------
+
+  /**
+   * 渲染所有条目
+   */
+  function render() {
+    if (!_container) return;
+
+    var countEl = document.getElementById('wb-count');
+    if (countEl) countEl.textContent = _entries.length + ' 条条目';
+
+    _container.innerHTML = '';
+    if (_entries.length === 0) {
+      _container.innerHTML =
+        '<div style="text-align:center;padding:48px 16px;color:var(--text-muted);font-size:13px">' +
+          '暂无世界书条目<br>' +
+          '<span style="font-size:11px;color:var(--text-dim)">点击"+ 新建"或"导入"添加</span>' +
+        '</div>';
       return;
     }
-    this.entries.forEach(entry => {
-      this.container.appendChild(this.renderEntry(entry));
-    });
-  },
 
-  renderEntry(entry) {
-    const card = document.createElement('div');
+    for (var i = 0; i < _entries.length; i++) {
+      _container.appendChild(renderEntry(_entries[i]));
+    }
+  }
+
+  /**
+   * 渲染单个条目卡片
+   *
+   * @param {Object} entry — 条目对象
+   * @returns {HTMLElement}
+   */
+  function renderEntry(entry) {
+    var esc = (window.utils && window.utils.escapeHTML)
+      ? window.utils.escapeHTML
+      : function (s) { var d = document.createElement('div'); d.textContent = String(s || ''); return d.innerHTML; };
+
+    var card = document.createElement('div');
     card.className = 'wb-entry';
-    card.dataset.id = entry.id;
+    card.setAttribute('data-id', entry.id);
 
     // --- Header ---
-    const header = document.createElement('div');
+    var header = document.createElement('div');
     header.className = 'wb-entry-header';
 
-    const statusDot = document.createElement('span');
-    statusDot.className = `entry-status ${entry.enabled ? 'enabled' : 'disabled'}`;
+    var statusDot = document.createElement('span');
+    statusDot.className = 'entry-status ' + (entry.enabled ? 'enabled' : 'disabled');
 
-    const nameSpan = document.createElement('span');
+    var nameSpan = document.createElement('span');
     nameSpan.className = 'entry-name';
     nameSpan.textContent = entry.name || '(未命名)';
 
-    const nameWrap = document.createElement('div');
-    nameWrap.className = 'entry-name';
+    var nameWrap = document.createElement('div');
+    nameWrap.className = 'entry-name-wrap';
     nameWrap.appendChild(statusDot);
     nameWrap.appendChild(nameSpan);
 
-    const meta = document.createElement('div');
+    var meta = document.createElement('div');
     meta.className = 'entry-meta';
-    meta.textContent = `#${entry.keywords?.length || 0} 词 · ${entry.weight || 50}`;
+    meta.textContent = '#' + (entry.keywords ? entry.keywords.length : 0) + ' 词 · ' + (entry.weight || 50);
 
     header.appendChild(nameWrap);
     header.appendChild(meta);
 
     // --- Body ---
-    const body = document.createElement('div');
+    var body = document.createElement('div');
     body.className = 'wb-entry-body';
 
-    // Name field
-    body.appendChild(this._field('名称', `<input type="text" class="wb-f-name" value="${utils.escapeHTML(entry.name || '')}" placeholder="条目名称">`));
+    // 字段：名称
+    body.appendChild(_makeField('名称',
+      '<input type="text" class="wb-f-name" value="' + esc(entry.name || '') + '" placeholder="条目名称">'));
 
-    // Content
-    body.appendChild(this._field('内容', `<textarea class="wb-f-content" rows="2" placeholder="世界书内容">${utils.escapeHTML(entry.content || '')}</textarea>`));
+    // 字段：内容
+    body.appendChild(_makeField('内容',
+      '<textarea class="wb-f-content" rows="2" placeholder="世界书内容">' + esc(entry.content || '') + '</textarea>'));
 
-    // Trigger condition
-    const condOpts = this.TRIGGER_CONDITIONS.map(c =>
-      `<option value="${c.value}" ${entry.triggerCondition === c.value ? 'selected' : ''}>${c.label}</option>`
-    ).join('');
-    body.appendChild(this._field('触发条件', `<select class="wb-f-trigger">${condOpts}</select>`));
+    // 字段：触发条件
+    var condOpts = TRIGGER_CONDITIONS.map(function (c) {
+      return '<option value="' + c.value + '"' + (entry.triggerCondition === c.value ? ' selected' : '') + '>' + c.label + '</option>';
+    }).join('');
+    body.appendChild(_makeField('触发条件', '<select class="wb-f-trigger">' + condOpts + '</select>'));
 
-    // Insert position
-    const posOpts = this.INSERT_POSITIONS.map(p =>
-      `<option value="${p.value}" ${entry.insertPosition === p.value ? 'selected' : ''}>${p.label}</option>`
-    ).join('');
-    body.appendChild(this._field('插入位置', `<select class="wb-f-position">${posOpts}</select>`));
+    // 字段：插入位置
+    var posOpts = INSERT_POSITIONS.map(function (p) {
+      return '<option value="' + p.value + '"' + (entry.insertPosition === p.value ? ' selected' : '') + '>' + p.label + '</option>';
+    }).join('');
+    body.appendChild(_makeField('插入位置', '<select class="wb-f-position">' + posOpts + '</select>'));
 
-    // Conditional: depth (for @ 深度 D)
-    const depthShow = entry.insertPosition === 'at_depth' ? ' show' : '';
-    body.appendChild(this._field('深度 D', `<input type="number" class="wb-f-depth wb-conditional${depthShow}" value="${entry.depth || 0}" min="0" max="100">`));
+    // 条件字段：深度（仅 at_depth 时显示）
+    var depthShowClass = entry.insertPosition === 'at_depth' ? ' show' : '';
+    body.appendChild(_makeField('深度 D',
+      '<input type="number" class="wb-f-depth wb-conditional' + depthShowClass + '" value="' + (entry.depth || 0) + '" min="0" max="100">'));
 
-    // Conditional: outlet name (for 输出口)
-    const outletShow = entry.insertPosition === 'outlet' ? ' show' : '';
-    body.appendChild(this._field('输出口', `<input type="text" class="wb-f-outlet wb-conditional${outletShow}" value="${utils.escapeHTML(entry.outletName || '')}" placeholder="输出口名称">`));
+    // 条件字段：输出口（仅 outlet 时显示）
+    var outletShowClass = entry.insertPosition === 'outlet' ? ' show' : '';
+    body.appendChild(_makeField('输出口',
+      '<input type="text" class="wb-f-outlet wb-conditional' + outletShowClass + '" value="' + esc(entry.outletName || '') + '" placeholder="输出口名称">'));
 
-    // Weight
-    body.appendChild(this._field('权重', `<input type="number" class="wb-f-weight" value="${entry.weight || 50}" min="0" max="999">`));
+    // 字段：权重
+    body.appendChild(_makeField('权重',
+      '<input type="number" class="wb-f-weight" value="' + (entry.weight || 50) + '" min="0" max="999">'));
 
-    // Keywords
-    const kwTags = (entry.keywords || []).map(k =>
-      `<span class="wb-keyword-tag">${utils.escapeHTML(k)}<span class="kw-remove" data-kw="${utils.escapeHTML(k)}">×</span></span>`
-    ).join('');
-    body.appendChild(this._field('关键词',
-      `<div class="wb-keywords">${kwTags}<input type="text" class="wb-keyword-input" placeholder="添加..."></div>`
-    ));
+    // 字段：关键词
+    var kwTagsHtml = (entry.keywords || []).map(function (k) {
+      return '<span class="wb-keyword-tag">' + esc(k) + '<span class="kw-remove" data-kw="' + esc(k) + '">x</span></span>';
+    }).join('');
+    body.appendChild(_makeField('关键词',
+      '<div class="wb-keywords">' + kwTagsHtml + '<input type="text" class="wb-keyword-input" placeholder="添加..."></div>'));
 
-    // Enabled toggle
-    body.appendChild(this._field('启用',
-      `<label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-secondary);cursor:pointer">
-         <input type="checkbox" class="wb-f-enabled" ${entry.enabled ? 'checked' : ''}>
-         ${entry.enabled ? '已启用' : '已禁用'}
-       </label>`
-    ));
+    // 字段：启用开关
+    body.appendChild(_makeField('启用',
+      '<label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-secondary);cursor:pointer">' +
+        '<input type="checkbox" class="wb-f-enabled"' + (entry.enabled ? ' checked' : '') + '>' +
+        (entry.enabled ? '已启用' : '已禁用') +
+      '</label>'));
 
-    // Actions
-    const actions = document.createElement('div');
+    // 操作按钮
+    var actions = document.createElement('div');
     actions.className = 'wb-entry-actions';
-    actions.innerHTML = `
-      <button class="wb-btn-delete">删除</button>
-      <button class="wb-btn-cancel">取消</button>
-      <button class="wb-btn-save">保存</button>
-    `;
+    actions.innerHTML =
+      '<button class="wb-btn-delete">删除</button>' +
+      '<button class="wb-btn-cancel">取消</button>' +
+      '<button class="wb-btn-save">保存</button>';
     body.appendChild(actions);
 
     card.appendChild(header);
     card.appendChild(body);
 
-    // --- Event binding (delegation via card) ---
-    this._bindCardEvents(card, entry);
+    // 绑定事件
+    _bindCardEvents(card, entry);
 
     return card;
-  },
+  }
 
-  _field(label, innerHTML) {
-    const div = document.createElement('div');
-    div.className = 'wb-field';
-    div.innerHTML = `<label>${label}</label>${innerHTML}`;
-    return div;
-  },
+  // ---------------------------------------------------------------------------
+  // Persistence
+  // ---------------------------------------------------------------------------
 
-  _bindCardEvents(card, entry) {
-    const header = card.querySelector('.wb-entry-header');
-    const body = card.querySelector('.wb-entry-body');
-    const isExpanded = card.classList.contains('editing');
-
-    // Toggle expand on header click
-    header.addEventListener('click', (e) => {
-      // Ignore clicks on buttons/inputs inside header
-      if (e.target.closest('button') || e.target.closest('input') || e.target.closest('select')) return;
-      card.classList.toggle('editing');
-    });
-
-    // Save button
-    card.querySelector('.wb-btn-save')?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const data = this._gatherFormData(card);
-      this.update(entry.id, data);
-      card.classList.remove('editing');
-    });
-
-    // Cancel button
-    card.querySelector('.wb-btn-cancel')?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      card.classList.remove('editing');
-      // Re-render to reset form to saved state
-      this.render();
-    });
-
-    // Delete button — show confirmation
-    card.querySelector('.wb-btn-delete')?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this._showDeleteConfirm(card, entry);
-    });
-
-    // Conditional field toggles for insert position
-    const posSelect = card.querySelector('.wb-f-position');
-    if (posSelect) {
-      posSelect.addEventListener('change', () => {
-        const val = posSelect.value;
-        const depthField = card.querySelector('.wb-f-depth');
-        const outletField = card.querySelector('.wb-f-outlet');
-        if (depthField) depthField.classList.toggle('show', val === 'at_depth');
-        if (outletField) outletField.classList.toggle('show', val === 'outlet');
-      });
+  /**
+   * 保存条目 — 优先级：ST IndexedDB > localStorage
+   */
+  function save() {
+    // 保存到 localStorage（向后兼容）
+    if (window.storage) {
+      window.storage.set('worldbook_entries', _entries);
     }
 
-    // Keyword add: Enter key on keyword input
-    const kwInput = card.querySelector('.wb-keyword-input');
-    if (kwInput) {
-      kwInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          const text = kwInput.value.trim();
-          if (!text) return;
-          // Insert tag before the input
-          const tag = document.createElement('span');
-          tag.className = 'wb-keyword-tag';
-          tag.innerHTML = `${utils.escapeHTML(text)}<span class="kw-remove" data-kw="${utils.escapeHTML(text)}">×</span>`;
-          kwInput.parentNode.insertBefore(tag, kwInput);
-          kwInput.value = '';
-          // Bind remove on new tag
-          tag.querySelector('.kw-remove')?.addEventListener('click', () => tag.remove());
-        }
-      });
-    }
+    // 保存到 ST IndexedDB
+    if (window.ST && typeof ST.saveLorebook === 'function') {
+      try {
+        // 作为一个世界书保存
+        var lorebookName = document.getElementById('cs-name')
+          ? document.getElementById('cs-name').value + '的世界书'
+          : '默认世界书';
 
-    // Keyword remove: delegated
-    card.addEventListener('click', (e) => {
-      const removeBtn = e.target.closest('.kw-remove');
-      if (removeBtn) {
-        removeBtn.parentElement.remove();
+        var lorebook = {
+          id: 'wb_default',
+          name: lorebookName,
+          description: '',
+          entries: _entries,
+          recursiveScanning: false,
+          caseSensitive: false,
+          matchWholeWords: false,
+          updatedAt: Date.now(),
+          createdAt: Date.now(),
+        };
+        ST.saveLorebook(lorebook).catch(function (err) {
+          console.warn('[WorldBook] ST.saveLorebook 失败:', err.message);
+        });
+      } catch (e) {
+        console.warn('[WorldBook] 保存到 ST 数据库失败:', e.message);
       }
-    });
+    }
+  }
 
-    // Enabled checkbox toggle label
-    const enabledCb = card.querySelector('.wb-f-enabled');
-    if (enabledCb) {
-      enabledCb.addEventListener('change', () => {
-        const label = enabledCb.closest('label');
-        if (label) {
-          label.lastChild.textContent = enabledCb.checked ? '已启用' : '已禁用';
-        }
+  // ---------------------------------------------------------------------------
+  // Toolbar
+  // ---------------------------------------------------------------------------
+
+  /**
+   * 绑定工具栏按钮事件
+   */
+  function bindToolbar() {
+    var addBtn = document.getElementById('wb-add');
+    if (addBtn) {
+      addBtn.addEventListener('click', function () {
+        var name = prompt('条目名称：');
+        if (!name || !name.trim()) return;
+        create({ name: name.trim() });
       });
     }
-  },
 
-  _gatherFormData(card) {
-    const name = card.querySelector('.wb-f-name')?.value || '';
-    const content = card.querySelector('.wb-f-content')?.value || '';
-    const trigger = card.querySelector('.wb-f-trigger')?.value || 'keyword';
-    const position = card.querySelector('.wb-f-position')?.value || 'before_char';
-    const depth = parseInt(card.querySelector('.wb-f-depth')?.value || '0', 10);
-    const outlet = card.querySelector('.wb-f-outlet')?.value || '';
-    const weight = parseInt(card.querySelector('.wb-f-weight')?.value || '50', 10);
-    const enabled = card.querySelector('.wb-f-enabled')?.checked || false;
-    // Gather keywords from tags
-    const keywords = [];
-    card.querySelectorAll('.wb-keyword-tag').forEach(tag => {
-      const text = tag.childNodes[0]?.textContent || '';
-      if (text) keywords.push(text);
-    });
-    return { name, content, triggerCondition: trigger, insertPosition: position, depth, outletName: outlet, weight, enabled, keywords };
-  },
+    var importBtn = document.getElementById('wb-import');
+    if (importBtn) {
+      importBtn.addEventListener('click', function () {
+        var jsonStr = prompt('粘贴 JSON 字符串：');
+        if (!jsonStr || !jsonStr.trim()) return;
+        importJson(jsonStr.trim());
+      });
+    }
 
-  _showDeleteConfirm(card, entry) {
-    // Collapse current card
-    card.classList.remove('editing');
-    // Insert delete confirmation above the card
-    const confirmEl = document.createElement('div');
-    confirmEl.className = 'wb-delete-confirm';
-    confirmEl.innerHTML = `
-      <div style="margin-bottom:8px">确认删除条目「${utils.escapeHTML(entry.name || '')}」？</div>
-      <div style="display:flex;gap:8px;justify-content:flex-end">
-        <button class="wb-btn-cancel" style="color:var(--text-muted)">取消</button>
-        <button class="wb-btn-save" style="background:var(--danger);color:white">确认删除</button>
-      </div>
-    `;
-    card.parentNode.insertBefore(confirmEl, card);
+    var exportBtn = document.getElementById('wb-export');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', function () { exportJson(); });
+    }
+  }
 
-    confirmEl.querySelector('.wb-btn-cancel')?.addEventListener('click', () => confirmEl.remove());
-    confirmEl.querySelector('.wb-btn-save')?.addEventListener('click', () => {
-      confirmEl.remove();
-      this.delete(entry.id);
-    });
-  },
-
-  // ---- Persistence ----
-
-  save() {
-    window.storage?.set('worldbook_entries', this.entries);
-  },
-
-  // ---- Toolbar ----
-
-  bindToolbar() {
-    document.getElementById('wb-add')?.addEventListener('click', () => {
-      const name = prompt('条目名称：');
-      if (!name) return;
-      this.create({ name });
-    });
-
-    document.getElementById('wb-import')?.addEventListener('click', () => {
-      const jsonStr = prompt('粘贴 JSON 字符串：');
-      if (!jsonStr) return;
-      this.import(jsonStr);
-    });
-
-    document.getElementById('wb-export')?.addEventListener('click', () => {
-      this.export();
-    });
-  },
-
-  import(jsonStr) {
+  /**
+   * 从 JSON 字符串导入条目
+   *
+   * @param {string} jsonStr
+   */
+  function importJson(jsonStr) {
     try {
-      const data = JSON.parse(jsonStr);
-      if (!Array.isArray(data)) throw new Error('需要 JSON 数组');
-      let count = 0;
-      data.forEach(item => {
+      var data = JSON.parse(jsonStr);
+      if (!Array.isArray(data)) {
+        throw new Error('需要 JSON 数组格式');
+      }
+
+      var uidFn = (window.utils && window.utils.uid)
+        ? window.utils.uid
+        : function () { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); };
+
+      var count = 0;
+      data.forEach(function (item) {
         if (!item.name) return;
-        this.entries.push({
-          id: utils.uid(),
+        _entries.push({
+          id: uidFn(),
+          name: item.name || '',
           keywords: item.keywords || [],
           content: item.content || '',
           weight: item.weight || 50,
@@ -365,34 +406,267 @@ const WorldBook = {
           outletName: item.outletName || '',
           triggerCondition: item.triggerCondition || 'keyword',
           enabled: item.enabled !== false,
-          order: this.entries.length,
-          ...item,
-          id: utils.uid(), // force new id
+          order: _entries.length,
         });
         count++;
       });
-      this.save();
-      this.render();
-      window.notifications?.show('success', '导入完成', `导入了 ${count} 条条目`);
-    } catch (e) {
-      window.notifications?.show('error', '导入失败', e.message);
-    }
-  },
 
-  export() {
-    const json = JSON.stringify(this.entries, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+      save();
+      render();
+
+      if (window.notifications) {
+        window.notifications.show('success', '导入完成', '导入了 ' + count + ' 条条目');
+      }
+    } catch (e) {
+      if (window.notifications) {
+        window.notifications.show('error', '导入失败', e.message);
+      }
+    }
+  }
+
+  /**
+   * 导出条目为 JSON 文件下载
+   */
+  function exportJson() {
+    var json = JSON.stringify(_entries, null, 2);
+    var blob = new Blob([json], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
     a.href = url;
-    a.download = `worldbook_${Date.now()}.json`;
+    a.download = 'worldbook_' + Date.now() + '.json';
     a.click();
     URL.revokeObjectURL(url);
-    window.notifications?.show('success', '导出成功', `已下载 ${this.entries.length} 条条目`);
-  },
-};
 
-// Initialize on DOM ready
-document.addEventListener('DOMContentLoaded', () => {
-  WorldBook.init();
+    if (window.notifications) {
+      window.notifications.show('success', '导出成功', '已下载 ' + _entries.length + ' 条条目');
+    }
+  }
+
+  // ===========================================================================
+  // Private Helpers
+  // ===========================================================================
+
+  /**
+   * 创建标签-字段的包装元素
+   * @param {string} label — 标签文本
+   * @param {string} innerHTML — 内部 HTML
+   * @returns {HTMLElement}
+   * @private
+   */
+  function _makeField(label, innerHTML) {
+    var div = document.createElement('div');
+    div.className = 'wb-field';
+    div.innerHTML = '<label>' + label + '</label>' + innerHTML;
+    return div;
+  }
+
+  /**
+   * 绑定条目卡片的所有交互事件
+   * @param {HTMLElement} card
+   * @param {Object} entry
+   * @private
+   */
+  function _bindCardEvents(card, entry) {
+    var header = card.querySelector('.wb-entry-header');
+
+    // 点击标题切换展开/折叠
+    header.addEventListener('click', function (e) {
+      if (e.target.closest('button') || e.target.closest('input') || e.target.closest('select')) return;
+      card.classList.toggle('editing');
+    });
+
+    // 保存按钮
+    var saveBtn = card.querySelector('.wb-btn-save');
+    if (saveBtn) {
+      saveBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var data = _gatherFormData(card);
+        update(entry.id, data);
+        card.classList.remove('editing');
+      });
+    }
+
+    // 取消按钮
+    var cancelBtn = card.querySelector('.wb-btn-cancel');
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        card.classList.remove('editing');
+        render(); // 重新渲染以恢复
+      });
+    }
+
+    // 删除按钮
+    var deleteBtn = card.querySelector('.wb-btn-delete');
+    if (deleteBtn) {
+      deleteBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        _showDeleteConfirm(card, entry);
+      });
+    }
+
+    // 插入位置变更 → 显示/隐藏条件字段
+    var posSelect = card.querySelector('.wb-f-position');
+    if (posSelect) {
+      posSelect.addEventListener('change', function () {
+        var val = posSelect.value;
+        var depthField = card.querySelector('.wb-f-depth');
+        var outletField = card.querySelector('.wb-f-outlet');
+        if (depthField) {
+          depthField.classList.toggle('show', val === 'at_depth');
+        }
+        if (outletField) {
+          outletField.classList.toggle('show', val === 'outlet');
+        }
+      });
+    }
+
+    // 关键词：回车添加
+    var kwInput = card.querySelector('.wb-keyword-input');
+    if (kwInput) {
+      kwInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          var text = kwInput.value.trim();
+          if (!text) return;
+          var esc = (window.utils && window.utils.escapeHTML)
+            ? window.utils.escapeHTML
+            : function (s) { var d = document.createElement('div'); d.textContent = String(s); return d.innerHTML; };
+          var tag = document.createElement('span');
+          tag.className = 'wb-keyword-tag';
+          tag.innerHTML = esc(text) + '<span class="kw-remove" data-kw="' + esc(text) + '">x</span>';
+          kwInput.parentNode.insertBefore(tag, kwInput);
+          kwInput.value = '';
+          var rm = tag.querySelector('.kw-remove');
+          if (rm) rm.addEventListener('click', function () { tag.remove(); });
+        }
+      });
+    }
+
+    // 关键词：委托删除
+    card.addEventListener('click', function (e) {
+      var removeBtn = e.target.closest('.kw-remove');
+      if (removeBtn) {
+        removeBtn.parentElement.remove();
+      }
+    });
+
+    // 启用开关切换标签文字
+    var enabledCb = card.querySelector('.wb-f-enabled');
+    if (enabledCb) {
+      enabledCb.addEventListener('change', function () {
+        var label = enabledCb.closest('label');
+        if (label) {
+          label.lastChild.textContent = enabledCb.checked ? '已启用' : '已禁用';
+        }
+      });
+    }
+  }
+
+  /**
+   * 从卡片表单中收集数据
+   * @param {HTMLElement} card
+   * @returns {Object}
+   * @private
+   */
+  function _gatherFormData(card) {
+    var name = (card.querySelector('.wb-f-name') && card.querySelector('.wb-f-name').value) || '';
+    var content = (card.querySelector('.wb-f-content') && card.querySelector('.wb-f-content').value) || '';
+    var trigger = (card.querySelector('.wb-f-trigger') && card.querySelector('.wb-f-trigger').value) || 'keyword';
+    var position = (card.querySelector('.wb-f-position') && card.querySelector('.wb-f-position').value) || 'before_char';
+    var depth = parseInt((card.querySelector('.wb-f-depth') && card.querySelector('.wb-f-depth').value) || '0', 10);
+    var outlet = (card.querySelector('.wb-f-outlet') && card.querySelector('.wb-f-outlet').value) || '';
+    var weight = parseInt((card.querySelector('.wb-f-weight') && card.querySelector('.wb-f-weight').value) || '50', 10);
+    var enabled = card.querySelector('.wb-f-enabled') ? card.querySelector('.wb-f-enabled').checked : false;
+
+    var keywords = [];
+    card.querySelectorAll('.wb-keyword-tag').forEach(function (tag) {
+      var text = tag.childNodes[0] ? tag.childNodes[0].textContent : '';
+      if (text) keywords.push(text);
+    });
+
+    return {
+      name: name,
+      content: content,
+      triggerCondition: trigger,
+      insertPosition: position,
+      depth: depth,
+      outletName: outlet,
+      weight: weight,
+      enabled: enabled,
+      keywords: keywords,
+    };
+  }
+
+  /**
+   * 显示删除确认提示
+   * @param {HTMLElement} card
+   * @param {Object} entry
+   * @private
+   */
+  function _showDeleteConfirm(card, entry) {
+    card.classList.remove('editing');
+
+    var esc = (window.utils && window.utils.escapeHTML)
+      ? window.utils.escapeHTML
+      : function (s) { var d = document.createElement('div'); d.textContent = String(s || ''); return d.innerHTML; };
+
+    var confirmEl = document.createElement('div');
+    confirmEl.className = 'wb-delete-confirm';
+    confirmEl.innerHTML =
+      '<div style="margin-bottom:8px">确认删除条目「' + esc(entry.name || '') + '」？</div>' +
+      '<div style="display:flex;gap:8px;justify-content:flex-end">' +
+        '<button class="wb-btn-cancel" style="color:var(--text-muted)">取消</button>' +
+        '<button class="wb-btn-save" style="background:var(--danger);color:white">确认删除</button>' +
+      '</div>';
+
+    card.parentNode.insertBefore(confirmEl, card);
+
+    var cancelConfirmBtn = confirmEl.querySelector('.wb-btn-cancel');
+    if (cancelConfirmBtn) {
+      cancelConfirmBtn.addEventListener('click', function () { confirmEl.remove(); });
+    }
+
+    var confirmDeleteBtn = confirmEl.querySelector('.wb-btn-save');
+    if (confirmDeleteBtn) {
+      confirmDeleteBtn.addEventListener('click', function () {
+        confirmEl.remove();
+        remove(entry.id);
+      });
+    }
+  }
+
+  // ===========================================================================
+  // Export
+  // ===========================================================================
+
+  return {
+    INSERT_POSITIONS: INSERT_POSITIONS,
+    TRIGGER_CONDITIONS: TRIGGER_CONDITIONS,
+    entries: _entries, // 向后兼容
+    init: init,
+    getAll: getAll,
+    create: create,
+    update: update,
+    remove: remove,
+    delete: remove, // 别名
+    render: render,
+    renderEntry: renderEntry,
+    save: save,
+    bindToolbar: bindToolbar,
+    import: importJson, // 别名
+    importJson: importJson,
+    export: exportJson, // 别名
+    exportJson: exportJson,
+  };
+})();
+
+// =============================================================================
+// DOMContentLoaded 初始化
+// =============================================================================
+
+document.addEventListener('DOMContentLoaded', function () {
+  try { WorldBook.init(); } catch (e) {
+    console.warn('[WorldBook] 初始化失败:', e.message);
+  }
 });

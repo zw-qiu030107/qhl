@@ -1,6 +1,17 @@
 /* css/layout.css */
-body { display: flex; flex-direction: column; height: 100vh; }
 
+/* ================================
+   App Shell — Vertical Flex
+   ================================ */
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* ================================
+   Top Navigation Bar
+   ================================ */
 #topnav {
   height: var(--topnav-height);
   display: flex;
@@ -10,15 +21,41 @@ body { display: flex; flex-direction: column; height: 100vh; }
   background: var(--bg-panel);
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
-  z-index: 100;
+  z-index: var(--z-dropdown);
 }
 
+#topnav-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-shrink: 0;
+}
+
+#topnav-center {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+#topnav-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
+
+/* ================================
+   Main Content Row
+   ================================ */
 #app-main {
   display: flex;
   flex: 1;
   overflow: hidden;
 }
 
+/* ================================
+   Left Panel
+   ================================ */
 #left-panel {
   width: var(--left-panel-width);
   flex-shrink: 0;
@@ -29,6 +66,11 @@ body { display: flex; flex-direction: column; height: 100vh; }
   overflow: hidden;
 }
 
+/* ================================
+   Center — Chat Area & Game Area
+   ================================ */
+
+/* Chat area: visible by default */
 #chat-area {
   flex: 1;
   display: flex;
@@ -37,6 +79,28 @@ body { display: flex; flex-direction: column; height: 100vh; }
   min-width: 0;
 }
 
+/* Game area: hidden by default, shown when game mode is active */
+#game-area {
+  flex: 1;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+  background: var(--bg-primary);
+}
+
+/* Mutual exclusivity: game mode ON hides chat, shows game */
+body.game-mode-active #chat-area {
+  display: none;
+}
+
+body.game-mode-active #game-area {
+  display: flex;
+}
+
+/* ================================
+   Right Panel
+   ================================ */
 #right-panel {
   width: var(--right-panel-width);
   flex-shrink: 0;
@@ -47,6 +111,9 @@ body { display: flex; flex-direction: column; height: 100vh; }
   overflow: hidden;
 }
 
+/* ================================
+   Input Bar
+   ================================ */
 #input-bar {
   height: var(--input-bar-height);
   background: var(--bg-panel);
@@ -56,10 +123,96 @@ body { display: flex; flex-direction: column; height: 100vh; }
   padding: 0 var(--space-lg);
   gap: var(--space-md);
   flex-shrink: 0;
-  z-index: 100;
+  z-index: var(--z-dropdown);
 }
 
-/* 响应式：小屏幕隐藏侧边栏 */
+/* ================================
+   Responsive: Tablet (max-width: 1200px)
+   ================================ */
+@media (max-width: 1200px) {
+  :root {
+    --right-panel-width: 260px;
+  }
+}
+
+/* ================================
+   Responsive: Mobile (max-width: 768px)
+   ================================ */
+@media (max-width: 768px) {
+  :root {
+    --left-panel-width: 0px;
+    --right-panel-width: 0px;
+  }
+
+  #left-panel {
+    display: none;
+  }
+
+  #right-panel {
+    display: none;
+  }
+
+  #topnav {
+    padding: 0 var(--space-sm);
+  }
+
+  #input-bar {
+    padding: 0 var(--space-sm);
+    height: 56px;
+  }
+
+  #chat-messages {
+    padding: var(--space-sm);
+  }
+
+  .msg-bubble {
+    max-width: 85% !important;
+  }
+
+  .chat-msg.user .msg-bubble {
+    max-width: 75% !important;
+  }
+}
+
+/* Legacy small breakpoint (keep for backward compat) */
 @media (max-width: 900px) {
-  #left-panel, #right-panel { display: none; }
+  #left-panel,
+  #right-panel {
+    display: none;
+  }
+}
+
+/* ================================
+   Print Styles
+   ================================ */
+@media print {
+  body {
+    overflow: visible;
+    height: auto;
+    background: white;
+    color: black;
+  }
+
+  #topnav,
+  #left-panel,
+  #right-panel,
+  #input-bar,
+  .modal-overlay,
+  .toast-container {
+    display: none !important;
+  }
+
+  #chat-area,
+  #game-area,
+  #chat-messages {
+    overflow: visible;
+    height: auto;
+    display: block !important;
+  }
+
+  .msg-bubble {
+    border: 1px solid #ccc;
+    background: #f9f9f9 !important;
+    color: #222 !important;
+  }
 }
