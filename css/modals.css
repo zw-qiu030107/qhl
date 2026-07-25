@@ -1,14 +1,14 @@
 /* css/modals.css — Modal Dialog System */
 
 /* ================================
-   Overlay (Backdrop)
+   Overlay (Backdrop) — 0.6 opacity
    ================================ */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: var(--z-modal-backdrop);
   display: flex;
   align-items: center;
@@ -21,63 +21,77 @@
 }
 
 /* ================================
-   Modal Card
+   Modal Card — 12px border-radius
    ================================ */
 .modal {
   background: var(--bg-panel);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  border-radius: var(--radius-12);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
   width: 90vw;
   max-width: 460px;
-  max-height: 76vh;
+  max-height: 80vh;
   display: flex;
   flex-direction: column;
-  animation: modalIn 220ms ease-out;
+  animation: modalIn 200ms ease-out;
 }
 
 .modal.hidden {
   display: none;
 }
 
-/* Wide variant */
+/* ---- Wide Variant ---- */
 .modal.wide {
   max-width: 640px;
 }
 
-/* Extra wide variant */
+/* ---- Extra Wide Variant ---- */
 .modal.x-wide {
   max-width: 800px;
 }
 
 /* ================================
-   Modal Header
+   Modal Header — 1px bottom border
    ================================ */
 .modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px var(--space-lg);
+  padding: var(--sp-16) var(--sp-20);
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
 }
 
 .modal-header h3 {
-  font-size: 14px;
+  font-size: var(--text-14);
   font-weight: 600;
   color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
 }
 
 .modal-header .view-back {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12px;
+  gap: var(--sp-4);
+  font-size: var(--text-12);
   color: var(--accent);
   cursor: pointer;
-  padding: 4px 6px;
-  border-radius: var(--radius-sm);
+  padding: var(--sp-4) var(--sp-8);
+  border-radius: var(--radius-4);
   transition: background var(--transition-fast);
+  background: none;
+  border: none;
+}
+
+.modal-header .view-back svg {
+  width: 14px;
+  height: 14px;
 }
 
 .modal-header .view-back:hover {
@@ -87,7 +101,7 @@
 .modal-header-right {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--sp-8);
 }
 
 .modal-close {
@@ -96,10 +110,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-4);
   color: var(--text-muted);
   cursor: pointer;
   transition: all var(--transition-fast);
+  background: none;
+  border: none;
+}
+
+.modal-close svg {
+  width: 16px;
+  height: 16px;
 }
 
 .modal-close:hover {
@@ -108,23 +129,23 @@
 }
 
 /* ================================
-   Modal Body
+   Modal Body — 20px padding
    ================================ */
 .modal-body {
-  padding: var(--space-lg);
+  padding: var(--sp-20);
   overflow-y: auto;
   flex: 1;
 }
 
 /* ================================
-   Modal Footer
+   Modal Footer — with gap
    ================================ */
 .modal-footer {
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--sp-16) var(--sp-20);
   border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: flex-end;
-  gap: var(--space-sm);
+  gap: var(--sp-8);
   flex-shrink: 0;
 }
 
@@ -136,18 +157,19 @@
    Buttons (shared)
    ================================ */
 .btn {
-  padding: 8px 16px;
-  font-size: 12px;
-  border-radius: var(--radius-sm);
+  padding: var(--sp-8) var(--sp-16);
+  font-size: var(--text-12);
   font-weight: 500;
+  border-radius: var(--radius-6);
   cursor: pointer;
   border: none;
   transition: all var(--transition-fast);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-8);
   line-height: 1;
   font-family: inherit;
+  background: none;
 }
 
 .btn-primary {
@@ -179,24 +201,23 @@
 }
 
 .btn-sm {
-  padding: 4px 8px;
-  font-size: 10px;
+  padding: var(--sp-4) var(--sp-8);
+  font-size: var(--text-11);
 }
 
 .btn-xs {
-  padding: 2px 6px;
-  font-size: 9px;
-  border-radius: var(--radius-xs);
+  padding: 2px 8px;
+  font-size: var(--text-10);
+  border-radius: var(--radius-4);
 }
 
 /* ================================
    Drop Zone (File Upload)
    ================================ */
 .drop-zone {
-  margin-top: 16px;
-  padding: 16px;
+  padding: var(--sp-24);
   border: 2px dashed var(--border-color);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-8);
   text-align: center;
   cursor: pointer;
   transition: border-color var(--transition-fast), background var(--transition-fast);
@@ -213,38 +234,38 @@
 }
 
 @keyframes dropZonePulse {
-  0%, 100% {
-    border-color: var(--accent);
-  }
-  50% {
-    border-color: var(--accent-dim);
-  }
+  0%, 100% { border-color: var(--accent); }
+  50%      { border-color: var(--accent-dim); }
 }
 
 .drop-zone p {
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: var(--text-13);
   margin: 0;
 }
 
 /* ================================
    Character Card List
    ================================ */
-.char-card-list {
+.char-card-list,
+#char-card-list,
+.char-card-list-modal {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--sp-8);
+  margin-top: var(--sp-16);
 }
 
 .char-card-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 12px;
+  padding: var(--sp-12) var(--sp-16);
   background: var(--bg-surface);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-6);
   border: 1px solid var(--border-color);
   transition: border-color var(--transition-fast);
+  cursor: pointer;
 }
 
 .char-card-item:hover {
@@ -259,13 +280,13 @@
 }
 
 .char-card-name {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--text-13);
+  font-weight: 600;
   color: var(--text-primary);
 }
 
 .char-card-desc {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -274,17 +295,17 @@
 
 .char-card-actions {
   display: flex;
-  gap: 4px;
+  gap: var(--sp-4);
   flex-shrink: 0;
 }
 
 .char-card-actions button {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-4);
   background: none;
   border: none;
   color: var(--text-muted);
@@ -302,22 +323,67 @@
 }
 
 /* ================================
+   Character Switcher Menu
+   ================================ */
+#char-switcher-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-8);
+  box-shadow: var(--shadow-lg);
+  z-index: var(--z-dropdown);
+  overflow: hidden;
+}
+
+#char-switcher-menu button {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+  width: 100%;
+  padding: var(--sp-8) var(--sp-12);
+  font-size: var(--text-12);
+  color: var(--text-secondary);
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-color);
+  transition: background var(--transition-fast);
+  background: none;
+}
+
+#char-switcher-menu button:hover {
+  background: var(--bg-hover);
+}
+
+#char-switcher-menu button .char-menu-name {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+#char-switcher-menu button .char-menu-desc {
+  font-size: var(--text-10);
+  color: var(--text-muted);
+}
+
+/* ================================
    Editor Form Fields
    ================================ */
 .char-editor-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--sp-16);
 }
 
 .editor-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--sp-4);
 }
 
 .editor-field label {
-  font-size: 11px;
+  font-size: var(--text-11);
   font-weight: 500;
   color: var(--text-secondary);
   text-transform: uppercase;
@@ -331,9 +397,9 @@
 .editor-field select {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  padding: 8px 10px;
-  font-size: 13px;
+  border-radius: var(--radius-6);
+  padding: var(--sp-8) var(--sp-12);
+  font-size: var(--text-13);
   color: var(--text-primary);
   font-family: var(--font-sans);
   outline: none;
@@ -344,11 +410,13 @@
 .editor-field textarea:focus,
 .editor-field select:focus {
   border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
 .editor-field textarea {
   resize: vertical;
-  min-height: 60px;
+  min-height: 72px;
+  line-height: var(--lh-body);
 }
 
 .editor-field textarea.tall {
@@ -359,17 +427,19 @@
   min-height: 140px;
 }
 
-/* Range input */
+/* ---- Range Input ---- */
 .editor-field input[type="range"] {
   width: 100%;
   accent-color: var(--accent);
   background: transparent;
+  padding: 0;
+  border: none;
 }
 
 .range-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--sp-12);
 }
 
 .range-row input[type="range"] {
@@ -377,7 +447,7 @@
 }
 
 .range-value {
-  font-size: 13px;
+  font-size: var(--text-13);
   font-weight: 600;
   color: var(--accent);
   min-width: 32px;
@@ -390,31 +460,38 @@
 .tags-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  padding: 8px;
+  gap: var(--sp-4);
+  padding: var(--sp-8);
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-6);
   min-height: 36px;
   cursor: text;
   align-items: center;
+  transition: border-color var(--transition-fast);
 }
 
 .tags-container:focus-within {
   border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
 .tag-chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
+  gap: var(--sp-4);
+  padding: 2px 10px;
   background: var(--accent-glow);
-  border: 1px solid rgba(126, 184, 218, 0.3);
-  border-radius: var(--radius-sm);
-  font-size: 11px;
+  border: 1px solid rgba(126, 184, 218, 0.25);
+  border-radius: var(--radius-4);
+  font-size: var(--text-11);
   color: var(--accent);
   animation: scaleIn 150ms ease-out;
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 .tag-chip .tag-remove {
@@ -423,7 +500,7 @@
   justify-content: center;
   width: 14px;
   height: 14px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   cursor: pointer;
   color: var(--text-muted);
   transition: color var(--transition-fast);
@@ -437,7 +514,7 @@
   border: none;
   background: transparent;
   color: var(--text-primary);
-  font-size: 12px;
+  font-size: var(--text-12);
   outline: none;
   flex: 1;
   min-width: 80px;
@@ -452,19 +529,21 @@
   min-height: 360px;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  padding: 12px;
+  border-radius: var(--radius-6);
+  padding: var(--sp-16);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-12);
   color: var(--text-primary);
   resize: vertical;
   outline: none;
-  line-height: 1.6;
+  line-height: 1.7;
   tab-size: 2;
+  transition: border-color var(--transition-fast);
 }
 
 .json-editor-textarea:focus {
   border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
 /* ================================
@@ -473,14 +552,13 @@
 .history-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--sp-8);
 }
 
 .history-session {
-  padding: 12px;
-  margin-bottom: 8px;
+  padding: var(--sp-12) var(--sp-16);
   background: var(--bg-surface);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-8);
   border: 1px solid var(--border-color);
   cursor: pointer;
   transition: border-color var(--transition-fast);
@@ -494,26 +572,26 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: var(--sp-4);
 }
 
 .history-session-time {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: var(--text-muted);
 }
 
 .history-session-count {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: var(--text-dim);
-  padding: 2px 6px;
+  padding: 2px 8px;
   background: var(--bg-hover);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-4);
 }
 
 .history-session-preview {
-  font-size: 12px;
+  font-size: var(--text-12);
   color: var(--text-tertiary);
-  line-height: 1.4;
+  line-height: var(--lh-body);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -525,14 +603,13 @@
 .bookmark-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--sp-8);
 }
 
 .bookmark-item {
-  padding: 12px;
-  margin-bottom: 8px;
+  padding: var(--sp-12) var(--sp-16);
   background: var(--bg-surface);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-8);
   border: 1px solid var(--border-color);
 }
 
@@ -540,46 +617,35 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: var(--sp-8);
 }
 
 .bookmark-sender {
-  font-size: 12px;
+  font-size: var(--text-12);
   font-weight: 600;
   color: var(--text-secondary);
 }
 
 .bookmark-time {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: var(--text-dim);
 }
 
 .bookmark-quote {
-  font-size: 12px;
+  font-size: var(--text-12);
   color: var(--text-tertiary);
-  line-height: 1.5;
-  margin-bottom: 8px;
-  padding: 8px 10px;
+  line-height: var(--lh-body);
+  margin-bottom: var(--sp-8);
+  padding: var(--sp-8) var(--sp-12);
   background: var(--bg-primary);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-6);
   border-left: 2px solid var(--accent-dim);
 }
 
 .bookmark-actions {
   display: flex;
-  gap: 6px;
+  gap: var(--sp-8);
   justify-content: flex-end;
-}
-
-/* ================================
-   Empty List State
-   ================================ */
-.empty-list-msg {
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 13px;
-  padding: 24px 0;
-  line-height: 1.5;
 }
 
 /* ================================
@@ -596,7 +662,7 @@
 
 .editor-field .field-error,
 .char-field .field-error {
-  font-size: 10px;
+  font-size: var(--text-10);
   color: var(--danger);
   margin-top: 2px;
   line-height: 1.4;
@@ -607,17 +673,10 @@
   color: var(--danger);
 }
 
-/* Shake animation for validation errors */
 @keyframes fieldShake {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  20%, 60% {
-    transform: translateX(-4px);
-  }
-  40%, 80% {
-    transform: translateX(4px);
-  }
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
 }
 
 .editor-field.error {
@@ -636,26 +695,21 @@
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-6);
 }
 
 .skeleton-text {
   height: 12px;
-  margin-bottom: 8px;
+  margin-bottom: var(--sp-8);
 }
 
-.skeleton-text.short {
-  width: 60%;
-}
-
-.skeleton-text.medium {
-  width: 80%;
-}
+.skeleton-text.short  { width: 60%; }
+.skeleton-text.medium { width: 80%; }
 
 .skeleton-block {
   height: 48px;
   width: 100%;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-8);
 }
 
 .skeleton-avatar {
@@ -667,18 +721,18 @@
 .skeleton-card {
   height: 80px;
   width: 100%;
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-sm);
+  border-radius: var(--radius-8);
+  margin-bottom: var(--sp-8);
 }
 
-/* Modal loading spinner */
+/* ---- Modal Loading Spinner ---- */
 .modal-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--space-3xl) var(--space-lg);
-  gap: var(--space-md);
+  padding: var(--sp-48) var(--sp-16);
+  gap: var(--sp-16);
 }
 
 .modal-loading .spinner {
@@ -686,11 +740,54 @@
   height: 32px;
   border: 3px solid var(--border-color);
   border-top-color: var(--accent);
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   animation: spin 600ms linear infinite;
 }
 
 .modal-loading .loading-text {
-  font-size: 12px;
+  font-size: var(--text-12);
   color: var(--text-muted);
+}
+
+/* ================================
+   Modal Utility Classes
+   ================================ */
+
+.modal-divider {
+  height: 1px;
+  background: var(--border-color);
+  border: none;
+  margin: var(--sp-16) 0;
+}
+
+.api-test-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+  margin-top: var(--sp-8);
+}
+
+.api-test-result-text {
+  font-size: var(--text-11);
+  color: var(--text-muted);
+}
+
+/* Author Note warning inside right panel */
+.an-warning-msg {
+  font-size: var(--text-10);
+  color: var(--warning);
+  margin-top: var(--sp-4);
+  line-height: var(--lh-body);
+}
+
+.an-warning-msg.hidden {
+  display: none;
+}
+
+/* ================================
+   Bookmark-specific Button Refinements
+   ================================ */
+.bookmark-jump,
+.bookmark-remove {
+  cursor: pointer;
 }

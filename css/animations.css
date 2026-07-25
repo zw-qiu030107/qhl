@@ -1,4 +1,4 @@
-/* css/animations.css — Global Keyframe Animations */
+/* css/animations.css — Essential Keyframe Animations Only */
 
 /* ================================
    Message Bubble Entrance
@@ -6,11 +6,33 @@
 @keyframes msgIn {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* ================================
+   Fade In
+   ================================ */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ================================
+   Modal Entrance (scale + fade)
+   ================================ */
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -20,7 +42,7 @@
 @keyframes toastIn {
   from {
     opacity: 0;
-    transform: translateX(100%);
+    transform: translateX(120%);
   }
   to {
     opacity: 1;
@@ -38,236 +60,64 @@
   }
   to {
     opacity: 0;
-    transform: translateX(100%);
+    transform: translateX(120%);
   }
 }
 
 /* ================================
-   Toast Stack Animation (downward push)
-   ================================ */
-@keyframes toastStack {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ================================
-   Modal Entrance (scale + fade)
-   ================================ */
-@keyframes modalIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* ================================
-   Modal Exit (reverse)
-   ================================ */
-@keyframes modalOut {
-  from {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(8px) scale(0.98);
-  }
-}
-
-/* ================================
-   Fade In
-   ================================ */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* ================================
-   Fade Out (reverse of fadeIn)
-   ================================ */
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-/* ================================
-   Slide Up
-   ================================ */
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ================================
-   Slide Down
-   ================================ */
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ================================
-   Scale In
-   ================================ */
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* ================================
-   Spin (loading indicators)
+   Spin (loading)
    ================================ */
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 /* ================================
-   Pulse (attention / highlight)
-   ================================ */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@keyframes pulse-strong {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.04);
-    opacity: 0.85;
-  }
-}
-
-/* ================================
-   Pulse Border (danger highlight)
-   ================================ */
-@keyframes pulse-border {
-  0%, 100% {
-    border-color: var(--danger);
-  }
-  50% {
-    border-color: transparent;
-  }
-}
-
-/* ================================
-   Shimmer / Skeleton Loading
+   Shimmer (skeleton loading)
    ================================ */
 @keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-/* ================================
-   Bounce In
-   ================================ */
-@keyframes bounceIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.3);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.05);
-  }
-  70% {
-    transform: scale(0.95);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 /* ================================
    Toast Progress Bar Shrink
    ================================ */
 @keyframes toastProgressShrink {
-  from {
-    transform: scaleX(1);
-  }
-  to {
-    transform: scaleX(0);
-  }
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
 }
 
 /* ================================
-   Game Mode Transition Effects
+   Game Mode Entrance
    ================================ */
 @keyframes gameEnter {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes gameExit {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(10px);
   }
 }
 
 /* ================================
-   Utility: Reduced Motion
+   Tab Indicator Slide
+   ================================ */
+@keyframes tabIndicatorIn {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+/* ================================
+   Utility: Prefers Reduced Motion
    ================================ */
 @media (prefers-reduced-motion: reduce) {
   *,

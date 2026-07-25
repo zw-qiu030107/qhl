@@ -300,7 +300,7 @@
     }
 
     if (sorted.length === 0) {
-      list.innerHTML = '<div class="empty-state" style="padding:24px;"><div class="empty-desc">暂无正则规则，点击"+ 新建"添加</div></div>';
+      list.innerHTML = '<div class="regex-empty-state"><div class="empty-desc">暂无正则规则，点击"+ 新建"添加</div></div>';
       return;
     }
 
@@ -371,7 +371,7 @@
             '<button class="regex-btn-move" data-id="' + rule.id + '" data-action="down" title="下移" ' + (i === sorted.length - 1 ? 'disabled' : '') + '>' +
               '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>' +
             '</button>' +
-            '<div style="flex:1;"></div>' +
+            '<div class="regex-actions-spacer"></div>' +
             '<button class="regex-btn-delete" data-id="' + rule.id + '" data-action="delete" title="删除">' +
               '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>' +
               ' 删除' +

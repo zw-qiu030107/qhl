@@ -5,12 +5,12 @@
    ================================ */
 .toast-container {
   position: fixed;
-  top: calc(var(--topnav-height) + 8px);
-  right: 16px;
+  top: calc(var(--topnav-height) + var(--sp-8));
+  right: var(--sp-16);
   z-index: var(--z-toast);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--sp-8);
   pointer-events: none;
 }
 
@@ -21,75 +21,48 @@
   pointer-events: auto;
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: var(--sp-8);
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 12px 16px;
+  border-radius: var(--radius-8);
+  padding: var(--sp-12) var(--sp-16);
   min-width: 280px;
   max-width: 380px;
   box-shadow: var(--shadow-md);
-  animation: toastIn 300ms ease-out;
+  animation: toastIn 200ms ease-out;
   position: relative;
   overflow: hidden;
 }
 
 .toast.removing {
-  animation: toastOut 300ms ease-in forwards;
-}
-
-/* New toast stacking animation (subsequent toasts slide down) */
-.toast + .toast {
-  animation: toastStack 250ms ease-out;
+  animation: toastOut 200ms ease-in forwards;
 }
 
 /* ================================
-   Type-Specific Left Border Accent
+   Type-Specific Left Border (4px)
    ================================ */
-.toast.success {
-  border-left: 3px solid var(--success);
-}
-
-.toast.warning {
-  border-left: 3px solid var(--warning);
-}
-
-.toast.error {
-  border-left: 3px solid var(--danger);
-}
-
-.toast.info {
-  border-left: 3px solid var(--accent);
-}
+.toast.success { border-left: 4px solid var(--success); }
+.toast.warning { border-left: 4px solid var(--warning); }
+.toast.error   { border-left: 4px solid var(--danger);  }
+.toast.info    { border-left: 4px solid var(--accent);  }
 
 /* ================================
-   Toast Icon (type-specific positioning)
+   Toast Icon
    ================================ */
 .toast .toast-icon {
   flex-shrink: 0;
-  margin-top: 1px;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 1px;
 }
 
-.toast.success .toast-icon {
-  color: var(--success);
-}
-
-.toast.warning .toast-icon {
-  color: var(--warning);
-}
-
-.toast.error .toast-icon {
-  color: var(--danger);
-}
-
-.toast.info .toast-icon {
-  color: var(--accent);
-}
+.toast.success .toast-icon { color: var(--success); }
+.toast.warning .toast-icon { color: var(--warning); }
+.toast.error   .toast-icon { color: var(--danger);  }
+.toast.info    .toast-icon { color: var(--accent);  }
 
 /* ================================
    Toast Body
@@ -100,14 +73,15 @@
 }
 
 .toast .toast-title {
-  font-size: 12px;
+  font-size: var(--text-12);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 2px;
+  line-height: 1.3;
 }
 
 .toast .toast-msg {
-  font-size: 11px;
+  font-size: var(--text-11);
   color: var(--text-muted);
   line-height: 1.4;
   word-break: break-word;
@@ -118,9 +92,14 @@
    ================================ */
 .toast .toast-close {
   flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-4);
   color: var(--text-dim);
   cursor: pointer;
-  padding: 2px;
   transition: color var(--transition-fast);
   background: none;
   border: none;
@@ -130,92 +109,27 @@
 
 .toast .toast-close:hover {
   color: var(--text-secondary);
+  background: var(--bg-hover);
 }
 
 /* ================================
-   Toast Progress Bar (auto-dismiss timer)
+   Toast Progress Bar
    ================================ */
 .toast .toast-progress {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 3px;
+  height: 2px;
   background: var(--border-color);
   transform-origin: left center;
 }
 
-.toast.success .toast-progress {
-  background: var(--success);
-}
-
-.toast.warning .toast-progress {
-  background: var(--warning);
-}
-
-.toast.error .toast-progress {
-  background: var(--danger);
-}
-
-.toast.info .toast-progress {
-  background: var(--accent);
-}
+.toast.success .toast-progress { background: var(--success); }
+.toast.warning .toast-progress { background: var(--warning); }
+.toast.error   .toast-progress { background: var(--danger);  }
+.toast.info    .toast-progress { background: var(--accent);  }
 
 .toast .toast-progress.active {
   animation: toastProgressShrink linear forwards;
-}
-
-/* ================================
-   Toast with Action Buttons
-   ================================ */
-.toast.has-actions .toast-body {
-  margin-bottom: 4px;
-}
-
-.toast .toast-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-  margin-left: 30px; /* align with body text (icon width + gap) */
-}
-
-.toast .toast-actions button {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  border: none;
-  transition: all var(--transition-fast);
-  font-family: inherit;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.toast .toast-actions .toast-action-primary {
-  background: var(--accent);
-  color: var(--bg-primary);
-}
-
-.toast .toast-actions .toast-action-primary:hover {
-  box-shadow: var(--glow-accent);
-}
-
-.toast .toast-actions .toast-action-secondary {
-  background: var(--bg-hover);
-  color: var(--text-secondary);
-  border: 1px solid var(--border-color);
-}
-
-.toast .toast-actions .toast-action-secondary:hover {
-  border-color: var(--text-dim);
-}
-
-.toast .toast-actions .toast-action-danger {
-  color: var(--danger);
-  background: transparent;
-}
-
-.toast .toast-actions .toast-action-danger:hover {
-  background: var(--danger-bg);
 }

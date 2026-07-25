@@ -183,9 +183,9 @@ const WorldBook = (function () {
     _container.innerHTML = '';
     if (_entries.length === 0) {
       _container.innerHTML =
-        '<div style="text-align:center;padding:48px 16px;color:var(--text-muted);font-size:13px">' +
+        '<div class="wb-empty">' +
           '暂无世界书条目<br>' +
-          '<span style="font-size:11px;color:var(--text-dim)">点击"+ 新建"或"导入"添加</span>' +
+          '<span class="wb-empty-hint">点击"+ 新建"或"导入"添加</span>' +
         '</div>';
       return;
     }
@@ -280,7 +280,7 @@ const WorldBook = (function () {
 
     // 字段：启用开关
     body.appendChild(_makeField('启用',
-      '<label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-secondary);cursor:pointer">' +
+      '<label class="wb-check-label">' +
         '<input type="checkbox" class="wb-f-enabled"' + (entry.enabled ? ' checked' : '') + '>' +
         (entry.enabled ? '已启用' : '已禁用') +
       '</label>'));
@@ -614,10 +614,10 @@ const WorldBook = (function () {
     var confirmEl = document.createElement('div');
     confirmEl.className = 'wb-delete-confirm';
     confirmEl.innerHTML =
-      '<div style="margin-bottom:8px">确认删除条目「' + esc(entry.name || '') + '」？</div>' +
-      '<div style="display:flex;gap:8px;justify-content:flex-end">' +
-        '<button class="wb-btn-cancel" style="color:var(--text-muted)">取消</button>' +
-        '<button class="wb-btn-save" style="background:var(--danger);color:white">确认删除</button>' +
+      '<div class="wb-delete-confirm-msg">确认删除条目「' + esc(entry.name || '') + '」？</div>' +
+      '<div class="wb-delete-confirm-actions">' +
+        '<button class="wb-btn-cancel">取消</button>' +
+        '<button class="wb-btn-save">确认删除</button>' +
       '</div>';
 
     card.parentNode.insertBefore(confirmEl, card);

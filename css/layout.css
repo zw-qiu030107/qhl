@@ -1,4 +1,4 @@
-/* css/layout.css */
+/* css/layout.css — Three-Column App Shell */
 
 /* ================================
    App Shell — Vertical Flex
@@ -10,42 +10,23 @@ body {
 }
 
 /* ================================
-   Top Navigation Bar
+   Top Navigation Bar — 44px
    ================================ */
 #topnav {
   height: var(--topnav-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--space-lg);
+  padding: 0 var(--sp-16);
   background: var(--bg-panel);
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
   z-index: var(--z-dropdown);
-}
-
-#topnav-left {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  flex-shrink: 0;
-}
-
-#topnav-center {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-#topnav-right {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  flex-shrink: 0;
+  gap: var(--sp-12);
 }
 
 /* ================================
-   Main Content Row
+   Main Content Row — Three Columns
    ================================ */
 #app-main {
   display: flex;
@@ -54,7 +35,7 @@ body {
 }
 
 /* ================================
-   Left Panel
+   Left Panel — 220px
    ================================ */
 #left-panel {
   width: var(--left-panel-width);
@@ -64,7 +45,6 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  position: relative; /* 角色切换菜单定位锚点 */
 }
 
 /* ================================
@@ -78,6 +58,7 @@ body {
   flex-direction: column;
   overflow: hidden;
   min-width: 0;
+  background: var(--bg-primary);
 }
 
 /* Game area: hidden by default, shown when game mode is active */
@@ -100,7 +81,7 @@ body.game-mode-active #game-area {
 }
 
 /* ================================
-   Right Panel
+   Right Panel — 280px
    ================================ */
 #right-panel {
   width: var(--right-panel-width);
@@ -113,7 +94,7 @@ body.game-mode-active #game-area {
 }
 
 /* ================================
-   Input Bar
+   Input Bar — 56px
    ================================ */
 #input-bar {
   height: var(--input-bar-height);
@@ -121,14 +102,14 @@ body.game-mode-active #game-area {
   border-top: 1px solid var(--border-color);
   display: flex;
   align-items: center;
-  padding: 0 var(--space-lg);
-  gap: var(--space-md);
+  padding: 0 var(--sp-16);
+  gap: var(--sp-12);
   flex-shrink: 0;
   z-index: var(--z-dropdown);
 }
 
 /* ================================
-   Responsive: Tablet (max-width: 1200px)
+   Responsive: Tablet
    ================================ */
 @media (max-width: 1200px) {
   :root {
@@ -137,7 +118,7 @@ body.game-mode-active #game-area {
 }
 
 /* ================================
-   Responsive: Mobile (max-width: 768px)
+   Responsive: Mobile
    ================================ */
 @media (max-width: 768px) {
   :root {
@@ -145,41 +126,22 @@ body.game-mode-active #game-area {
     --right-panel-width: 0px;
   }
 
-  #left-panel {
-    display: none;
-  }
-
+  #left-panel,
   #right-panel {
     display: none;
   }
 
   #topnav {
-    padding: 0 var(--space-sm);
+    padding: 0 var(--sp-8);
   }
 
   #input-bar {
-    padding: 0 var(--space-sm);
-    height: 56px;
+    padding: 0 var(--sp-8);
+    height: 52px;
   }
 
   #chat-messages {
-    padding: var(--space-sm);
-  }
-
-  .msg-bubble {
-    max-width: 85% !important;
-  }
-
-  .chat-msg.user .msg-bubble {
-    max-width: 75% !important;
-  }
-}
-
-/* Legacy small breakpoint (keep for backward compat) */
-@media (max-width: 900px) {
-  #left-panel,
-  #right-panel {
-    display: none;
+    padding: var(--sp-8);
   }
 }
 
