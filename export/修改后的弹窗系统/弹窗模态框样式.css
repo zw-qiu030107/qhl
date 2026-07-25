@@ -1,0 +1,403 @@
+/* ====================================================================== */
+/* 弹窗 / 模态框（css/modals.css 完整）                                        */
+/* ====================================================================== */
+
+/* ===== 遮罩层 ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 150ms ease-out;
+}
+.modal-overlay.hidden { display: none; }
+
+/* ===== 弹窗卡片 ===== */
+.modal {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  width: 90vw;
+  max-width: 460px;
+  max-height: 76vh;
+  display: flex;
+  flex-direction: column;
+  animation: modalIn 220ms ease-out;
+}
+.modal.wide { max-width: 640px; }
+
+/* ★★★ 核心修复 ★★★                                                    */
+/* 原因：上面 .modal { display: flex } 的 CSS 优先级高于浏览器对 HTML     */
+/*       hidden 属性的默认 display:none，导致所有带 hidden 的弹窗实际仍然  */
+/*       可见。当遮罩层显示时，所有弹窗就一起出现了。                      */
+/* 修复：显式声明 .modal.hidden 的 display:none，覆盖掉 flex。             */
+.modal.hidden { display: none; }
+
+/* ===== 弹窗头部 ===== */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px var(--space-lg);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+.modal-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* 头部左侧返回链接 */
+.modal-header .view-back {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+}
+.modal-header .view-back:hover { background: var(--bg-hover); }
+
+/* 头部右侧按钮组 */
+.modal-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* 关闭按钮 (X) */
+.modal-close {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.modal-close:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+/* ===== 弹窗内容区 ===== */
+.modal-body {
+  padding: var(--space-lg);
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* ===== 弹窗底部按钮栏 ===== */
+.modal-footer {
+  padding: var(--space-md) var(--space-lg);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
+
+/* ===== 按钮体系 ===== */
+.btn {
+  padding: 8px 16px;
+  font-size: 12px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+.btn-primary:hover { box-shadow: var(--glow-accent); }
+.btn-secondary {
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+.btn-secondary:hover { border-color: var(--text-dim); }
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+.btn-danger:hover { opacity: 0.9; }
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 10px;
+}
+
+/* ===== 拖拽上传区 ===== */
+.drop-zone {
+  margin-top: 16px;
+  padding: 16px;
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.drop-zone:hover,
+.drop-zone.drag-over {
+  border-color: var(--accent);
+  background: rgba(126, 184, 218, 0.06);
+}
+.drop-zone p {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 0;
+}
+
+/* ===== 编辑器表单 ===== */
+.char-editor-form { display: flex; flex-direction: column; gap: 14px; }
+.editor-field { display: flex; flex-direction: column; gap: 4px; }
+.editor-field label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.editor-field input[type="text"],
+.editor-field input[type="number"],
+.editor-field textarea,
+.editor-field select {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+.editor-field input:focus,
+.editor-field textarea:focus,
+.editor-field select:focus { border-color: var(--accent); }
+.editor-field textarea { resize: vertical; min-height: 60px; }
+.editor-field textarea.tall { min-height: 100px; }
+.editor-field textarea.x-tall { min-height: 140px; }
+.editor-field input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+/* 范围滑块行 */
+.range-row { display: flex; align-items: center; gap: 10px; }
+.range-row input[type="range"] { flex: 1; }
+.range-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  min-width: 32px;
+  text-align: center;
+}
+
+/* 标签输入 */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  min-height: 36px;
+  cursor: text;
+}
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: var(--accent-glow);
+  border: 1px solid rgba(126, 184, 218, 0.3);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  color: var(--accent);
+}
+.tag-chip .tag-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color var(--transition-fast);
+}
+.tag-chip .tag-remove:hover { color: var(--danger); }
+.tag-input-inline {
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 12px;
+  outline: none;
+  flex: 1;
+  min-width: 80px;
+  font-family: var(--font-sans);
+}
+
+/* JSON 编辑器 */
+.json-editor-textarea {
+  width: 100%;
+  min-height: 360px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-primary);
+  resize: vertical;
+  outline: none;
+  line-height: 1.6;
+  tab-size: 2;
+}
+.json-editor-textarea:focus { border-color: var(--accent); }
+
+/* 角色卡列表项 */
+.char-card-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  transition: border-color var(--transition-fast);
+}
+.char-card-item:hover { border-color: var(--border-active); }
+.char-card-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.char-card-name { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+.char-card-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.char-card-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.char-card-actions button {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.char-card-actions button:hover { background: var(--bg-hover); color: var(--text-primary); }
+.char-card-actions .btn-card-delete:hover { color: var(--danger); }
+
+/* 历史会话 */
+.history-session {
+  padding: 12px;
+  margin-bottom: 8px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+.history-session:hover { border-color: var(--border-active); }
+.history-session-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.history-session-time { font-size: 11px; color: var(--text-muted); }
+.history-session-count {
+  font-size: 10px;
+  color: var(--text-dim);
+  padding: 2px 6px;
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+}
+.history-session-preview {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 书签 */
+.bookmark-item {
+  padding: 12px;
+  margin-bottom: 8px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+.bookmark-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.bookmark-sender { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.bookmark-time { font-size: 10px; color: var(--text-dim); }
+.bookmark-quote {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  border-left: 2px solid var(--accent-dim);
+}
+.bookmark-actions { display: flex; gap: 6px; justify-content: flex-end; }
+
+/* 消息气泡上的书签按钮（悬停显示） */
+.msg-bubble { position: relative; }
+.msg-bookmark-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--transition-fast), color var(--transition-fast);
+}
+.msg-bubble:hover .msg-bookmark-btn { opacity: 1; }
+.msg-bookmark-btn:hover { color: var(--accent); border-color: var(--accent-dim); }
+
+/* 空状态 */
+.empty-list-msg {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 24px 0;
+}

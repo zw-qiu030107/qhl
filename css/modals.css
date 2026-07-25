@@ -32,6 +32,10 @@
 
 .modal.wide { max-width: 640px; }
 
+/* ★ 核心修复：.modal { display:flex } 优先级高于浏览器 hidden 属性 */
+/* 必须显式声明 .modal.hidden 覆盖掉 flex，否则所有弹窗同时可见 */
+.modal.hidden { display: none; }
+
 /* ---- 弹窗头部 ---- */
 .modal-header {
   display: flex;

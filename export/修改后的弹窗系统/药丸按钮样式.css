@@ -1,0 +1,112 @@
+/* ====================================================================== */
+/* 药丸按钮 + 悬停下拉（css/components.css 导航部分）                           */
+/* ====================================================================== */
+
+#nav-right {
+  display: flex;
+  gap: 2px;
+}
+
+.nav-pill-group {
+  position: relative;   /* 为下拉菜单提供定位锚点 */
+}
+
+.nav-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  height: 28px;
+  border-radius: 14px;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+.nav-pill .pill-chevron {
+  transition: transform var(--transition-normal);
+}
+.nav-pill:hover {
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border-color: var(--border-color);
+}
+.nav-pill:active {
+  transform: scale(0.96);
+}
+.nav-pill.active {
+  color: var(--accent);
+  background: var(--bg-surface);
+  border-color: var(--border-active);
+}
+
+/* ---- 下拉面板（悬停滑出） ---- */
+.pill-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  min-width: 140px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition:
+    opacity 180ms ease-out,
+    transform 200ms ease-out,
+    visibility 0ms 200ms;   /* 延迟隐藏，让动画播完 */
+  z-index: 200;
+}
+
+/* 悬停触发：显示 + 上滑 */
+.nav-pill-group:hover .pill-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition:
+    opacity 150ms ease-out,
+    transform 180ms ease-out,
+    visibility 0ms 0ms;     /* 立即显示 */
+}
+
+/* 悬停时药丸高亮 */
+.nav-pill-group:hover .nav-pill {
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border-color: var(--border-active);
+}
+
+/* 悬停时箭头旋转 */
+.nav-pill-group:hover .pill-chevron {
+  transform: rotate(180deg);
+}
+
+/* 下拉菜单选项 */
+.pill-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: left;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.pill-dropdown button:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+.pill-dropdown button + button {
+  border-top: 1px solid var(--border-color);
+  margin-top: 2px;
+  padding-top: 9px;
+}

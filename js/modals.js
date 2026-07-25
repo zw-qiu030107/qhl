@@ -70,7 +70,7 @@ const ViewManager = {
   },
 
   clearNavHighlight() {
-    document.querySelectorAll('#topnav .nav-pill.active').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.nav-pill.active').forEach(b => b.classList.remove('active'));
   }
 };
 
@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewId = trigger.dataset.view;
     if (viewId) {
       e.preventDefault();
+      e.stopPropagation(); // 防止下拉菜单项和 pill 间的冒泡导致重复调用
       ViewManager.open(viewId);
     }
   });

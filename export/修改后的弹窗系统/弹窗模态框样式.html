@@ -1,0 +1,165 @@
+<!-- ===================================================================== -->
+<!-- 一、导航药丸按钮（放在 index.html 的 #nav-right 内）                      -->
+<!-- ===================================================================== -->
+
+<div id="nav-right">
+  <!-- 角色 -->
+  <div class="nav-pill-group">
+    <!-- 【修改点 ①】多选项组：移除了 pill 上的 data-view -->
+    <!-- 原因：角色下有"角色卡管理"和"角色卡编辑器"两个子选项，     -->
+    <!--       点击 pill 本身不应直接打开某个弹窗，只有悬停后选择子项才打开 -->
+    <button id="btn-character-manager" class="nav-pill">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>角色</span>
+      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pill-chevron"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="pill-dropdown">
+      <button data-view="modal-char-manager">角色卡管理</button>
+      <button data-view="modal-char-editor">角色卡编辑器</button>
+    </div>
+  </div>
+
+  <!-- 历史（单选项组，pill 保留 data-view 作为快捷入口） -->
+  <div class="nav-pill-group">
+    <button id="btn-history" class="nav-pill" data-view="modal-chat-history">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>历史</span>
+      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pill-chevron"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="pill-dropdown">
+      <button data-view="modal-chat-history">对话历史</button>
+    </div>
+  </div>
+
+  <!-- 书签（单选项组，pill 保留 data-view 作为快捷入口） -->
+  <div class="nav-pill-group">
+    <button id="btn-bookmarks" class="nav-pill" data-view="modal-bookmarks">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+      <span>书签</span>
+      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pill-chevron"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="pill-dropdown">
+      <button data-view="modal-bookmarks">书签收藏</button>
+    </div>
+  </div>
+
+  <!-- 设置（单选项组，pill 保留 data-view 作为快捷入口） -->
+  <div class="nav-pill-group">
+    <button id="btn-settings" class="nav-pill" data-view="modal-settings">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      <span>设置</span>
+      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pill-chevron"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="pill-dropdown">
+      <button data-view="modal-settings">全局设置</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===================================================================== -->
+<!-- 二、弹窗容器（放在 index.html 的 #modal-overlay 内）                       -->
+<!-- ===================================================================== -->
+
+<!-- 遮罩层 -->
+<div id="modal-overlay" class="modal-overlay hidden">
+
+  <!-- 弹窗 1：角色卡管理 -->
+  <div class="modal hidden" id="modal-char-manager">
+    <div class="modal-header">
+      <h3>角色卡管理</h3>
+      <button class="modal-close" onclick="ViewManager.close()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="char-card-list"><!-- JS 动态渲染角色卡列表 --></div>
+      <div class="drop-zone" id="char-drop-zone">
+        <p>拖拽 JSON 角色卡文件到此处导入</p>
+        <input type="file" accept=".json" id="char-file-input" style="display:none">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="ModalManager.close()">关闭</button>
+    </div>
+  </div>
+
+  <!-- 弹窗 2：角色卡编辑器 -->
+  <div class="modal hidden wide" id="modal-char-editor">
+    <div class="modal-header">
+      <h3>角色卡编辑器</h3>
+      <div class="modal-header-right">
+        <button id="editor-toggle-view" class="btn btn-secondary btn-sm">JSON 视图</button>
+        <button class="modal-close" onclick="ModalManager.close()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" id="char-editor-body">
+      <!-- 可视化表单 -->
+      <div id="editor-form-view">
+        <div class="char-editor-form">
+          <div class="editor-field"><label>名称</label><input type="text" id="editor-name"></div>
+          <div class="editor-field"><label>描述</label><textarea id="editor-description" rows="2"></textarea></div>
+          <div class="editor-field"><label>性格</label><textarea id="editor-personality" class="tall" rows="3"></textarea></div>
+          <div class="editor-field"><label>场景</label><textarea id="editor-scenario" rows="2"></textarea></div>
+          <div class="editor-field"><label>首次问候</label><textarea id="editor-first-mes" class="tall" rows="3"></textarea></div>
+          <div class="editor-field"><label>对话示例</label><textarea id="editor-mes-example" class="x-tall" rows="4"></textarea></div>
+          <div class="editor-field"><label>健谈程度</label><div class="range-row"><input type="range" id="editor-talkativeness" min="0" max="100" value="50"><span class="range-value" id="editor-talkativeness-val">50</span></div></div>
+          <div class="editor-field"><label>标签</label><div class="tags-container" id="editor-tags-container"><input type="text" class="tag-input-inline" id="editor-tags-input" placeholder="输入标签后按 Enter 添加"></div></div>
+        </div>
+      </div>
+      <!-- JSON 视图（默认隐藏） -->
+      <div id="editor-json-view" style="display:none">
+        <textarea class="json-editor-textarea" id="editor-json-textarea" spellcheck="false"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="ModalManager.close()">取消</button>
+      <button class="btn btn-primary" id="editor-save">保存</button>
+    </div>
+  </div>
+
+  <!-- 弹窗 3：对话历史 -->
+  <div class="modal hidden" id="modal-chat-history">
+    <div class="modal-header">
+      <h3>对话历史</h3>
+      <button class="modal-close" onclick="ViewManager.close()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="history-list">
+      <!-- JS 动态渲染 -->
+    </div>
+  </div>
+
+  <!-- 弹窗 4：书签收藏 -->
+  <div class="modal hidden" id="modal-bookmarks">
+    <div class="modal-header">
+      <h3>书签收藏</h3>
+      <button class="modal-close" onclick="ViewManager.close()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="bookmark-list">
+      <!-- JS 动态渲染 -->
+    </div>
+  </div>
+
+  <!-- 弹窗 5：全局设置 -->
+  <div class="modal hidden" id="modal-settings">
+    <div class="modal-header">
+      <h3>全局设置</h3>
+      <button class="modal-close" onclick="ViewManager.close()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <!-- 主题 / 字体大小 / 气泡样式 -->
+      <!-- API 连接配置（接口地址 / Key / 模型 / 测试连接） -->
+      <!-- 键盘快捷键 -->
+      <!-- 数据管理（清空所有本地数据） -->
+    </div>
+  </div>
+
+</div><!-- /#modal-overlay -->
