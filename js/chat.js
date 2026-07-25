@@ -968,7 +968,7 @@ const ChatHistory = (function () {
     });
 
     if (!sessions.length) {
-      container.innerHTML = '<div class="history-empty"><p>暂无对话记录</p></div>';
+      container.innerHTML = '<div class="history-empty" style="text-align:center;padding:40px;color:var(--text-muted)"><p>暂无对话记录</p></div>';
       return;
     }
 
@@ -1192,7 +1192,7 @@ const Bookmarks = (function () {
     if (!container) return;
 
     if (!_items.length) {
-      container.innerHTML = '<div class="history-empty"><p>暂无书签</p></div>';
+      container.innerHTML = '<div class="history-empty" style="text-align:center;padding:40px;color:var(--text-muted)"><p>暂无书签</p></div>';
       return;
     }
 

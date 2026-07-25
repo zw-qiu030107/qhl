@@ -210,17 +210,18 @@ const CharacterManager = (function () {
 
     var menu = document.createElement('div');
     menu.className = 'char-switch-menu';
+    menu.style.cssText = 'position:absolute;left:12px;right:12px;top:44px;background:var(--bg-panel);border:1px solid var(--border-color);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.5);z-index:300;overflow:hidden';
 
     var html = '';
     for (var i = 0; i < _cards.length; i++) {
       var c = _cards[i];
       var name = (c.data && c.data.name) || c.name || '未命名';
       var desc = (c.data && c.data.description) || c.description || '';
-      html += '<button data-idx="' + i + '">' +
-        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>' +
-        '<div><div class="char-menu-name">' + escapeHtml(name) + '</div><div class="char-menu-desc">' + escapeHtml(desc) + '</div></div></button>';
+      html += '<button style="display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;font-size:12px;color:var(--text-secondary);text-align:left;cursor:pointer;border-bottom:1px solid var(--border-color);transition:background .15s" data-idx="' + i + '">' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-7 8-7s8 3 8 7"/></svg>' +
+        '<div><div style="color:var(--text-primary)">' + escapeHtml(name) + '</div><div style="font-size:10px;color:var(--text-muted)">' + escapeHtml(desc) + '</div></div></button>';
     }
-    html += '<button id="menu-open-manager"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> 管理角色卡…</button>';
+    html += '<button style="display:flex;align-items:center;gap:6px;width:100%;padding:10px 12px;font-size:11px;color:var(--accent);text-align:left;cursor:pointer" id="menu-open-manager"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> 管理角色卡…</button>';
 
     menu.innerHTML = html;
 

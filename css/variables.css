@@ -1,120 +1,113 @@
-/* css/variables.css — Design Tokens & Inter Font */
+/* css/variables.css */
 
-/* ================================
-   Inter Font (Google Fonts)
-   ================================ */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-/* ================================
-   Design Tokens (light theme not supported — dark only)
-   ================================ */
 :root {
-  /* ---- Colors — Dark Theme ---- */
-  --bg-primary: #0c0e12;
-  --bg-panel: #13151a;
-  --bg-surface: #1a1d24;
-  --bg-hover: #21252d;
-  --border-color: #262a33;
-  --border-active: #323843;
-  --text-primary: #f0f2f5;
-  --text-secondary: #c4cad4;
-  --text-tertiary: #949eac;
-  --text-muted: #6e7687;
+  /* ================================
+     Colors — Dark Theme Base #141619
+     ================================ */
+  --bg-primary: #141619;
+  --bg-panel: #1a1d23;
+  --bg-surface: #20242a;
+  --bg-hover: #252830;
+  --border-color: #2d3140;
+  --border-active: #3a4050;
+  --text-primary: #e8eaed;
+  --text-secondary: #c8ccd4;
+  --text-tertiary: #8b95a5;
+  --text-muted: #6b7583;
   --text-dim: #4a5060;
   --accent: #7eb8da;
   --accent-dim: #5a8aaa;
-  --accent-glow: rgba(126, 184, 218, 0.2);
+  --accent-glow: rgba(126, 184, 218, 0.25);
   --success: #6fc98f;
   --warning: #d4a860;
   --danger: #c46b6b;
-  --danger-bg: rgba(196, 107, 107, 0.1);
+  --danger-bg: rgba(196, 107, 107, 0.12);
 
-  /* ---- Chat Bubble Backgrounds ---- */
-  --bubble-char: #1a1d24;
-  --bubble-user: #1c3040;
+  /* Chat bubble backgrounds */
+  --bubble-char: #252830;
+  --bubble-user: #1e3a4a;
 
-  /* ---- Typography ---- */
-  --font-sans: "Inter", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, -apple-system, sans-serif;
+  /* ================================
+     Typography
+     ================================ */
+  --font-sans: "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", "Consolas", monospace;
 
-  /* ---- Font Size Scale (10/11/12/13/14/16/20) ---- */
-  --text-10: 10px;
-  --text-11: 11px;
-  --text-12: 12px;
-  --text-13: 13px;
-  --text-14: 14px;
-  --text-16: 16px;
-  --text-20: 20px;
+  --font-size-xs: 9px;
+  --font-size-sm: 11px;
+  --font-size-base: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
 
-  /* ---- Line Height ---- */
-  --lh-body: 1.5;
-  --lh-chat: 1.7;
-  --lh-game: 1.8;
+  /* ================================
+     Spacing
+     ================================ */
+  --space-3xs: 2px;
+  --space-2xs: 4px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 48px;
 
-  /* ---- Spacing Scale (multiples of 4px) ---- */
-  --sp-4: 4px;
-  --sp-8: 8px;
-  --sp-12: 12px;
-  --sp-16: 16px;
-  --sp-20: 20px;
-  --sp-24: 24px;
-  --sp-32: 32px;
-  --sp-48: 48px;
-  --sp-56: 56px;
-  --sp-64: 64px;
+  /* ================================
+     Border Radius
+     ================================ */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 50%;
 
-  /* ---- Border Radius ---- */
-  --radius-4: 4px;
-  --radius-6: 6px;
-  --radius-8: 8px;
-  --radius-12: 12px;
-  --radius-16: 16px;
-  --radius-full: 9999px;
-
-  /* ---- Shadows ---- */
+  /* ================================
+     Shadows
+     ================================ */
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.55);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
   --glow-accent: 0 0 12px var(--accent-glow);
 
-  /* ---- Transitions ---- */
-  --transition-fast: 150ms ease;
+  /* ================================
+     Transitions
+     ================================ */
+  --transition-fast: 150ms ease-out;
   --transition-normal: 200ms ease;
-  --transition-slow: 250ms ease;
+  --transition-slow: 300ms ease-out;
+  --transition-fade: 200ms ease-out;
 
-  /* ---- Layout Dimensions ---- */
-  --topnav-height: 44px;
+  /* ================================
+     Layout Dimensions
+     ================================ */
   --left-panel-width: 220px;
   --right-panel-width: 280px;
-  --input-bar-height: 56px;
+  --topnav-height: 40px;
+  --input-bar-height: 64px;
 
-  /* ---- Z-Index Scale ---- */
-  --z-dropdown: 100;
-  --z-sticky: 200;
-  --z-modal-backdrop: 500;
-  --z-modal: 1000;
-  --z-toast: 5000;
-  --z-tooltip: 9999;
+  /* ================================
+     Z-Index Scale
+     ================================ */
+  --z-dropdown: 200;
+  --z-sticky: 300;
+  --z-modal-backdrop: 5000;
+  --z-modal: 5010;
+  --z-toast: 9999;
+  --z-tooltip: 10000;
 }
 
-/* ---- Keep backward-compat aliases for JS inline styles ---- */
-:root {
-  --font-size-xs: var(--text-10);
-  --font-size-sm: var(--text-11);
-  --font-size-base: var(--text-13);
-  --font-size-md: var(--text-14);
-  --font-size-lg: var(--text-16);
-  --space-xs: var(--sp-4);
-  --space-sm: var(--sp-8);
-  --space-md: var(--sp-12);
-  --space-lg: var(--sp-16);
-  --space-xl: var(--sp-24);
-  --space-2xl: var(--sp-32);
-  --space-3xl: var(--sp-48);
-  --radius-xs: var(--radius-4);
-  --radius-sm: var(--radius-4);
-  --radius-md: var(--radius-8);
-  --radius-lg: var(--radius-12);
-  --radius-xl: var(--radius-16);
+/* ================================
+   Theme Variant: Darker
+   ================================ */
+[data-theme="darker"] {
+  --bg-primary: #0c0e12;
+  --bg-panel: #111318;
+  --bg-surface: #161920;
+  --bg-hover: #1c1f27;
+  --border-color: #252830;
+  --border-active: #2d3140;
+  --bubble-char: #1c1f27;
+  --bubble-user: #152535;
 }

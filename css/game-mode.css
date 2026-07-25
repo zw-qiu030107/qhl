@@ -1,4 +1,49 @@
-/* css/game-mode.css — Interactive Fiction Game View */
+/* css/game-mode.css */
+/* ================================
+   Game Mode — Interactive Fiction UI
+   ================================ */
+
+/* ================================
+   Game Mode Toggle Button (Topnav)
+   ================================ */
+#btn-game-mode {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  height: 28px;
+  border-radius: 14px;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  margin: 0 auto;
+}
+
+#btn-game-mode:hover {
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border-color: var(--border-color);
+}
+
+#btn-game-mode.active {
+  color: var(--accent);
+  background: var(--bg-surface);
+  border-color: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+#btn-game-mode:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+#btn-game-mode svg {
+  width: 13px;
+  height: 13px;
+}
 
 /* ================================
    Game Area Container
@@ -12,32 +57,39 @@
   background: var(--bg-primary);
 }
 
-/* Visibility controlled by body.game-mode-active in layout.css */
+/* Visible state is controlled by body.game-mode-active in layout.css */
 
 /* ================================
-   Game Mode Transition
+   Game Mode Enter / Exit Transition
    ================================ */
+
+/* When game mode becomes active, animate the game area content */
 body.game-mode-active #game-area {
   display: flex;
 }
 
 body.game-mode-active #game-maintext {
-  animation: gameEnter 250ms ease-out;
-}
-
-body.game-mode-active #game-options {
   animation: gameEnter 300ms ease-out;
 }
 
+body.game-mode-active #game-options {
+  animation: gameEnter 350ms ease-out;
+}
+
+/* Fade out chat area when game mode activates */
+body.game-mode-active #chat-area {
+  animation: gameExit 200ms ease-in;
+}
+
 /* ================================
-   Game Main Text — generous line-height
+   Game Main Text
    ================================ */
 #game-maintext {
   flex: 1;
   overflow-y: auto;
-  padding: var(--sp-32) var(--sp-24);
-  line-height: var(--lh-game);
-  font-size: var(--text-16);
+  padding: var(--space-xl) var(--space-lg);
+  line-height: 1.9;
+  font-size: 15px;
   color: var(--text-primary);
   scroll-behavior: smooth;
 }
@@ -63,14 +115,14 @@ body.game-mode-active #game-options {
    Game Options
    ================================ */
 #game-options {
-  padding: var(--sp-16) var(--sp-24);
+  padding: var(--space-md) var(--space-lg);
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sp-12);
+  gap: var(--space-sm);
   border-top: 1px solid var(--border-color);
   background: var(--bg-panel);
   flex-shrink: 0;
-  max-height: 200px;
+  max-height: 180px;
   overflow-y: auto;
   align-items: flex-start;
 }
@@ -78,35 +130,35 @@ body.game-mode-active #game-options {
 .game-options-empty {
   width: 100%;
   text-align: center;
-  font-size: var(--text-12);
+  font-size: 12px;
   color: var(--text-muted);
-  padding: var(--sp-8) 0;
+  padding: var(--space-sm) 0;
   font-style: italic;
 }
 
 /* ================================
-   Option Button — elegant cards
+   Option Button
    ================================ */
 .game-option-btn {
   display: inline-flex;
   align-items: center;
-  gap: var(--sp-8);
-  padding: var(--sp-12) var(--sp-16);
-  font-size: var(--text-14);
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
   font-family: inherit;
-  line-height: var(--lh-body);
+  line-height: 1.5;
   color: var(--text-secondary);
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-8);
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--transition-fast);
   text-align: left;
   white-space: normal;
   word-break: break-word;
   flex: 1 1 auto;
-  min-width: 140px;
-  max-width: 300px;
+  min-width: 120px;
+  max-width: 280px;
 }
 
 .game-option-btn:hover {
@@ -114,7 +166,7 @@ body.game-mode-active #game-options {
   background: var(--bg-hover);
   border-color: var(--border-active);
   transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .game-option-btn:active {
@@ -129,17 +181,19 @@ body.game-mode-active #game-options {
   outline: none;
 }
 
-/* ---- Option Number Badge ---- */
+/* ================================
+   Option Number Badge
+   ================================ */
 .game-option-btn .option-number {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: var(--radius-full);
   background: var(--bg-hover);
   border: 1px solid var(--border-color);
-  font-size: var(--text-11);
+  font-size: 11px;
   font-weight: 600;
   color: var(--accent);
   flex-shrink: 0;
@@ -164,9 +218,9 @@ body.game-mode-active #game-options {
 #game-thinking summary {
   display: flex;
   align-items: center;
-  gap: var(--sp-8);
-  padding: var(--sp-8) var(--sp-24);
-  font-size: var(--text-11);
+  gap: 8px;
+  padding: 8px var(--space-lg);
+  font-size: 11px;
   color: var(--text-muted);
   cursor: pointer;
   user-select: none;
@@ -179,13 +233,13 @@ body.game-mode-active #game-options {
 }
 
 #game-thinking summary .chevron {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   transition: transform var(--transition-normal);
   flex-shrink: 0;
 }
 
-#game-thinking[open] > summary .chevron {
+#game-thinking[open] summary .chevron {
   transform: rotate(90deg);
 }
 
@@ -200,15 +254,29 @@ body.game-mode-active #game-options {
 }
 
 #game-thinking .game-thinking-body {
-  padding: 0 var(--sp-24) var(--sp-16);
-  font-size: var(--text-12);
-  line-height: var(--lh-body);
+  padding: 0 var(--space-lg) var(--space-md);
+  font-size: 12px;
+  line-height: 1.6;
   color: var(--text-tertiary);
   font-style: italic;
   white-space: pre-wrap;
   word-break: break-word;
   max-height: 200px;
   overflow-y: auto;
+
+  /* Fold animation */
+  animation: slideUp 250ms ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ================================
@@ -218,8 +286,8 @@ body.game-mode-active #game-options {
   display: none;
   border-top: 1px solid var(--border-color);
   background: var(--bg-surface);
-  padding: var(--sp-8) var(--sp-24);
-  font-size: var(--text-11);
+  padding: 8px var(--space-lg);
+  font-size: 11px;
   font-family: var(--font-mono);
   color: var(--text-muted);
   white-space: pre-wrap;
@@ -231,6 +299,7 @@ body.game-mode-active #game-options {
   tab-size: 2;
 }
 
+/* Show game vars when game mode is active and vars are available */
 body.game-mode-active #game-vars.show {
   display: block;
 }
@@ -238,60 +307,64 @@ body.game-mode-active #game-vars.show {
 /* ================================
    Responsive: Game Mode
    ================================ */
+
+/* Tablet */
 @media (max-width: 1200px) {
   #game-maintext {
-    padding: var(--sp-24) var(--sp-16);
+    padding: var(--space-lg) var(--space-md);
   }
 
   #game-options {
-    padding: var(--sp-12) var(--sp-16);
+    padding: var(--space-sm) var(--space-md);
   }
 
   .game-option-btn {
-    max-width: 260px;
+    max-width: 240px;
   }
 }
 
-@media (max-width: 768px) {
+/* Mobile */
+@media (max-width: 900px) {
   #game-maintext {
-    padding: var(--sp-16);
-    font-size: var(--text-14);
+    padding: var(--space-md);
+    font-size: 14px;
   }
 
   #game-options {
-    padding: var(--sp-8) var(--sp-16);
-    gap: var(--sp-8);
-    max-height: 160px;
+    padding: var(--space-sm) var(--space-md);
+    gap: 6px;
+    max-height: 150px;
   }
 
   .game-option-btn {
-    padding: var(--sp-8) var(--sp-12);
-    font-size: var(--text-13);
-    min-width: 120px;
-    max-width: 220px;
+    padding: 8px 12px;
+    font-size: 12px;
+    min-width: 100px;
+    max-width: 200px;
   }
 
   #game-thinking summary {
-    padding: var(--sp-8) var(--sp-16);
+    padding: 8px var(--space-md);
   }
 
   #game-thinking .game-thinking-body {
-    padding: 0 var(--sp-16) var(--sp-8);
+    padding: 0 var(--space-md) var(--space-sm);
   }
 
   #game-vars {
-    padding: var(--sp-8) var(--sp-16);
+    padding: 8px var(--space-md);
   }
 }
 
+/* Small mobile */
 @media (max-width: 480px) {
   #game-maintext {
-    padding: var(--sp-12);
-    font-size: var(--text-13);
+    padding: var(--space-sm);
+    font-size: 13px;
   }
 
   #game-options {
-    padding: var(--sp-4) var(--sp-8);
+    padding: var(--space-xs) var(--space-sm);
     flex-direction: column;
   }
 
