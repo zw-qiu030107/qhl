@@ -81,14 +81,18 @@ const ModalManager = {
   close() { ViewManager.close(); }
 };
 
-// 统一点击绑定 — 所有 .nav-pill 按钮自动打开对应视图
+// 统一点击绑定 — 所有带 data-view 的元素自动打开对应视图
 document.addEventListener('DOMContentLoaded', () => {
   ViewManager.init();
 
-  document.querySelectorAll('.nav-pill[data-view]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const viewId = btn.dataset.view;
-      if (viewId) ViewManager.open(viewId);
-    });
+  // 委托：捕获所有 data-view 按钮的点击
+  document.addEventListener('click', (e) => {
+    const trigger = e.target.closest('[data-view]');
+    if (!trigger) return;
+    const viewId = trigger.dataset.view;
+    if (viewId) {
+      e.preventDefault();
+      ViewManager.open(viewId);
+    }
   });
 });
