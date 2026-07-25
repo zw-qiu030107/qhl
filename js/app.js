@@ -154,22 +154,7 @@ const App = (function () {
         rawCard = window.storage.get('character_card');
       }
 
-      // 不存在则从 JSON 文件加载
-      if (!rawCard) {
-        try {
-          var resp = await fetch('data/qhl.json');
-          if (resp.ok) {
-            rawCard = await resp.json();
-            if (typeof window.storage !== 'undefined') {
-              window.storage.set('character_card', rawCard);
-            }
-            console.log('[App] 从 data/qhl.json 加载了默认角色卡');
-          }
-        } catch (e) {
-          console.warn('[App] 无法加载默认角色卡:', e.message);
-          return null;
-        }
-      }
+      // 不从文件自动加载 — 用户自行导入角色卡
 
       if (!rawCard) return null;
 
