@@ -107,47 +107,104 @@
   /**
    * Convert a ST-format lorebook entry to an internal entry.
    *
+   * Handles both top-level fields (ST lorebook v2 format) and
+   * extensions-nested fields (character_book embedded format),
+   * with fallbacks for singular/plural and camelCase/snake_case.
+   *
    * @param {Object} rawEntry — Entry from ST lorebook JSON
    * @returns {Object} Internal entry object
    * @private
    */
   function _convertEntry(rawEntry) {
+    // Merge extensions into top level for unified access
+    // Character cards store many fields (position, probability, depth, etc.)
+    // inside an .extensions sub-object; standalone lorebooks use top-level.
+    var ext = rawEntry.extensions || {};
+
     return {
       id: generateUUID(),
-      keys: rawEntry.key || [],
-      secondaryKeys: rawEntry.keysecondary || [],
+      // Keywords: "key" (ST singular), "keys" (plural, common in character_book)
+      keys: rawEntry.key || rawEntry.keys || [],
+      // Secondary keys: "keysecondary" (ST camelCase), "secondary_keys" (snake_case)
+      secondaryKeys: rawEntry.keysecondary || rawEntry.secondary_keys || [],
       content: rawEntry.content || '',
       comment: typeof rawEntry.comment === 'string' ? rawEntry.comment : '',
-      order: rawEntry.order != null ? rawEntry.order : 100,
-      position: POSITION_MAP[rawEntry.position] || POSITION_MAP[1] || 'after_char',
-      depth: rawEntry.depth != null ? rawEntry.depth : null,
-      role: rawEntry.role != null ? rawEntry.role : 0,
+      order: rawEntry.order != null ? rawEntry.order : (rawEntry.insertion_order != null ? rawEntry.insertion_order : 100),
+      // Position: handle both string ("before_char") and numeric (0-7) formats,
+      // checking top-level first, then extensions
+      position: _resolvePosition(
+        rawEntry.position != null ? rawEntry.position : ext.position
+      ),
+      // Depth: top-level first, then extensions
+      depth: rawEntry.depth != null ? rawEntry.depth : (ext.depth != null ? ext.depth : null),
+      role: rawEntry.role != null ? rawEntry.role : (ext.role != null ? ext.role : 0),
       selective: rawEntry.selective != null ? rawEntry.selective : false,
-      selectiveLogic: LOGIC_MAP[rawEntry.selectiveLogic] || LOGIC_MAP[1] || 'not_all',
+      // Selective logic: handle both string ("and_any") and numeric (0-3),
+      // checking top-level first, then extensions
+      selectiveLogic: _resolveLogic(
+        rawEntry.selectiveLogic != null ? rawEntry.selectiveLogic : ext.selectiveLogic
+      ),
       constant: rawEntry.constant != null ? rawEntry.constant : false,
-      probability: rawEntry.useProbability ? (rawEntry.probability != null ? rawEntry.probability : 100) : 100,
-      useProbability: rawEntry.useProbability != null ? rawEntry.useProbability : false,
+      // Probability: top-level first, then extensions
+      probability: rawEntry.probability != null ? rawEntry.probability
+        : (ext.probability != null ? ext.probability : 100),
+      useProbability: rawEntry.useProbability != null ? rawEntry.useProbability
+        : (ext.useProbability != null ? ext.useProbability : false),
       addMemo: rawEntry.addMemo != null ? rawEntry.addMemo : false,
-      sticky: rawEntry.sticky != null ? rawEntry.sticky : 0,
-      cooldown: rawEntry.cooldown != null ? rawEntry.cooldown : 0,
-      delay: rawEntry.delay != null ? rawEntry.delay : 0,
+      sticky: rawEntry.sticky != null ? rawEntry.sticky : (ext.sticky != null ? ext.sticky : 0),
+      cooldown: rawEntry.cooldown != null ? rawEntry.cooldown : (ext.cooldown != null ? ext.cooldown : 0),
+      delay: rawEntry.delay != null ? rawEntry.delay : (ext.delay != null ? ext.delay : 0),
       weight: rawEntry.weight != null ? rawEntry.weight : 100,
-      scanDepth: rawEntry.scanDepth != null ? rawEntry.scanDepth : 0,
-      caseSensitive: rawEntry.caseSensitive != null ? rawEntry.caseSensitive : false,
-      matchWholeWords: rawEntry.matchWholeWords != null ? rawEntry.matchWholeWords : false,
-      excludeRecursion: rawEntry.excludeRecursion != null ? rawEntry.excludeRecursion : false,
-      preventRecursion: rawEntry.preventRecursion != null ? rawEntry.preventRecursion : false,
-      useGroupScoring: rawEntry.useGroupScoring != null ? rawEntry.useGroupScoring : false,
-      matchPersonaDescription: rawEntry.matchPersonaDescription != null ? rawEntry.matchPersonaDescription : false,
-      matchCharacterDescription: rawEntry.matchCharacterDescription != null ? rawEntry.matchCharacterDescription : false,
-      matchCharacterPersonality: rawEntry.matchCharacterPersonality != null ? rawEntry.matchCharacterPersonality : false,
-      matchCharacterDepthPrompt: rawEntry.matchCharacterDepthPrompt != null ? rawEntry.matchCharacterDepthPrompt : false,
-      matchScenario: rawEntry.matchScenario != null ? rawEntry.matchScenario : false,
-      matchCreatorNotes: rawEntry.matchCreatorNotes != null ? rawEntry.matchCreatorNotes : false,
-      group: rawEntry.group || '',
-      decorators: rawEntry.decorators || [],
+      scanDepth: rawEntry.scanDepth != null ? rawEntry.scanDepth : (ext.scan_depth != null ? ext.scan_depth : 0),
+      caseSensitive: rawEntry.caseSensitive != null ? rawEntry.caseSensitive : (ext.case_sensitive != null ? ext.case_sensitive : false),
+      matchWholeWords: rawEntry.matchWholeWords != null ? rawEntry.matchWholeWords : (ext.match_whole_words != null ? ext.match_whole_words : false),
+      excludeRecursion: rawEntry.excludeRecursion != null ? rawEntry.excludeRecursion : (ext.exclude_recursion != null ? ext.exclude_recursion : false),
+      preventRecursion: rawEntry.preventRecursion != null ? rawEntry.preventRecursion : (ext.prevent_recursion != null ? ext.prevent_recursion : false),
+      useGroupScoring: rawEntry.useGroupScoring != null ? rawEntry.useGroupScoring : (ext.use_group_scoring != null ? ext.use_group_scoring : false),
+      matchPersonaDescription: rawEntry.matchPersonaDescription != null ? rawEntry.matchPersonaDescription : (ext.match_persona_description != null ? ext.match_persona_description : false),
+      matchCharacterDescription: rawEntry.matchCharacterDescription != null ? rawEntry.matchCharacterDescription : (ext.match_character_description != null ? ext.match_character_description : false),
+      matchCharacterPersonality: rawEntry.matchCharacterPersonality != null ? rawEntry.matchCharacterPersonality : (ext.match_character_personality != null ? ext.match_character_personality : false),
+      matchCharacterDepthPrompt: rawEntry.matchCharacterDepthPrompt != null ? rawEntry.matchCharacterDepthPrompt : (ext.match_character_depth_prompt != null ? ext.match_character_depth_prompt : false),
+      matchScenario: rawEntry.matchScenario != null ? rawEntry.matchScenario : (ext.match_scenario != null ? ext.match_scenario : false),
+      matchCreatorNotes: rawEntry.matchCreatorNotes != null ? rawEntry.matchCreatorNotes : (ext.match_creator_notes != null ? ext.match_creator_notes : false),
+      group: rawEntry.group || ext.group || '',
+      decorators: rawEntry.decorators || ext.decorators || [],
       characterFilter: rawEntry.characterFilter || { isExclude: false, names: [], tags: [] },
     };
+  }
+
+  /**
+   * Resolve position value to internal string format.
+   * Handles both numeric (0-7) and string ("before_char") inputs.
+   *
+   * @param {number|string} pos
+   * @returns {string}
+   * @private
+   */
+  function _resolvePosition(pos) {
+    if (pos == null) return POSITION_MAP[1] || 'after_char';
+    // If already a string position, return as-is
+    if (typeof pos === 'string') return pos;
+    // If numeric, look up in POSITION_MAP
+    if (typeof pos === 'number') return POSITION_MAP[pos] || POSITION_MAP[1] || 'after_char';
+    return POSITION_MAP[1] || 'after_char';
+  }
+
+  /**
+   * Resolve selective logic value to internal string format.
+   * Handles both numeric (0-3) and string ("and_any") inputs.
+   *
+   * @param {number|string} logic
+   * @returns {string}
+   * @private
+   */
+  function _resolveLogic(logic) {
+    if (logic == null) return LOGIC_MAP[1] || 'not_all';
+    // If already a string logic, return as-is
+    if (typeof logic === 'string') return logic;
+    // If numeric, look up in LOGIC_MAP
+    if (typeof logic === 'number') return LOGIC_MAP[logic] || LOGIC_MAP[1] || 'not_all';
+    return LOGIC_MAP[1] || 'not_all';
   }
 
   /**
@@ -796,6 +853,29 @@
       });
     }
 
+    // --- Import extensions: regex scripts ---
+    if (card.extensions && card.extensions.regex_scripts && Array.isArray(card.extensions.regex_scripts)) {
+      _importCardRegexScripts(card.extensions.regex_scripts);
+    }
+
+    // --- Import extensions: embedded world book ---
+    // card.raw contains the original v3 data block (with character_book)
+    if (card.raw && card.raw.character_book) {
+      _importCardWorldBook(card.raw.character_book, card.name);
+    }
+
+    // --- Import extensions: depth prompt ---
+    if (card.extensions && card.extensions.depth_prompt) {
+      var dp = card.extensions.depth_prompt;
+      if (window.storage && typeof window.storage.set === 'function') {
+        window.storage.set('depth_prompt', {
+          prompt: dp.prompt || '',
+          depth: dp.depth || 4,
+          role: dp.role || 'system',
+        });
+      }
+    }
+
     // --- Show notification ---
     if (window.notifications && typeof window.notifications.show === 'function') {
       window.notifications.show('success', '角色卡已加载', '已应用: ' + card.name);
@@ -805,6 +885,171 @@
   // =========================================================================
   // Private Helpers
   // =========================================================================
+
+  /**
+   * 从 SillyTavern 角色卡 extensions.regex_scripts 导入正则规则。
+   *
+   * 将 ST 格式（findRegex / replaceString / placement / disabled）转换为
+   * 内部 RegexEngine 格式（regex / replacement / scope / enabled），
+   * 并通过 ST.RegexEngine.importRules() 合并到现有规则中。
+   *
+   * @param {Object[]} stScripts — extensions.regex_scripts 数组
+   * @private
+   */
+  function _importCardRegexScripts(stScripts) {
+    if (!stScripts || !Array.isArray(stScripts) || stScripts.length === 0) return;
+
+    if (!window.ST || !ST.RegexEngine || typeof ST.RegexEngine.importRules !== 'function') {
+      console.warn('[ST.Importer] RegexEngine 不可用，跳过正则脚本导入');
+      return;
+    }
+
+    var converted = [];
+    for (var i = 0; i < stScripts.length; i++) {
+      var s = stScripts[i];
+
+      // 映射 placement → scope
+      // ST placement: 0=system prompt, 1=before user msg, 2=after AI output (display)
+      var placements = s.placement || [];
+      var hasPreGen = placements.indexOf(0) !== -1 || placements.indexOf(1) !== -1;
+      var hasPostGen = placements.indexOf(2) !== -1;
+      var scope;
+      if (hasPreGen && !hasPostGen) scope = 'input';
+      else if (hasPostGen && !hasPreGen) scope = 'output';
+      else scope = 'both';
+
+      converted.push({
+        id: s.id || generateUUID(),
+        name: s.scriptName || s.name || ('导入规则 ' + (i + 1)),
+        regex: s.findRegex || s.regex || '',
+        replacement: s.replaceString || s.replacement || '',
+        flags: 'gi',
+        scope: scope,
+        enabled: !s.disabled,
+        order: i,
+        // 保留 ST 特有字段以便完整回传
+        _stMarkdownOnly: s.markdownOnly,
+        _stPromptOnly: s.promptOnly,
+        _stRunOnEdit: s.runOnEdit,
+        _stSubstituteRegex: s.substituteRegex,
+        _stMinDepth: s.minDepth,
+        _stMaxDepth: s.maxDepth,
+        _stTrimStrings: s.trimStrings || [],
+      });
+    }
+
+    if (converted.length > 0) {
+      var result = ST.RegexEngine.importRules(converted);
+      if (result.success && result.count > 0) {
+        console.log('[ST.Importer] 从角色卡导入了 ' + result.count + ' 条正则规则');
+        // 刷新 RegexEngine UI（如果已渲染）
+        if (typeof ST.RegexEngine.renderList === 'function') {
+          try { ST.RegexEngine.renderList(); } catch (e) { /* ignore */ }
+        }
+      }
+    }
+  }
+
+  /**
+   * 从角色卡内嵌的 character_book 导入世界书条目。
+   *
+   * 支持 ST v2/v3 格式的 entries（数组或对象），
+   * 转换为 WorldBook 内部格式并合并到现有条目中。
+   *
+   * @param {Object} charBook — data.character_book 对象
+   * @param {string} charName — 角色名称（用于生成世界书名称）
+   * @private
+   */
+  function _importCardWorldBook(charBook, charName) {
+    if (!charBook || typeof charBook !== 'object') return;
+    if (typeof WorldBook === 'undefined' || !WorldBook.entries) {
+      console.log('[ST.Importer] WorldBook 尚未初始化，跳过世界书导入（将由 App 延迟导入）');
+      return;
+    }
+
+    // 提取 entries — ST 格式可能是数组或带数字键的对象
+    var rawEntries;
+    if (Array.isArray(charBook.entries)) {
+      rawEntries = charBook.entries;
+    } else if (charBook.entries && typeof charBook.entries === 'object') {
+      rawEntries = Object.values(charBook.entries);
+    } else {
+      return;
+    }
+
+    if (!rawEntries || rawEntries.length === 0) return;
+
+    // 使用 ST.Importer.importLorebook 进行格式规范化
+    var lorebookWrap = {
+      name: (charName || '角色') + '的世界书',
+      description: charBook.description || '',
+      entries: _arrayToEntriesObj(rawEntries),
+      settings: {},
+    };
+    var imported = importLorebook(lorebookWrap);
+
+    if (!imported || !imported.entries || imported.entries.length === 0) return;
+
+    // 去重：按条目名称
+    var existingNames = new Set();
+    WorldBook.entries.forEach(function (e) { existingNames.add(e.name); });
+
+    var addedCount = 0;
+    imported.entries.forEach(function (stEntry) {
+      var wbName = stEntry.comment || (stEntry.keys.length > 0 ? stEntry.keys.join(', ') : '');
+      if (!wbName) wbName = '导入条目 ' + (WorldBook.entries.length + 1);
+
+      // 已存在则跳过
+      if (existingNames.has(wbName)) return;
+
+      WorldBook.entries.push({
+        id: stEntry.id,
+        name: wbName,
+        keywords: stEntry.keys || [],
+        content: stEntry.content || '',
+        weight: stEntry.weight || 50,
+        insertPosition: stEntry.position || 'before_char',
+        depth: stEntry.depth || 0,
+        outletName: '',
+        triggerCondition: stEntry.constant ? 'always' :
+          (stEntry.useProbability ? 'probability' : 'keyword'),
+        enabled: true,
+        order: WorldBook.entries.length,
+        // 保留 ST 完整字段以支持高级匹配
+        _stKeys: stEntry.keys || [],
+        _stSecondaryKeys: stEntry.secondaryKeys || [],
+        _stSelective: stEntry.selective || false,
+        _stSelectiveLogic: stEntry.selectiveLogic || 'and_any',
+        _stConstant: stEntry.constant || false,
+        _stProbability: stEntry.probability || 100,
+        _stUseProbability: stEntry.useProbability || false,
+        _stCaseSensitive: stEntry.caseSensitive || false,
+        _stMatchWholeWords: stEntry.matchWholeWords || false,
+      });
+      existingNames.add(wbName);
+      addedCount++;
+    });
+
+    if (addedCount > 0) {
+      WorldBook.save();
+      WorldBook.render();
+      console.log('[ST.Importer] 从角色卡导入了 ' + addedCount + ' 条世界书条目');
+    }
+  }
+
+  /**
+   * 将条目数组转换为 ST lorebook entries 对象格式（数字键）。
+   * @param {Object[]} arr
+   * @returns {Object}
+   * @private
+   */
+  function _arrayToEntriesObj(arr) {
+    var obj = {};
+    for (var i = 0; i < arr.length; i++) {
+      obj[String(i)] = arr[i];
+    }
+    return obj;
+  }
 
   /**
    * 从性格文本中提取结构化信息（昵称、年龄、星座等）
@@ -916,6 +1161,7 @@
     // Lorebooks
     importLorebook: importLorebook,
     exportLorebook: exportLorebook,
+    importCardWorldBook: _importCardWorldBook,
 
     // Presets
     importPreset: importPreset,

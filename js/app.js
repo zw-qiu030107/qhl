@@ -78,7 +78,7 @@ const App = (function () {
 
     // WorldBook 初始化后再导入 character_book
     if (pendingCharBookCard) {
-      _importCharacterBook(pendingCharBookCard);
+      _importCharacterBookDelayed(pendingCharBookCard);
     }
 
     // Regex 引擎 UI 初始化（右面板第4个 tab）
@@ -203,15 +203,15 @@ const App = (function () {
   }
 
   /**
-   * 从角色卡数据中提取 character_book 并导入到世界书
+   * 从角色卡数据中提取 character_book 并导入到世界书（延迟导入版本）
    *
-   * SillyTavern 角色卡支持在 data.character_book 中包含世界书条目，
-   * 此函数将其提取并导入到 WorldBook 模块中。
+   * 仅在应用初始化时调用 — WorldBook 模块尚未就绪。
+   * 后续角色卡导入由 ST.Importer.applyCharacterCard 直接处理。
    *
-   * @param {Object} card — 角色卡对象
+   * @param {Object} card — 角色卡原始 JSON 对象
    * @private
    */
-  function _importCharacterBook(card) {
+  function _importCharacterBookDelayed(card) {
     try {
       // 提取 character_book
       var data = card.data || card;
@@ -225,83 +225,80 @@ const App = (function () {
 
       if (!charBook) return;
 
-      // 提取 entries（可能是数组或对象）
-      var rawEntries;
-      if (Array.isArray(charBook.entries)) {
-        rawEntries = charBook.entries;
-      } else if (charBook.entries && typeof charBook.entries === 'object') {
-        rawEntries = Object.values(charBook.entries);
-      } else {
+      // 委托给 ST.Importer.importCardWorldBook（如果可用）
+      if (window.ST && ST.Importer && typeof ST.Importer.importCardWorldBook === 'function') {
+        var charName = data.name || card.name || '角色';
+        ST.Importer.importCardWorldBook(charBook, charName);
         return;
       }
 
-      if (!rawEntries || rawEntries.length === 0) return;
-
-      // 转换为 WorldBook 条目格式
-      var convertedEntries = [];
-      for (var i = 0; i < rawEntries.length; i++) {
-        var e = rawEntries[i];
-        // 跳过禁用或排除的条目
-        if (e.disable || e.excluded) continue;
-
-        convertedEntries.push({
-          name: e.comment || e.key ? e.key.join(', ') : '导入条目 ' + (i + 1),
-          keywords: e.key || e.keys || e.keywords || [],
-          content: e.content || '',
-          weight: e.weight || 50,
-          insertPosition: _mapPosition(e.position, e.insertPosition),
-          depth: e.depth || 0,
-          outletName: e.outletName || '',
-          triggerCondition: e.constant ? 'always' :
-            (e.useProbability ? 'probability' : 'keyword'),
-          enabled: true,
-          order: i,
-        });
-      }
-
-      if (convertedEntries.length === 0) return;
-
-      // 合并到现有世界书条目
-      if (typeof WorldBook !== 'undefined' && WorldBook.entries) {
-        // 避免重复导入
-        var existingNames = new Set();
-        WorldBook.entries.forEach(function (e) { existingNames.add(e.name); });
-
-        var addedCount = 0;
-        convertedEntries.forEach(function (e) {
-          if (!existingNames.has(e.name)) {
-            WorldBook.entries.push(e);
-            addedCount++;
-          }
-        });
-
-        if (addedCount > 0) {
-          WorldBook.save();
-          WorldBook.render();
-          console.log('[App] 导入了 ' + addedCount + ' 条角色卡世界书条目');
-        }
-      }
-
-      // 同时保存到 ST IndexedDB
-      if (window.ST && typeof ST.saveLorebook === 'function') {
-        var lorebook = {
-          id: 'wb_character_book',
-          name: (card.data && card.data.name || card.name || '角色') + '的世界书',
-          description: '从角色卡导入的世界书',
-          entries: convertedEntries,
-          recursiveScanning: false,
-          caseSensitive: false,
-          matchWholeWords: false,
-          updatedAt: Date.now(),
-          createdAt: Date.now(),
-        };
-        ST.saveLorebook(lorebook).catch(function (err) {
-          console.warn('[App] 保存角色卡世界书到 ST 失败:', err.message);
-        });
-      }
+      // 回退: 使用旧的内联转换逻辑（ST.Importer 不可用时）
+      _importCharacterBookFallback(card);
 
     } catch (e) {
       console.warn('[App] 导入 character_book 失败:', e.message);
+    }
+  }
+
+  /**
+   * 回退逻辑：当 ST.Importer 不可用时，使用内联方式导入 world book。
+   * @param {Object} card
+   * @private
+   */
+  function _importCharacterBookFallback(card) {
+    var data = card.data || card;
+    var charBook = data.character_book || card.character_book;
+    if (!charBook) return;
+
+    var rawEntries;
+    if (Array.isArray(charBook.entries)) {
+      rawEntries = charBook.entries;
+    } else if (charBook.entries && typeof charBook.entries === 'object') {
+      rawEntries = Object.values(charBook.entries);
+    } else {
+      return;
+    }
+    if (!rawEntries || rawEntries.length === 0) return;
+
+    var convertedEntries = [];
+    for (var i = 0; i < rawEntries.length; i++) {
+      var e = rawEntries[i];
+      if (e.disable || e.excluded) continue;
+
+      convertedEntries.push({
+        name: e.comment || (e.key ? e.key.join(', ') : '导入条目 ' + (i + 1)),
+        keywords: e.key || e.keys || e.keywords || [],
+        content: e.content || '',
+        weight: e.weight || 50,
+        insertPosition: _mapPosition(e.position, e.insertPosition),
+        depth: e.depth || 0,
+        outletName: e.outletName || '',
+        triggerCondition: e.constant ? 'always' :
+          (e.useProbability ? 'probability' : 'keyword'),
+        enabled: true,
+        order: i,
+      });
+    }
+
+    if (convertedEntries.length === 0) return;
+
+    if (typeof WorldBook !== 'undefined' && WorldBook.entries) {
+      var existingNames = new Set();
+      WorldBook.entries.forEach(function (e) { existingNames.add(e.name); });
+
+      var addedCount = 0;
+      convertedEntries.forEach(function (e) {
+        if (!existingNames.has(e.name)) {
+          WorldBook.entries.push(e);
+          addedCount++;
+        }
+      });
+
+      if (addedCount > 0) {
+        WorldBook.save();
+        WorldBook.render();
+        console.log('[App] 导入了 ' + addedCount + ' 条角色卡世界书条目');
+      }
     }
   }
 

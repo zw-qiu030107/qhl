@@ -379,48 +379,163 @@ const WorldBook = (function () {
   /**
    * 从 JSON 字符串导入条目
    *
+   * 支持两种格式：
+   * 1. SillyTavern lorebook 格式（{name, entries: {...}, settings: {...}}）
+   * 2. 简单数组格式（[{name, keywords, content, ...}, ...]）
+   *
    * @param {string} jsonStr
    */
   function importJson(jsonStr) {
     try {
       var data = JSON.parse(jsonStr);
+
+      // 检测 ST lorebook 格式（有 .entries 且是非数组对象）
+      if (data && data.entries && typeof data.entries === 'object' && !Array.isArray(data.entries)) {
+        _importStFormat(data);
+        return;
+      }
+
       if (!Array.isArray(data)) {
-        throw new Error('需要 JSON 数组格式');
+        throw new Error('需要 JSON 数组格式或 SillyTavern lorebook 格式');
       }
 
-      var uidFn = (window.utils && window.utils.uid)
-        ? window.utils.uid
-        : function () { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); };
+      _importSimpleArray(data);
 
-      var count = 0;
-      data.forEach(function (item) {
-        if (!item.name) return;
-        _entries.push({
-          id: uidFn(),
-          name: item.name || '',
-          keywords: item.keywords || [],
-          content: item.content || '',
-          weight: item.weight || 50,
-          insertPosition: item.insertPosition || 'before_char',
-          depth: item.depth || 0,
-          outletName: item.outletName || '',
-          triggerCondition: item.triggerCondition || 'keyword',
-          enabled: item.enabled !== false,
-          order: _entries.length,
-        });
-        count++;
-      });
-
-      save();
-      render();
-
-      if (window.notifications) {
-        window.notifications.show('success', '导入完成', '导入了 ' + count + ' 条条目');
-      }
     } catch (e) {
       if (window.notifications) {
         window.notifications.show('error', '导入失败', e.message);
       }
+    }
+  }
+
+  /**
+   * 导入 ST lorebook 格式（通过 ST.Importer.importLorebook 转换）
+   * @param {Object} stData — ST lorebook JSON
+   * @private
+   */
+  function _importStFormat(stData) {
+    var imported;
+    if (window.ST && ST.Importer && typeof ST.Importer.importLorebook === 'function') {
+      imported = ST.Importer.importLorebook(stData);
+    } else {
+      // 回退: 手动提取 entries
+      var rawEntries = Object.values(stData.entries || {});
+      imported = {
+        name: stData.name || '导入的世界书',
+        description: stData.description || '',
+        entries: rawEntries.map(function (e) {
+          return {
+            id: e.uid || (Date.now().toString(36) + Math.random().toString(36).slice(2, 8)),
+            keys: e.key || [],
+            secondaryKeys: e.keysecondary || [],
+            content: e.content || '',
+            comment: e.comment || '',
+            position: (window.ST && ST.Importer && ST.Importer.POSITION_MAP && ST.Importer.POSITION_MAP[e.position]) || 'after_char',
+            weight: e.weight || 100,
+            constant: e.constant || false,
+            selective: e.selective || false,
+            selectiveLogic: (window.ST && ST.Importer && ST.Importer.LOGIC_MAP && ST.Importer.LOGIC_MAP[e.selectiveLogic]) || 'and_any',
+            useProbability: e.useProbability || false,
+            probability: e.probability || 100,
+            depth: e.depth || 0,
+            enabled: !(e.disable || e.excluded),
+          };
+        }),
+        recursiveScanning: !!(stData.settings && stData.settings.recursive_scanning),
+        caseSensitive: !!(stData.settings && stData.settings.case_sensitive),
+        matchWholeWords: !!(stData.settings && stData.settings.match_whole_words),
+      };
+    }
+
+    if (!imported || !imported.entries || imported.entries.length === 0) {
+      if (window.notifications) {
+        window.notifications.show('warning', '无条目', '世界书数据为空');
+      }
+      return;
+    }
+
+    var uidFn = (window.utils && window.utils.uid)
+      ? window.utils.uid
+      : function () { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); };
+
+    // 合并导入
+    var existingNames = new Set();
+    _entries.forEach(function (e) { existingNames.add(e.name); });
+
+    var count = 0;
+    imported.entries.forEach(function (stEntry) {
+      var wbName = stEntry.comment || (stEntry.keys && stEntry.keys.length > 0 ? stEntry.keys.join(', ') : '');
+      if (!wbName) wbName = '导入条目 ' + (_entries.length + 1);
+      if (existingNames.has(wbName)) return;
+
+      _entries.push({
+        id: stEntry.id || uidFn(),
+        name: wbName,
+        keywords: stEntry.keys || [],
+        content: stEntry.content || '',
+        weight: stEntry.weight || 50,
+        insertPosition: stEntry.position || 'before_char',
+        depth: stEntry.depth || 0,
+        outletName: stEntry.outletName || '',
+        triggerCondition: stEntry.constant ? 'always' :
+          (stEntry.useProbability ? 'probability' : 'keyword'),
+        enabled: true,
+        order: _entries.length,
+        // 保留 ST 完整字段
+        _stKeys: stEntry.keys || [],
+        _stSecondaryKeys: stEntry.secondaryKeys || [],
+        _stSelective: stEntry.selective || false,
+        _stSelectiveLogic: stEntry.selectiveLogic || 'and_any',
+        _stConstant: stEntry.constant || false,
+        _stProbability: stEntry.probability || 100,
+        _stUseProbability: stEntry.useProbability || false,
+      });
+      existingNames.add(wbName);
+      count++;
+    });
+
+    save();
+    render();
+
+    if (window.notifications) {
+      window.notifications.show('success', '导入完成', '导入了 ' + count + ' 条条目');
+    }
+  }
+
+  /**
+   * 导入简单数组格式
+   * @param {Object[]} data
+   * @private
+   */
+  function _importSimpleArray(data) {
+    var uidFn = (window.utils && window.utils.uid)
+      ? window.utils.uid
+      : function () { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); };
+
+    var count = 0;
+    data.forEach(function (item) {
+      if (!item.name) return;
+      _entries.push({
+        id: uidFn(),
+        name: item.name || '',
+        keywords: item.keywords || [],
+        content: item.content || '',
+        weight: item.weight || 50,
+        insertPosition: item.insertPosition || 'before_char',
+        depth: item.depth || 0,
+        outletName: item.outletName || '',
+        triggerCondition: item.triggerCondition || 'keyword',
+        enabled: item.enabled !== false,
+        order: _entries.length,
+      });
+      count++;
+    });
+
+    save();
+    render();
+
+    if (window.notifications) {
+      window.notifications.show('success', '导入完成', '导入了 ' + count + ' 条条目');
     }
   }
 
